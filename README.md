@@ -10,6 +10,8 @@ git clone https://github.com/allnulled/lsw.git .
 
 ## Default subprojects
 
+### API
+
 - **Database:** [@allnulled/lsw-database](https://github.com/allnulled/lsw-database)
 - **External resources:** [@allnulled/lsw-importer](https://github.com/allnulled/lsw-importer)
 - **Screen debugger:** [@allnulled/lsw-logger](https://github.com/allnulled/lsw-logger)
@@ -23,3 +25,8 @@ git clone https://github.com/allnulled/lsw.git .
 - **Function returner:** [@allnulled/lsw-returner](https://github.com/allnulled/lsw-returner)
 - **Other utilities:** [@allnulled/lsw-utils](https://github.com/allnulled/lsw-utils)
 
+### Complements for vue@2
+
+- **v-descriptor directive:** [@allnulled/v-descriptor](https://github.com/allnulled/v-descriptor)
+- **v-focus directive:** [@allnulled/v-focus](https://github.com/allnulled/v-focus)
+- **v-call directive:** [@allnulled/v-call](https://github.com/allnulled/v-call)
