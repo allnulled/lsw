@@ -15,7 +15,7 @@ git clone https://github.com/allnulled/lsw.git .
 - **Screen Debugger:** [@allnulled/lsw-logger](https://github.com/allnulled/lsw-logger)
 - **State:** [@allnulled/lsw-store](https://github.com/allnulled/lsw-store)
 - **Testing:** [@allnulled/lsw-tester](https://github.com/allnulled/lsw-tester)
-- **API:** [@allnulled/lsw-trigger](https://github.com/allnulled/lsw-trigger)
+- **Event Emissions:** [@allnulled/lsw-trigger](https://github.com/allnulled/lsw-trigger)
 - **Assertions:** [@allnulled/lsw-ensurer](https://github.com/allnulled/lsw-ensurer)
 - **Time Formats:** [@allnulled/lsw-timer](https://github.com/allnulled/lsw-timer)
 - **Functions:** [@allnulled/lsw-utils](https://github.com/allnulled/lsw-utils)
