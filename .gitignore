@@ -8,3 +8,4 @@ src/lib/lsw-framework/src/apis/lsw-trigger
 src/lib/lsw-framework/src/apis/lsw-ensurer
 src/lib/lsw-framework/src/apis/lsw-timer
 src/lib/lsw-framework/src/apis/lsw-utils
+src/lib/lsw-framework/src/apis/lsw-circuiter

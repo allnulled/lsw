@@ -18,6 +18,8 @@ git clone https://github.com/allnulled/lsw.git .
 - **Event Emissions:** [@allnulled/lsw-trigger](https://github.com/allnulled/lsw-trigger)
 - **Assertions:** [@allnulled/lsw-ensurer](https://github.com/allnulled/lsw-ensurer)
 - **Time Formats:** [@allnulled/lsw-timer](https://github.com/allnulled/lsw-timer)
-- **Functions:** [@allnulled/lsw-utils](https://github.com/allnulled/lsw-utils)
 - **Scripting:** [@allnulled/lsw-commander](https://github.com/allnulled/lsw-commander)
+- **Circuit design:** [@allnulled/lsw-circuiter](https://github.com/allnulled/lsw-circuiter)
+- **Function returner:** [@allnulled/lsw-returner](https://github.com/allnulled/lsw-returner)
+- **Other utilities:** [@allnulled/lsw-utils](https://github.com/allnulled/lsw-utils)
 

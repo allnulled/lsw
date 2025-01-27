@@ -4,6 +4,7 @@
   "description": "Boilerplate for web applications",
   "main": "src/index.html",
   "scripts": {
+    "up": "npm run push:all && bash up.sh",
     "install:all": "mpp --install --list projects.list.js",
     "push:all": "mpp --push --list projects.list.js",
     "versionate:all": "mpp --versionate --list projects.list.js",
