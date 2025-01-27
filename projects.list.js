@@ -46,4 +46,16 @@ module.exports = [{
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-utils.git",
   version: "last"
+}, {
+  name: "@allnulled/lsw-ensurer",
+  path: "src/lib/lsw-framework/src/apis/lsw-ensurer",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-ensurer.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-timer",
+  path: "src/lib/lsw-framework/src/apis/lsw-timer",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-timer.git",
+  version: "last"
 }]
