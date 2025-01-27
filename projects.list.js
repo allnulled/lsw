@@ -64,10 +64,10 @@ module.exports = [{
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-circuiter.git",
   version: "last"
-}/*, {
+}, {
   name: "@allnulled/lsw-returner",
   path: "src/lib/lsw-framework/src/apis/lsw-returner",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-returner.git",
   version: "last"
-}*/]
+}]
