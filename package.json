@@ -4,9 +4,10 @@
   "description": "Boilerplate for web applications",
   "main": "src/index.html",
   "scripts": {
-    "install:all": "mpp --install",
-    "push:all": "mpp --push",
-    "versionate:all": "mpp --versionate"
+    "install:all": "mpp --install --list projects.list.js",
+    "push:all": "mpp --push --list projects.list.js",
+    "versionate:all": "mpp --versionate --list projects.list.js",
+    "inject:all": "mpp --fileval dev/multiproject.injection.js --list projects.list.js"
   },
   "keywords": [],
   "author": "allnulled",

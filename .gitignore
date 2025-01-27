@@ -1,8 +1,8 @@
-src/lib/lsw-framework/lsw-commander
-src/lib/lsw-framework/lsw-database
-src/lib/lsw-framework/lsw-importer
-src/lib/lsw-framework/lsw-logger
-src/lib/lsw-framework/lsw-store
-src/lib/lsw-framework/lsw-tester
-src/lib/lsw-framework/lsw-trigger
-src/lib/lsw-framework/lsw-utils
+src/lib/lsw-framework/src/apis/lsw-commander
+src/lib/lsw-framework/src/apis/lsw-database
+src/lib/lsw-framework/src/apis/lsw-importer
+src/lib/lsw-framework/src/apis/lsw-logger
+src/lib/lsw-framework/src/apis/lsw-store
+src/lib/lsw-framework/src/apis/lsw-tester
+src/lib/lsw-framework/src/apis/lsw-trigger
+src/lib/lsw-framework/src/apis/lsw-utils

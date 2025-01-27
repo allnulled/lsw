@@ -1,48 +1,48 @@
 module.exports = [{
   name: "@allnulled/lsw-tester",
-  path: "src/lib/lsw-framework/lsw-tester",
+  path: "src/lib/lsw-framework/src/apis/lsw-tester",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-tester.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-importer",
-  path: "src/lib/lsw-framework/lsw-importer",
+  path: "src/lib/lsw-framework/src/apis/lsw-importer",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-importer.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-logger",
-  path: "src/lib/lsw-framework/lsw-logger",
+  path: "src/lib/lsw-framework/src/apis/lsw-logger",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-logger.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-database",
-  path: "src/lib/lsw-framework/lsw-database",
+  path: "src/lib/lsw-framework/src/apis/lsw-database",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-database.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-commander",
-  path: "src/lib/lsw-framework/lsw-commander",
+  path: "src/lib/lsw-framework/src/apis/lsw-commander",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-commander.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-trigger",
-  path: "src/lib/lsw-framework/lsw-trigger",
+  path: "src/lib/lsw-framework/src/apis/lsw-trigger",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-trigger.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-store",
-  path: "src/lib/lsw-framework/lsw-store",
+  path: "src/lib/lsw-framework/src/apis/lsw-store",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-store.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-utils",
-  path: "src/lib/lsw-framework/lsw-utils",
+  path: "src/lib/lsw-framework/src/apis/lsw-utils",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-utils.git",
   version: "last"
