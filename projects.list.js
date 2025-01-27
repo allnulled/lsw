@@ -70,4 +70,22 @@ module.exports = [{
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-returner.git",
   version: "last"
-}]
+}, {
+  name: "@allnulled/v-focus",
+  path: "src/lib/lsw-framework/src/directives/v-focus",
+  sourceType: "git",
+  source: "https://github.com/allnulled/v-focus.git",
+  version: "last"
+}, {
+  name: "@allnulled/v-descriptor",
+  path: "src/lib/lsw-framework/src/directives/v-descriptor",
+  sourceType: "git",
+  source: "https://github.com/allnulled/v-descriptor.git",
+  version: "last"
+}/*, {
+  name: "@allnulled/v-call",
+  path: "src/lib/lsw-framework/src/apis/v-call",
+  sourceType: "git",
+  source: "https://github.com/allnulled/v-call.git",
+  version: "last"
+}*/]

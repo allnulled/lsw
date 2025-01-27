@@ -10,4 +10,6 @@ src/lib/lsw-framework/src/apis/lsw-timer
 src/lib/lsw-framework/src/apis/lsw-utils
 src/lib/lsw-framework/src/apis/lsw-circuiter
 src/lib/lsw-framework/src/apis/lsw-returner
-src/lib/lsw-framework/src/apis/lsw-returnero
+src/lib/lsw-framework/src/directives/v-descriptor
+src/lib/lsw-framework/src/directives/v-focus
+src/lib/lsw-framework/src/directives/v-call
