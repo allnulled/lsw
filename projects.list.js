@@ -82,6 +82,18 @@ module.exports = [{
   sourceType: "git",
   source: "https://github.com/allnulled/v-descriptor.git",
   version: "last"
+}, {
+  name: "@allnulled/htmlbundler",
+  path: "dev/bundlers/htmlbundler",
+  sourceType: "git",
+  source: "https://github.com/allnulled/htmlbundler.git",
+  version: "last"
+}, {
+  name: "@allnulled/vuebundler",
+  path: "dev/bundlers/vuebundler",
+  sourceType: "git",
+  source: "https://github.com/allnulled/vuebundler.git",
+  version: "last"
 }/*, {
   name: "@allnulled/v-call",
   path: "src/lib/lsw-framework/src/apis/v-call",

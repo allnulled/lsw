@@ -1,3 +1,5 @@
+dev/bundlers/htmlbundler
+dev/bundlers/vuebundler
 src/lib/lsw-framework/src/apis/lsw-commander
 src/lib/lsw-framework/src/apis/lsw-database
 src/lib/lsw-framework/src/apis/lsw-importer

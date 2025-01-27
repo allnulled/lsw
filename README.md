@@ -30,3 +30,8 @@ git clone https://github.com/allnulled/lsw.git .
 - **v-descriptor directive:** [@allnulled/v-descriptor](https://github.com/allnulled/v-descriptor)
 - **v-focus directive:** [@allnulled/v-focus](https://github.com/allnulled/v-focus)
 - **v-call directive:** [@allnulled/v-call](https://github.com/allnulled/v-call)
+
+### Bundlers
+
+- **HTML, CSS and JS:** [@allnulled/htmlbundler](https://github.com/allnulled/htmlbundler)
+- **Vue.js:** [@allnulled/vuebundler](https://github.com/allnulled/vuebundler)

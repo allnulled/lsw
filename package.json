@@ -12,5 +12,6 @@
   },
   "keywords": [],
   "author": "allnulled",
-  "license": "WTFPL"
+  "license": "WTFPL",
+  "devDependencies": {}
 }
