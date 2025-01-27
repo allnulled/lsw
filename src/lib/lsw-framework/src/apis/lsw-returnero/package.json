@@ -1,0 +1,14 @@
+{
+  "name": "@allnulled/lsw-returner",
+  "version": "1.0.3",
+  "description": "API to return values through 1 outter function scope.",
+  "main": "controlled-function.js",
+  "scripts": {
+    "build": "echo 'no building for @allnulled/lsw-returner'",
+    "versionate": "echo 'no versionate for @allnulled/lsw-returner'",
+    "test": "npx mocha test.js"
+  },
+  "keywords": [],
+  "author": "allnulled",
+  "license": "WTFPL"
+}
