@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
     <title>LSW | Lite Starter Web</title>
+    <script src="lsw-framework/src/apis/lsw-importer/importer.js"></script>
+    <script src="boot.js"></script>
 </head>
+
 <body>
     <h1>Lite Starter Web</h1>
+    <div id="intersitial">
+        <div>There is <span id="intersitial_modules_loaded"></span> out of <span id="intersitial_modules_all">?</span> modules loaded</div>
+        <div id="intersitial_loader">
+            <div id="intersitial_loader_bar"></div>
+        </div>
+        <pre id="intersitial_modules_trace"></pre>
+    </div>
 </body>
+
 </html>

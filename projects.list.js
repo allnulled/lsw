@@ -1,103 +1,115 @@
 module.exports = [{
   name: "@allnulled/lsw-tester",
-  path: "src/lib/lsw-framework/src/apis/lsw-tester",
+  path: "src/lsw-framework/src/apis/lsw-tester",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-tester.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-importer",
-  path: "src/lib/lsw-framework/src/apis/lsw-importer",
+  path: "src/lsw-framework/src/apis/lsw-importer",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-importer.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-logger",
-  path: "src/lib/lsw-framework/src/apis/lsw-logger",
+  path: "src/lsw-framework/src/apis/lsw-logger",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-logger.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-database",
-  path: "src/lib/lsw-framework/src/apis/lsw-database",
+  path: "src/lsw-framework/src/apis/lsw-database",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-database.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-commander",
-  path: "src/lib/lsw-framework/src/apis/lsw-commander",
+  path: "src/lsw-framework/src/apis/lsw-commander",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-commander.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-trigger",
-  path: "src/lib/lsw-framework/src/apis/lsw-trigger",
+  path: "src/lsw-framework/src/apis/lsw-trigger",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-trigger.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-store",
-  path: "src/lib/lsw-framework/src/apis/lsw-store",
+  path: "src/lsw-framework/src/apis/lsw-store",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-store.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-utils",
-  path: "src/lib/lsw-framework/src/apis/lsw-utils",
+  path: "src/lsw-framework/src/apis/lsw-utils",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-utils.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-ensurer",
-  path: "src/lib/lsw-framework/src/apis/lsw-ensurer",
+  path: "src/lsw-framework/src/apis/lsw-ensurer",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-ensurer.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-timer",
-  path: "src/lib/lsw-framework/src/apis/lsw-timer",
+  path: "src/lsw-framework/src/apis/lsw-timer",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-timer.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-circuiter",
-  path: "src/lib/lsw-framework/src/apis/lsw-circuiter",
+  path: "src/lsw-framework/src/apis/lsw-circuiter",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-circuiter.git",
   version: "last"
 }, {
   name: "@allnulled/lsw-returner",
-  path: "src/lib/lsw-framework/src/apis/lsw-returner",
+  path: "src/lsw-framework/src/apis/lsw-returner",
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-returner.git",
   version: "last"
 }, {
   name: "@allnulled/v-focus",
-  path: "src/lib/lsw-framework/src/directives/v-focus",
+  path: "src/lsw-framework/src/directives/v-focus",
   sourceType: "git",
   source: "https://github.com/allnulled/v-focus.git",
   version: "last"
 }, {
   name: "@allnulled/v-descriptor",
-  path: "src/lib/lsw-framework/src/directives/v-descriptor",
+  path: "src/lsw-framework/src/directives/v-descriptor",
   sourceType: "git",
   source: "https://github.com/allnulled/v-descriptor.git",
   version: "last"
-}, {
-  name: "@allnulled/htmlbundler",
-  path: "dev/bundlers/htmlbundler",
-  sourceType: "git",
-  source: "https://github.com/allnulled/htmlbundler.git",
-  version: "last"
-}, {
-  name: "@allnulled/vuebundler",
-  path: "dev/bundlers/vuebundler",
-  sourceType: "git",
-  source: "https://github.com/allnulled/vuebundler.git",
-  version: "last"
 }/*, {
   name: "@allnulled/v-call",
-  path: "src/lib/lsw-framework/src/apis/v-call",
+  path: "src/lsw-framework/src/apis/v-call",
   sourceType: "git",
   source: "https://github.com/allnulled/v-call.git",
   version: "last"
-}*/]
+}*/, {
+  name: "@allnulled/lsw-reloader",
+  path: "src/lsw-framework/src/apis/lsw-reloader",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-reloader.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-error-manager",
+  path: "src/lsw-framework/src/apis/lsw-error-manager",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-error-manager.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-cycler",
+  path: "src/lsw-framework/src/apis/lsw-cycler",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-cycler.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-compromiser",
+  path: "src/lsw-framework/src/apis/lsw-compromiser",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-compromiser.git",
+  version: "last"
+}]

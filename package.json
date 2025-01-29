@@ -4,11 +4,16 @@
   "description": "Boilerplate for web applications",
   "main": "src/index.html",
   "scripts": {
+    "serve": "npx http-server -c-1 src -o index.html",
+    "bundle:lsw-framework": "node dev/bundlers/lsw-framework/bundler.js",
+    "bundle:lsw-app": "node dev/bundlers/distribution/bundler.js",
+    "bundle:lsw": "npm run bundle:lsw-framework && npm run bundle:lsw-app",
     "up": "npm run push:all && bash up.sh",
     "install:all": "mpp --install --list projects.list.js",
     "push:all": "mpp --push --list projects.list.js",
     "versionate:all": "mpp --versionate --list projects.list.js",
-    "inject:all": "mpp --fileval dev/multiproject.injection.js --list projects.list.js"
+    "inject:all": "mpp --fileval dev/multiproject.injection.js --list projects.list.js",
+    "reloader": "node src/lsw-framework/src/apis/lsw-reloader/starter.js"
   },
   "keywords": [],
   "author": "allnulled",

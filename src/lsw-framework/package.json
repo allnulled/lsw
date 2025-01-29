@@ -1,0 +1,14 @@
+{
+  "name": "@allnulled/lsw-framework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lsw-framework.js",
+  "scripts": {
+    "build": "echo 'no building for node.js of lsw-framework'",
+    "test": "echo 'no test for node.js of lsw-framework'",
+    "versionate": "echo 'no versionate for node.js of lsw-framework'"
+  },
+  "keywords": [],
+  "author": "allnulled",
+  "license": "WTFPL"
+}
