@@ -23,9 +23,13 @@ git clone https://github.com/allnulled/lsw.git .
 - **Scripting:** [@allnulled/lsw-commander](https://github.com/allnulled/lsw-commander)
 - **Circuit design:** [@allnulled/lsw-circuiter](https://github.com/allnulled/lsw-circuiter)
 - **Function returner:** [@allnulled/lsw-returner](https://github.com/allnulled/lsw-returner)
+- **Promises manager:** [@allnulled/lsw-compromiser](https://github.com/allnulled/lsw-compromiser)
+- **Cycles manager:** [@allnulled/lsw-cycler](https://github.com/allnulled/lsw-cycler)
+- **Error manager:** [@allnulled/lsw-error-manager](https://github.com/allnulled/lsw-error-manager)
+- **Remote reloader:** [@allnulled/lsw-reloader](https://github.com/allnulled/lsw-reloader)
 - **Other utilities:** [@allnulled/lsw-utils](https://github.com/allnulled/lsw-utils)
 
-### Complements for vue@2
+### Directives for vue@2 templates
 
 - **v-descriptor directive:** [@allnulled/v-descriptor](https://github.com/allnulled/v-descriptor)
 - **v-focus directive:** [@allnulled/v-focus](https://github.com/allnulled/v-focus)

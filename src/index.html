@@ -5,15 +5,30 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
-    <title>LSW | Lite Starter Web</title>
+    <title>Lite Starter Web or LSW</title>
     <script src="lsw-framework/src/apis/lsw-importer/importer.js"></script>
     <script src="boot.js"></script>
+    <style>
+        html {
+            background-color: #D0D0D0;
+        }
+        #intersitial {
+            overflow: scroll;
+        }
+        #intersitial pre {
+            background-color: #222;
+            color: white;
+            padding: 6px;
+            font-size: 10px;
+            font-family: Arial;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Lite Starter Web</h1>
     <div id="intersitial">
-        <div>There is <span id="intersitial_modules_loaded"></span> out of <span id="intersitial_modules_all">?</span> modules loaded</div>
+        <pre>Welcome to Lsw demo application.</pre>
+        <pre>It is <span id="intersitial_modules_loaded"></span>/<span id="intersitial_modules_all">?</span> modules loaded.</pre>
         <div id="intersitial_loader">
             <div id="intersitial_loader_bar"></div>
         </div>
