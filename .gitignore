@@ -16,7 +16,14 @@ src/lsw-framework/src/apis/lsw-reloader
 src/lsw-framework/src/apis/lsw-error-manager
 src/lsw-framework/src/apis/lsw-cycler
 src/lsw-framework/src/apis/lsw-compromiser
+src/lsw-framework/src/apis/lsw-filesystem
 src/lsw-framework/src/directives/v-descriptor
 src/lsw-framework/src/directives/v-focus
 src/lsw-framework/src/directives/v-call
 src/lsw-framework/src/components/lsw-calendario
+src/lsw-framework/src/components/lsw-dialogs
+src/lsw-framework/src/components/lsw-windows
+src/lsw-framework/src/components/lsw-toasts
+src/lsw-framework/src/components/lsw-console-hooker
+src/lsw-framework/src/components/lsw-database-ui
+src/lsw-framework/src/components/lsw-filesystem-explorer

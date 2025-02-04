@@ -1,5 +1,12 @@
 const fs = require("fs");
 const path = require("path");
-const changelogPath = path.resolve(projectPath, "CHANGELOG.md");
+const licensePath = path.resolve(projectPath, "LICENSE.md");
+const $packagePath = path.resolve(projectPath, "package.json");
+const $package = require($packagePath);
 
-fs.writeFileSync(changelogPath, `# CHANGELOG\n\nChangelog file of project [${project.name}](${project.source}) on [${project.source}](${project.source}).\n\n`);
+fs.writeFileSync(licensePath, `/*
+  @artifact:  Lite Starter Web Dependency
+  @url:       ${project.source}
+  @name:      ${project.name}
+  @version:   ${$package.version}
+*/`, "utf8");

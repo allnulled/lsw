@@ -1,0 +1,48 @@
+<div>
+    <button v-on:click="uploadConductometria" v-if="!conductometria.registros">Abrir conductometría</button>
+    <button v-on:click="clearConductometria" v-else>Cerrar</button>
+    <button v-on:click="openDialog">Abrir diálogo</button>
+    <button v-on:click="openDialogSequence">Abrir secuencia de diálogos</button>
+    <div style="height: 4px;"></div>
+    <pre class="conductometria_viewer_1" style="display: none;">{{ conductometria }}</pre>
+    <table class="tabla_de_conductometria">
+        <template v-for="dia, dia_index in conductometria.registros">
+            <tbody v-bind:key="'conductometria_registro_dia_' + dia.day ">
+                <tr v-on:click="() => toggleDay(dia.day)">
+                    <td colspan="1000" class="celda_fecha" :class="{ activated: conductometria_minified_days.indexOf(dia.day) === -1 }">
+                        {{ dia.day }}
+                    </td>
+                </tr>
+                <template v-if="conductometria_minified_days.indexOf(dia.day) === -1">
+                    <template v-for="hora, hora_index in dia.hours">
+                        <tr v-bind:key="'conductometria_registro_dia_' + dia.day + '_celda_hora'" :class="{ passed: hora.passed, current: hora.current }">
+                            <td class="celda_hora">
+                                {{ hora.hour }}
+                            </td>
+                            <td class="celda_contenido">
+                                <button class="minibutton">+</button>
+                                <span class="pill_group" v-for="event, event_index in hora.events" v-bind:key="'conductometria_registro_dia_' + dia.day + '_celda_hora_event_' + event_index" style="margin-right: 2px;">
+                                    <span style="padding-left: 2px; padding-right: 2px; border: 1px solid #000; border-right: 0px solid #000; background-color: #FFFFFF;">
+                                        <template v-if="event.details">
+                                            <span>{{ event.name }} <span>({{ event.details }})</span></span>
+                                        </template>
+                                        <template v-else>
+                                            <span>{{ event.name }}</span>
+                                        </template>
+                                    </span><span class="like_button minibutton display_inline_block text_align_center" style="border: 1px solid #000; border-left: 0px solid #000; min-width:15px;"> - </span>
+                                </span>
+                            </td>
+                        </tr>
+                    </template>
+                </template>
+            </tbody>
+        </template>
+    </table>
+
+
+
+
+    <lsw-console-hooker />
+    <lsw-windows-viewer />
+    <lsw-toasts />
+</div>

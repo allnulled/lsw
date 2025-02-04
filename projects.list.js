@@ -112,4 +112,46 @@ module.exports = [{
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-compromiser.git",
   version: "last"
+}, {
+  name: "@allnulled/lsw-dialogs",
+  path: "src/lsw-framework/src/components/lsw-dialogs",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-dialogs.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-windows",
+  path: "src/lsw-framework/src/components/lsw-windows",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-windows.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-calendario",
+  path: "src/lsw-framework/src/components/lsw-calendario",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-calendario.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-toasts",
+  path: "src/lsw-framework/src/components/lsw-toasts",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-toasts.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-console-hooker",
+  path: "src/lsw-framework/src/components/lsw-console-hooker",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-console-hooker.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-filesystem",
+  path: "src/lsw-framework/src/apis/lsw-filesystem",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-filesystem.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-filesystem-explorer",
+  path: "src/lsw-framework/src/components/lsw-filesystem-explorer",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-filesystem-explorer.git",
+  version: "last"
 }]

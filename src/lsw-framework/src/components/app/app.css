@@ -1,0 +1,111 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+button,
+input,
+textarea {
+    font-family: Arial;
+    font-size: 13px;
+}
+
+.like_button,
+button {
+    border: 0px solid black;
+    border-radius: 2pt;
+    padding: 4px;
+    font-family: Arial;
+    font-size: 13px;
+    cursor: pointer;
+    background-color: black;
+    color: white;
+    margin-bottom: 1px;
+}
+.like_button:hover,
+button:hover {
+    background-color: #336;
+}
+
+button.mini {
+    padding: 0px;
+    padding-right: 4px;
+    padding-left: 4px;
+}
+
+/* API de Conductometria */
+:root {
+    --cmt_border_color_1: #114;
+}
+.conductometria_viewer_1 {
+    max-height: 200px;
+    overflow: scroll;
+    border: 1px solid #333;
+    font-size: 10px;
+    font-family: monospace;
+    background-color: white;
+    margin: 0px;
+    margin-top: 4px;
+}
+table.tabla_de_conductometria {
+    width: 100%;
+    border-collapse: collapse;
+    border-left: 1px solid var(--cmt_border_color_1);
+    border-right: 1px solid var(--cmt_border_color_1);
+}
+table.tabla_de_conductometria td.celda_fecha {
+    padding: 8px;
+    background-color: #000;
+    color: white;
+    cursor: pointer;
+}
+table.tabla_de_conductometria td.celda_fecha.activated {
+    background-color: #333;
+    color: #FFF;
+}
+table.tabla_de_conductometria td.celda_hora,
+table.tabla_de_conductometria td.celda_contenido {
+    vertical-align: top;
+    border-bottom: 1px solid var(--cmt_border_color_1);
+}
+table.tabla_de_conductometria td.celda_hora {
+    background-color: #224;
+    color: white;
+    border-right: 1px solid var(--cmt_border_color_1);
+}
+table.tabla_de_conductometria td.celda_contenido {
+    width: 100%;
+    background-color: white;
+    vertical-align: middle;
+}
+table.tabla_de_conductometria td.celda_contenido > span {
+    display: inline-block;
+    height: 100%;
+}
+
+table.tabla_de_conductometria tr.passed td.celda_contenido {
+    background-color: orange;
+}
+table.tabla_de_conductometria tr.current td.celda_contenido {
+    background-color: red;
+}
+table.tabla_de_conductometria .minibutton {
+    min-width: 20px;
+    padding: 0px;
+}
+.conductometria_viewer_2 {
+    
+}
+.event_badge {
+    border: 1px solid #333;
+    border-radius: 2pt;
+    padding: 0px;
+    padding-right: 2px;
+    margin-right: 2px;
+    background-color: #CCCCCC;
+    color: #000;
+    cursor: pointer;
+}
+.event_badge:hover {
+    background-color: #FFFFFF;
+}
