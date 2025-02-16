@@ -154,4 +154,34 @@ module.exports = [{
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-filesystem-explorer.git",
   version: "last"
+}, {
+  name: "@allnulled/lsw-wiki",
+  path: "src/lsw-framework/src/components/lsw-wiki",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-wiki.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-agenda",
+  path: "src/lsw-framework/src/components/lsw-agenda",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-agenda.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-form-controls",
+  path: "src/lsw-framework/src/components/lsw-form-controls",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-form-controls.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-table",
+  path: "src/lsw-framework/src/components/lsw-table",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-table.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-proxifier",
+  path: "src/lsw-framework/src/apis/lsw-proxifier",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-proxifier.git",
+  version: "last"
 }]

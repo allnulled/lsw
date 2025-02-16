@@ -28,9 +28,17 @@ button:hover {
 }
 
 button.mini {
-    padding: 0px;
+    padding: 4px;
     padding-right: 4px;
     padding-left: 4px;
+    min-width: 20px;
+}
+textarea {
+    outline: none;
+}
+input[type="text"] {
+    height: 24px;
+    outline: none;
 }
 
 /* API de Conductometria */
