@@ -1,0 +1,52 @@
+.lsw_data_explorer {
+    
+}
+.entry.flex_row {
+    align-items: center;
+}
+.prop_row {
+    white-space: nowrap;
+}
+.prop_cell {
+    color: #113;
+    font-style: italic;
+}
+.val_cell {
+    padding-left: 4px;
+    font-weight: bold;
+}
+.type_cell {
+    padding-left: 4px;
+    font-style: italic;
+    font-size: 10px;
+}
+.path_cell_container {
+    padding-left: 4px;
+    position: relative;
+}
+.path_cell {
+    font-size: 10px;
+    text-decoration: underline;
+    white-space: nowrap;
+}
+.level_cell {
+    font-size: 9px;
+}
+.path_row {
+    align-items: center;
+    padding-left: 20px;background: #333;
+    color: white;
+}
+.inner_sight_row {
+    
+}
+.top_panel_showable {
+    padding-left: 1px;
+    padding-right: 1px;
+}
+.top_panel_showable > .content {
+    padding: 4px;
+    border: 1px solid black;
+    border-radius: 2pt;
+    background-color: #DDD;
+}

@@ -1,0 +1,48 @@
+<div class="data-explorer">
+    <div class="top_panel flex_row centered" style="padding: 1px;">
+        <div class="top_button_cell" v-on:click="toggleTopPanel">
+            <button v-if="!isShowingTopPanel">📝</button>
+            <button v-else>❌</button>
+        </div>
+        <div class="top_button_cell" style="padding-left: 1px;">
+            <button v-on:click="applyFastFilter">
+                <span v-if="isLoadingInnerValue">⌛️</span>
+                <span v-else>🔎</span>
+            </button>
+        </div>
+        <div class="top_search_bar_cell flex_cell expanded" style="padding-left: 1px; padding-right: 1px;">
+            <input type="text" class="width_100" v-model="textFilter" v-keydown.enter="applyFastFilter" />
+        </div>
+    </div>
+    <div class="top_panel_showable" v-if="isShowingTopPanel">
+        <div class="content">
+            <div class="flex_row centered">
+                <div style="padding-right: 1px;">
+                    <button v-on:click="saveRelatedDocument">☑️</button>
+                </div>
+                <div style="padding-right: 1px;">
+                    <button v-on:click="toggleRelatedDocuments">
+                        <span v-if="isShowingRelatedDocuments">📂</span>
+                        <span v-else>📁</span>
+                    </button>
+                </div>
+                <input v-if="!isShowingRelatedDocuments" class="width_100" type="text" placeholder="Document title here" v-model="documentTitle" />
+                <div v-else class="width_100">Related documents: </div>
+                <div style="padding-left: 1px;">
+                    <button v-on:click="toggleTopPanel">❌</button>
+                </div>
+            </div>
+            <div v-if="isShowingRelatedDocuments" style="padding-top: 1px;">
+                <div v-for="doc, docIndex in relatedDocuments">
+                    <button v-on:click="() => openDocument(docIndex)">{{ doc.title }}</button>
+                </div>
+            </div>
+            <div class="width_100" v-show="!isShowingRelatedDocuments">
+                <textarea v-model="documentContent" placeholder="// Document content here" />
+            </div>
+        </div>
+    </div>
+    <template v-if="hasLoadedInnerValue">
+        <LswDataImplorer :value="innerValue" v-bind:key="'data-implorer-' + getRandomId()" />
+    </template>
+</div>

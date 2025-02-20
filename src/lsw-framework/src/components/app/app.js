@@ -3,7 +3,6 @@ Vue.component("App", {
   template: $template,
   props: {},
   data() {
-    window.on_application_mounted = Promise.withResolvers();
     return {
       conductometria: [],
       conductometria_minified_days: [],

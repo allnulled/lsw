@@ -1,0 +1,84 @@
+.lsw_data_implorer {
+    padding-top: 2px;
+}
+
+.lsw_data_implorer.paginated {
+    margin-left: 1px;
+    padding: 2px;
+}
+
+.lsw_data_implorer.paginated>.paginated_entry>.inner_sight_row {}
+
+.entry {}
+
+.entry.flex_row {
+    align-items: center;
+}
+
+.prop_row {
+    white-space: nowrap;
+}
+
+.prop_cell {
+    color: #113;
+}
+
+.val_cell {
+    padding-left: 4px;
+    font-weight: bold;
+}
+
+.type_cell {
+    padding-left: 4px;
+    font-size: 10px;
+}
+
+.path_cell_container {
+    padding-left: 4px;
+    position: relative;
+}
+
+.path_cell {
+    font-size: 10px;
+    text-decoration: underline;
+    white-space: nowrap;
+}
+
+.level_cell {
+    font-size: 9px;
+}
+
+.path_row {
+    display: none !important;
+    align-items: center;
+    padding-left: 20px;
+    background: #333;
+    color: white;
+    padding-bottom: 1px;
+}
+
+.inner_sight_row {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    box-shadow: 0 0 4px black;
+}
+
+.paginator button {
+    max-height: 18px;
+    padding-top: 0px;
+}
+.paginator > div {
+    padding-left: 1px;
+}
+.paginator > div:first-child {
+    padding-left: 0px;
+}
+.prop_id {
+    font-weight: bold;
+    text-decoration: underline;
+}
+.prop_type {
+    font-style: italic;
+}

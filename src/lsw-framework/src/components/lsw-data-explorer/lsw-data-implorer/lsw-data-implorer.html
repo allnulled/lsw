@@ -1,0 +1,60 @@
+<div class="lsw_data_implorer" :class="{ paginated: isPaginated || isRoot }">
+    <div class="paginator flex_row centered" v-if="isPaginated" style="padding-left: 1px; padding-top: 1px;">
+        <div>
+            <button v-on:click="goToPage(1)">««</button>
+        </div>
+        <div>
+            <button v-on:click="goToPreviousPage()">«</button>
+        </div>
+        <div>
+            <button v-on:click="goToNextPage()">»</button>
+        </div>
+        <div>
+            <button v-on:click="goToLastPage()">»»</button>
+        </div>
+        <div style=" font-size: 10px;">
+            Page {{ currentPage }} out of {{ Math.ceil(entries.length / pageSize) }} in packs of {{ pageSize }}
+        </div>
+    </div>
+    <div class="paginated_entry"
+        v-for="(entry, index) in paginatedEntries"
+        :key="index">
+        <div class="entry flex_row">
+            <button
+                v-if="typeof entry.value === 'object' && entry.value !== null"
+                style="margin: 1px; min-width: 20px;"
+                @click="toggleExpand(entry.key)">
+                {{ expanded[entry.key] ? '🔶' : '🔸' }}
+            </button>
+            <button
+                v-else
+                style="margin: 1px; min-width: 20px; background-color: transparent; color: black; border: 1px solid transparent; cursor: default;">
+                🔷
+            </button>
+            <div class="prop_row">
+                <span class="level_cell"
+                    :title="'value[' + pointer.concat([entry.key]).map(v => JSON.stringify(v)).join('][') + ']'">L{{ level + 1 }} ·
+                </span><span class="prop_cell">
+                    <span class="prop_id">{{ entry.key }}</span>
+                    <span class="prop_type">[{{ typeof entry.value }}]</span>
+                </span>
+            </div>
+            <div class="val_cell"
+                v-if="typeof entry.value !== 'object' || entry.value === null"> = {{ entry.value }}</div>
+        </div>
+        <div class="inner_sight_row" v-if="expanded[entry.key]">
+            <div class="path_row flex_row">
+                <span class="type_cell">{{ typeof entry.value }} · </span>
+                <span class="path_cell_container">
+                    <span class="path_cell">{{
+                        ["#"].concat(pointer).concat([entry.key]).reverse().join(' « ') }}
+                    </span>
+                </span>
+            </div>
+            <LswDataImplorer :value="entry.value"
+                :pageSize="pageSize"
+                :level="level + 1"
+                :pointer="pointer.concat([entry.key])" />
+        </div>
+    </div>
+</div>
