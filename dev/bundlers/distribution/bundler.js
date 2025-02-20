@@ -17,3 +17,8 @@ require(__dirname + "/../core/htmlbundler.js").bundle({
   ignore: [],
   wrap: false,
 });
+
+// 3. Export assets, index and dist files to dist folder:
+const utils = require(__dirname + "/../../utils/utils.js");
+utils.copyDirectorySync(__dirname + "/../../../src/assets", __dirname + "/../../../docs/assets");
+utils.copyFilesOnlySync(__dirname + "/../../../src", __dirname + "/../../../docs");
