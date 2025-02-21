@@ -1,4 +1,4 @@
-const LAST_VERSION = 2;
+const LAST_VERSION = 3;
 const BASE_URL = self.location.pathname.replace(/\/service-worker\.js$/, ''); // Obtiene el prefijo correcto
 const CACHE_NAME = `mi-app-cache-v${LAST_VERSION}`;
 const URLS_A_CACHEAR = [
