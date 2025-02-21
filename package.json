@@ -9,7 +9,7 @@
     "bundle:lsw-framework": "node dev/bundlers/lsw-framework/bundler.js",
     "bundle:lsw-app": "node dev/bundlers/distribution/bundler.js",
     "bundle:lsw": "npm run bundle:lsw-framework && npm run bundle:lsw-app",
-    "up": "npm run build:all && npm run push:all && bash up.sh",
+    "up": "npm run bundle:lsw && npm run push:all && bash up.sh",
     "install:all": "mpp --install --list projects.list.js",
     "build:all": "mpp --fileval dev/injections/buildAndTest.js --list projects.list.js && npm run build:framework && npm run build:dist",
     "build-only:all": "mpp --fileval dev/injections/build.js --list projects.list.js && npm run build:framework && npm run build:dist",
