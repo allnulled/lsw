@@ -8,7 +8,7 @@
     <title>Lite Starter Web or LSW</title>
     <script id="service_worker_script_tag">
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
+            navigator.serviceWorker.register(location.pathname.replace(/\/(index\.html)?$/, '') + "/service-worker.js")
                 .then(() => console.log('Service Worker registrado'))
                 .catch(err => console.error('Error al registrar el Service Worker:', err));
         }
