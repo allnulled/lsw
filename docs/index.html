@@ -7,7 +7,9 @@
         content="width=device-width, initial-scale=1.0">
     <title>Lite Starter Web or LSW</title>
     <script id="service_worker_script_tag">
+        Implementar_cacheo_offline:
         if ('serviceWorker' in navigator) {
+            break Implementar_cacheo_offline;
             navigator.serviceWorker.register(location.pathname.replace(/\/(index\.html)?$/, '') + "/service-worker.js")
                 .then(() => console.log('Service Worker registrado'))
                 .catch(err => console.error('Error al registrar el Service Worker:', err));
