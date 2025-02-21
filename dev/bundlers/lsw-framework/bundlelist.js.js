@@ -12,7 +12,7 @@ module.exports = [
   `${basepath}/src/apis/lsw-logger/superlogger.unbundled.js`,
   `${basepath}/src/apis/lsw-returner/controlled-function.js`,
   `${basepath}/src/apis/lsw-store/dist/store.unbundled.js`,
-  `${basepath}/src/apis/lsw-timer/timeformat.js`,
+  `${basepath}/src/apis/lsw-timer/timeformat.bundled.js`,
   `${basepath}/src/apis/lsw-cycler/lsw-cycler.js`,
   `${basepath}/src/apis/lsw-compromiser/lsw-compromiser.js`,
   `${basepath}/src/apis/lsw-utils/lsw-utils.js`,

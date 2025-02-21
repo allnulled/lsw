@@ -6,6 +6,13 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
     <title>Lite Starter Web or LSW</title>
+    <script id="service_worker_script_tag">
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(() => console.log('Service Worker registrado'))
+                .catch(err => console.error('Error al registrar el Service Worker:', err));
+        }
+    </script>
     <script src="importer.js"></script>
     <script src="boot.js"></script>
     <style>
@@ -15,6 +22,7 @@
             margin: 0;
             padding: 0;
         }
+
         #intersitial {
             position: fixed;
             top: 1px;
@@ -22,6 +30,7 @@
             left: 1px;
             right: 2px;
         }
+
         #intersitial pre {
             background-color: #222222B5;
             overflow: scroll;
@@ -39,11 +48,13 @@
 <body>
     <div id="intersitial">
         <pre style="text-align:center; font-size:15px;">Welcome to Lsw demo application.</pre>
-        <pre style="text-align:center;">It is <span id="intersitial_modules_loaded"></span>/<span id="intersitial_modules_all">?</span> modules loaded.</pre>
+        <pre style="text-align:center;">It is <span id="intersitial_modules_loaded"></span>/<span id="intersitial_modules_all">?</span>
+            modules loaded.</pre>
         <div id="intersitial_loader">
             <div id="intersitial_loader_bar"></div>
         </div>
-        <pre id="intersitial_modules_trace" style="text-align:left;"></pre>
+        <pre id="intersitial_modules_trace"
+            style="text-align:left;"></pre>
     </div>
     <div id="app"></div>
 </body>

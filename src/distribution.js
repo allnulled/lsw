@@ -1073,7 +1073,6 @@
   LswDatabase.default = LswDatabase;
   window.LswDatabase = LswDatabase;
 
-
   return LswDatabase;
 
 });
@@ -3310,8 +3309,54 @@ return Store;
   }
 })(function () {
   
+  const Timeformat_utils = {};
+
+  Timeformat_utils.formatHour = function(horaInput, minutoInput) {
+    console.log("momento recibido en formatHour:", horaInput, minutoInput);
+    const hora = ("" + horaInput).padStart(2, '0');
+    const minuto = ("" + minutoInput).padStart(2, '0');
+    return `${hora}:${minuto}`;
+  };
+
+  Timeformat_utils.formatHourFromMomento = function(momentoBrute, setMeridian = false) {
+    const momento = Timeformat_utils.toPlainObject(momentoBrute);
+    console.log("momento recibido en formatHourFromMomento:", momento);
+    const hora = ("" + (momento.hora ?? 0)).padStart(2, '0');
+    const minuto = ("" + (momento.minuto ?? 0)).padStart(2, '0');
+    return `${hora}:${minuto}${setMeridian ? hora >= 12 ? 'pm' : 'am' : ''}`;
+  };
+
+  Timeformat_utils.addDuracionToMomento = function(momentoBrute, duracion) {
+    console.log(duracion);
+    const momentoFinal = {};
+    const duracionParsed = Timeformat_parser.parse(duracion)[0];
+    console.log(duracionParsed);
+    const props = ["anio", "mes", "dia", "hora", "minuto", "segundo"];
+    const propsInDuracion = ["anios", "meses", "dias", "horas", "minutos", "segundos"];
+    for(let index=0; index<props.length; index++) {
+      const prop = props[index];
+      const propInDuracion = propsInDuracion[index];
+      const base = momentoBrute[prop] ?? 0;
+      const aggregated = duracionParsed[propInDuracion] ?? 0;
+      momentoFinal[prop] = base + aggregated;
+    }
+    return momentoFinal;
+  };
+
+  Timeformat_utils.toPlainObject = function(obj) {
+    const seen = new WeakSet();
+    return JSON.parse(JSON.stringify(obj, (key, value) => {
+      if (typeof value === "object" && value !== null) {
+        if (seen.has(value)) return undefined; // Ignora referencias circulares
+        seen.add(value);
+      }
+      return value;
+    }));
+  };
+
   return {
-    parser: Timeformat_parser
+    parser: Timeformat_parser,
+    utils: Timeformat_utils
   };
   
 });
@@ -3711,17 +3756,24 @@ return Store;
     },
   });
 
-
-
-
-
-
   // API de LSW:
+  LswUtils.toPlainObject = function(obj) {
+    const seen = new WeakSet();
+    return JSON.parse(JSON.stringify(obj, (key, value) => {
+      if (typeof value === "object" && value !== null) {
+        if (seen.has(value)) return undefined; // Ignora referencias circulares
+        seen.add(value);
+      }
+      return value;
+    }));
+  };
 
-  LswUtils.formatHour = function(horaInput, minutoInput) {
-    const hora = ("" + horaInput).padStart(2, '0');
-    const minuto = ("" + minutoInput).padStart(2, '0');
-    return `${hora}:${minuto}`;
+  LswUtils.pluralizar = function(singular, plural, contexto, cantidad) {
+    return contexto.replace("%s", cantidad === 1 ? singular : plural).replace("%i", cantidad);
+  }
+
+  LswUtils.hello = function() {
+    console.log("hello");
   };
 
   return LswUtils;
@@ -18583,30 +18635,38 @@ Vue.component("LswCalendario", {
     }
   }
 });
+let trackerCounter = 0;
+
 Vue.component("LswAgenda", {
   name: "LswAgenda",
   template: `<div class="lsw_agenda">
     <div class="calendar_viewer">
-        <lsw-calendario ref="calendario" :solo-fecha="true" :al-cambiar-valor="selectedDateTasks" />
+        <lsw-calendario ref="calendario"
+            :solo-fecha="true"
+            :al-cambiar-valor="selectedDateTasks" />
     </div>
-    <template v-if="selectedDateTasks && selectedDateTasks.length">
-        <table>
-            <tbody>
-                <template v-for="task, taskIndex in selectedDateTasks">
-                    <tr v-bind:key="'task-overview-' + taskIndex">
-                        <td>{{ $lsw.utils.formatHour(task.hora, task.minuto) }}</td>
-                        <td>{{ task.nombre }}</td>
-                    </tr>
-                    <tr v-bind:key="'task-details-' + taskIndex">
-                        <td>{{ $lsw.utils.formatHour(task.hora, task.minuto) }}</td>
-                        <td>{{ task.nombre }}</td>
-                    </tr>
+    <div class="box_for_date_details">
+        <div v-for="franja, franjaIndex in selectedDateTasksFormattedPerHour" v-bind:key="'franja_horaria_' + franjaIndex">
+            <div class="hour_lapse_separator" v-on:click="() => toggleHour(franja.hora)">{{ $lsw.timer.utils.formatHourFromMomento(franja) }} · <span class="hour_compromises">{{ $lsw.utils.pluralizar("compromiso", "compromisos", "%i %s", Object.keys(franja.tareas).length) }}</span></div>
+            <div class="hour_lapse_list" v-show="hiddenDateHours.indexOf(franja.hora) === -1">
+                <template v-for="tarea, tareaIndex in franja.tareas">
+                    <div class="hour_task_block" :class="{is_completed: tarea.estado === 'done', is_failed: tarea.estado === 'failed', is_pending: tarea.estado === 'pending'}" v-bind:key="'franja_horaria_' + franjaIndex + '_tarea_' + tareaIndex">
+                        <div class="hour_task_pill pill">
+                            <span class="hour_task_dragger pill_start">
+                                ≡</span><span class="hour_task_name pill_middle">
+                                {{ tarea.nombre }}</span><span class="hour_task_details_start pill_middle">
+                                {{ $lsw.timer.utils.formatHourFromMomento(tarea, false) }}</span><span class="hour_task_details_duration pill_middle">
+                                {{ tarea.duracion }}</span><span class="hour_task_editer pill_middle">
+                                ⚙</span><span class="hour_task_editer pill_end">
+                                ❌</span>
+                        </div>
+                    </div>
                 </template>
-            </tbody>
-        </table>
-        <pre>{{ selectedDateTasks }}</pre>
-    </template>
-    <div class="no_tasks_message" v-else>
+            </div>
+        </div>
+    </div>
+    <div class="no_tasks_message"
+        v-else>
         There are no tasks assigned to this day.
     </div>
 </div>`,
@@ -18614,11 +18674,22 @@ Vue.component("LswAgenda", {
   data() {
     this.$trace("lsw-agenda.data");
     return {
+      counter: 0,
       selectedDate: undefined,
       selectedDateTasks: undefined,
+      selectedDateTasksFormattedPerHour: undefined,
+      hiddenDateHours: [],
     };
   },
   methods: {
+    toggleHour(hourInt) {
+      const pos = this.hiddenDateHours.indexOf(hourInt);
+      if(pos === -1) {
+        this.hiddenDateHours.push(hourInt);
+      } else {
+        this.hiddenDateHours.splice(pos, 1);
+      }
+    },
     async loadDateTasks(newDate) {
       this.$trace("lsw-agenda.methods.loadDateTasks");
       this.selectedDate = newDate;
@@ -18627,16 +18698,55 @@ Vue.component("LswAgenda", {
         const isSameYear = value.anio === selectedDate.getFullYear();
         const isSameMonth = value.mes === selectedDate.getMonth();
         const isSameDay = value.dia === selectedDate.getDate();
-        console.log(isSameYear);
-        console.log(isSameMonth);
-        console.log(isSameDay);
         return isSameYear && isSameMonth && isSameDay;
       });
       this.selectedDateTasks = selectedDateTasks;
+      this.propagateDateTasks();
+    },
+    groupTasksByHour(tareas = this.selectedDateTasks) {
+      this.$trace("lsw-agenda.methods.groupTasksByHour");
+      const mapaHoras = new Map();
+      for (let i = 0; i < tareas.length; i++) {
+        const tarea = tareas[i];
+        const { hora, minuto } = tarea;
+        if (!mapaHoras.has(hora)) {
+          mapaHoras.set(hora, []);
+        }
+        mapaHoras.get(hora).push(tarea);
+      }
+      const resultado = [];
+      for (const [hora, lista] of mapaHoras) {
+        // Ordenar tareas por minuto
+        for (let j = 1; j < lista.length; j++) {
+          let k = j;
+          while (k > 0 && lista[k - 1].minuto > lista[k].minuto) {
+            [lista[k - 1], lista[k]] = [lista[k], lista[k - 1]];
+            k--;
+          }
+        }
+        resultado.push({ hora: Number(hora), tareas: lista });
+      }
+      for (let i = 1; i < resultado.length; i++) {
+        let j = i;
+        while (j > 0 && resultado[j - 1].hora > resultado[j].hora) {
+          [resultado[j - 1], resultado[j]] = [resultado[j], resultado[j - 1]];
+          j--;
+        }
+      }
+      return resultado;
+    },
+    propagateDateTasks() {
+      this.$trace("lsw-agenda.methods.propagateDateTasks");
+      this.selectedDateTasksFormattedPerHour = this.groupTasksByHour();
+    },
+    saluda(i) {
+      console.log(i);
+    },
+    increaseCounter() {
+      return trackerCounter++;
     }
   },
   watch: {
-
   },
   async mounted() {
     try {

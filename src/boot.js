@@ -80,7 +80,7 @@ const boot = async function () {
               importer.scriptSrc("lsw-framework/src/apis/lsw-returner/controlled-function.js"),
               // LSW Store:
               importer.scriptSrc("lsw-framework/src/apis/lsw-store/dist/store.unbundled.js"),
-              // LSW Timer:
+              // LSW Timer Parser (not API):
               importer.scriptSrc("lsw-framework/src/apis/lsw-timer/timeformat.js"),
               // LSW Cycler:
               importer.scriptSrc("lsw-framework/src/apis/lsw-cycler/lsw-cycler.js"),
@@ -92,17 +92,19 @@ const boot = async function () {
               importer.scriptSrc("lsw-framework/src/apis/lsw-filesystem/ufs-v1.0.2.js"),
               // LSW ConsoleHooker API (not component):
               importer.scriptSrc("lsw-framework/src/components/lsw-console-hooker/console-hooker-api.js"),
-              // LSW Database Adapter:
-              importer.scriptSrc("lsw-framework/src/components/lsw-database-ui/database-adapter/LswDatabaseAdapter.js"),
               // Socket.io:
               importer.scriptSrc("lsw-framework/src/others/socket.io-client/socket.io-client.js"),
             ]);
           }
           Second_wave: {
             await Promise.all([
+              // LSW Database Adapter:
+              importer.scriptSrc("lsw-framework/src/components/lsw-database-ui/database-adapter/LswDatabaseAdapter.js"),
               // LSW Directives for Vue.js:
               importer.scriptSrc("lsw-framework/src/directives/v-descriptor/v-descriptor.js"),
               importer.scriptSrc("lsw-framework/src/directives/v-focus/v-focus.js"),
+              // LSW Timeformat API (not Parser):
+              importer.scriptSrc("lsw-framework/src/apis/lsw-timer/timeformat.api.js"),
               // LSW FormControls API (part 1):
               importer.linkStylesheet("lsw-framework/src/components/lsw-form-controls/api/api.css"),
               importer.scriptSrc("lsw-framework/src/components/lsw-form-controls/api/api.js"),
@@ -218,6 +220,7 @@ const boot = async function () {
       Vue.prototype.$lsw.logger = Superlogger.create("lsw");
       Vue.prototype.$trace = (...args) => Vue.prototype.$lsw.logger.trace(...args);
       Vue.prototype.$lsw.utils = LswUtils;
+      Vue.prototype.$lsw.timer = LswTimer;
       Vue.prototype.$lsw.database = await LswDatabase.open("lsw_default_database");
       Vue.prototype.$lsw.windows = null;
       Vue.prototype.$lsw.dialogs = null;
@@ -235,19 +238,68 @@ const boot = async function () {
       window.on_application_mounted.promise.then(async () => {
         try {
           console.log("Application is ready here!");
+          Vue.prototype.$consoleHooker.instance.restoreConsole();
           Fill_database: {
             await Vue.prototype.$lsw.database.insert("procedimiento", {
-              nombre: "desayunar",
+              nombre: "Desayunar",
+              subconceptos: "ajo, cacao, leche, tostada, miel, mermelada",
               anio: 2025,
               mes: 2,
               dia: 19,
               hora: 8,
               minuto: 0,
+              estado: "done",
+              duracion: "50min",
               resumen: "",
               conclusion: "",
               relato: "",
               matices: "",
-            })
+            });
+            await Vue.prototype.$lsw.database.insert("procedimiento", {
+              nombre: "Comer",
+              subconceptos: "comida en general",
+              anio: 2025,
+              mes: 2,
+              dia: 19,
+              hora: 14,
+              minuto: 0,
+              estado: "pending",
+              duracion: "50min",
+              resumen: "",
+              conclusion: "",
+              relato: "",
+              matices: "",
+            });
+            await Vue.prototype.$lsw.database.insert("procedimiento", {
+              nombre: "Cenar",
+              subconceptos: "sopa, tortilla",
+              anio: 2025,
+              mes: 2,
+              dia: 19,
+              hora: 21,
+              minuto: 0,
+              estado: "failed",
+              duracion: "50min",
+              resumen: "",
+              conclusion: "",
+              relato: "",
+              matices: "",
+            });
+            await Vue.prototype.$lsw.database.insert("procedimiento", {
+              nombre: "Cenar",
+              subconceptos: "sopa, tortilla",
+              anio: 2025,
+              mes: 2,
+              dia: 19,
+              hora: 21,
+              minuto: 0,
+              estado: "pending",
+              duracion: "50min",
+              resumen: "",
+              conclusion: "",
+              relato: "",
+              matices: "",
+            });
           }
           Working_on_agenda: {
             document.querySelector("#windows_pivot_button").click();
