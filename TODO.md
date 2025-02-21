@@ -7,3 +7,4 @@
   [ ] 4. Marcar los días que tienen tareas en el mes (hay que paremtrizar calendario)
   [ ] 5. Draggable de tarea a hora.
   [ ] 6. Adaptar la vista para móvil (un poco botones-más-grandes)
+  [ ] 7. Que cambie de estado al clicar al nombre de la tarea

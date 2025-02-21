@@ -1364,6 +1364,12 @@ Vue.component('LswDataImplorer', {
         if (typeof this.promiser.reject !== "function") {
           throw new Error(`Required parameter «dialog.promiser.reject» to be an function on «Dialog.constructor»`);
         }
+        if (typeof this.acceptButton !== "object") {
+          this.acceptButton = false;
+        }
+        if (typeof this.cancelButton !== "object") {
+          this.cancelButton = false;
+        }
       }
     }
   }
@@ -1406,16 +1412,16 @@ Vue.component('LswDataImplorer', {
                             </div>
                         </div>
                         <div class="dialog_body">
-                            <component :is="dialog.name" />
+                            <component :is="dialog.name" :ref="'currentDialogComponent_' + dialog_index" />
                         </div>
                         <div class="dialog_footer">
                             <button v-if="dialog && dialog.acceptButton"
                                 class=""
-                                v-on:click="dialog.acceptButton.callback ? () => dialog.acceptButton.callback(dialog.id, dialog) : () => close(dialog.id)">{{
+                                v-on:click="() => dialog.acceptButton.callback ? dialog.acceptButton.callback(dialog.id, dialog) : resolve(dialog.id).close()">{{
                                 dialog.acceptButton.text || "Accept" }}</button>
                             <button v-if="dialog && dialog.cancelButton"
                                 class=""
-                                v-on:click="dialog.cancelButton.callback ? () => dialog.cancelButton.callback(dialog.id, dialog) : () => close(dialog.id)">{{
+                                v-on:click="() => dialog.cancelButton.callback ? dialog.cancelButton.callback(dialog.id, dialog) : close(dialog.id)">{{
                                 dialog.cancelButton.text || "Cancel" }}</button>
                             <button v-else
                                 class=""
@@ -1434,6 +1440,7 @@ Vue.component('LswDataImplorer', {
       }
     },
     data() {
+      this.$trace("lsw-dialogs.data", arguments);
       return {
         enabledWindowsSystem: this.asWindows,
         opened: {},
@@ -1445,12 +1452,14 @@ Vue.component('LswDataImplorer', {
     },
     watch: {
       opened(newValue) {
+        this.$trace("lsw-dialogs.watch.opened", ["too long object"]);
         this.openedLength = (typeof newValue !== "object") ? 0 : Object.keys(newValue).length;
         this._refreshMinimizedLength(newValue);
       }
     },
     methods: {
       open(parametricObject = {}) {
+        this.$trace("lsw-dialogs.methods.open", arguments);
         if (typeof parametricObject !== "object") {
           throw new Error(`Required argument «parametricObject» to be an object on «LswDialogs.methods.open»`);
         }
@@ -1495,10 +1504,12 @@ Vue.component('LswDataImplorer', {
           }
         })();
         // 1) Este es para el Vue.component:
+        const componentId = Dialog.fromIdToComponentName(id);
         const dialogComponent = Object.assign({}, dialogComponentInput, {
-          name: Dialog.fromIdToComponentName(id),
+          name: componentId,
           template,
-          data() {
+          data(...args) {
+            this.$trace(`lsw-dialogs.[${componentId}].data`, ["too long object"]);
             const preData = dialogComponentData.call(this);
             if (typeof preData.value === "undefined") {
               preData.value = "";
@@ -1510,24 +1521,29 @@ Vue.component('LswDataImplorer', {
           computed: (dialogComponentInput.computed || {}),
           methods: {
             getValue() {
+              this.$trace(`lsw-dialogs.[${componentId}].methods.getValue`, []);
               return JSON.parse(JSON.stringify(this.value));
             },
-            accept: function (solution = undefined) {
+            accept(solution = undefined, ...args) {
+              this.$trace(`lsw-dialogs.[${componentId}].methods.accept`, [solution, ...args]);
               if (solution instanceof Event) {
                 return this.$dialogs.resolve(id, this.getValue()).close(id);
               }
               return this.$dialogs.resolve(id, typeof solution !== "undefined" ? solution : this.getValue()).close(id);
             },
-            cancel: function () {
+            cancel(...args) {
+              this.$trace("lsw-dialogs.[${componentId}].methods.cancel", args);
               return this.$dialogs.resolve(id, -1).close(id);
             },
-            abort: function (error = undefined) {
+            abort(error = undefined, ...args) {
+              this.$trace(`lsw-dialogs.[${componentId}].methods.abort`, [error, ...args]);
               if (solution instanceof Event) {
                 return this.$dialogs.reject(id, new Error("Aborted dialog error")).close(id);
               }
               return this.$dialogs.reject(id, error).close(id);
             },
-            close: function () {
+            close(...args) {
+              this.$trace(`lsw-dialogs.[${componentId}].methods.close`, args);
               return this.$dialogs.resolve(id, -2).close(id);
             },
             ...(dialogComponentInput.methods || {})
@@ -1538,6 +1554,7 @@ Vue.component('LswDataImplorer', {
         }
         // 1) Este es para el this.$dialogs:
         const dialogDefinition = Object.assign({}, {
+          ...parametricObject,
           id,
           title,
           name: dialogComponent.name,
@@ -1548,9 +1565,11 @@ Vue.component('LswDataImplorer', {
           created_at,
           promiser: Promise.withResolvers(),
         });
+        const dialogInstance = new Dialog(dialogDefinition);
+        console.log("Definición final del dialogo", dialogInstance);
         Define_dialog: {
           this.opened = Object.assign({}, this.opened, {
-            [id]: new Dialog(dialogDefinition)
+            [id]: dialogInstance
           });
         }
         if (typeof this.hookOnOpen === "function") {
@@ -1558,7 +1577,8 @@ Vue.component('LswDataImplorer', {
         }
         return this.opened[id].promiser.promise;
       },
-      resolve(id, solution) {
+      resolve(id, solution, ...args) {
+        this.$trace("lsw-dialogs.methods.resolve", [id, solution, ...args]);
         if (typeof id !== "string") {
           throw new Error("Required parameter «id» (argument:1) to be a string on «LswDialogs.resolve»");
         }
@@ -1570,7 +1590,8 @@ Vue.component('LswDataImplorer', {
           close: () => this.close(id)
         };
       },
-      reject(id, error) {
+      reject(id, error, ...args) {
+        this.$trace("lsw-dialogs.methods.reject", [id, error, ...args]);
         if (typeof id !== "string") {
           throw new Error("Required parameter «id» (argument:1) to be a string on «LswDialogs.reject»");
         }
@@ -1582,7 +1603,8 @@ Vue.component('LswDataImplorer', {
           close: () => this.close(id)
         };
       },
-      close(id) {
+      close(id, ...args) {
+        this.$trace("lsw-dialogs.methods.close", [id, ...args]);
         if (typeof id !== "string") {
           throw new Error("Required parameter «id» (argument:1) to be a string on «LswDialogs.close»");
         }
@@ -1610,7 +1632,8 @@ Vue.component('LswDataImplorer', {
         return promiseOfDialog;
         // this.$forceUpdate(true);
       },
-      minimize(id) {
+      minimize(id, ...args) {
+        this.$trace("lsw-dialogs.methods.minimize", [id, ...args]);
         if (typeof id !== "string") {
           throw new Error("Required parameter «id» (argument:1) to be a string on «LswDialogs.minimize»");
         }
@@ -1620,7 +1643,8 @@ Vue.component('LswDataImplorer', {
         this.opened[id].minimized = true;
         this._refreshMinimizedLength(this.opened);
       },
-      maximize(id) {
+      maximize(id, ...args) {
+        this.$trace("lsw-dialogs.methods.maximize", [id, ...args]);
         if (typeof id !== "string") {
           throw new Error("Required parameter «id» (argument:1) to be a string on «LswDialogs.maximize»");
         }
@@ -1641,7 +1665,8 @@ Vue.component('LswDataImplorer', {
         this.opened[id].minimized = false;
         this._refreshMinimizedLength();
       },
-      _refreshMinimizedLength(newValue = this.opened) {
+      _refreshMinimizedLength(newValue = this.opened, ...args) {
+        this.$trace("lsw-dialogs.methods._refreshMinimizedLength", ["too long object", ...args]);
         this.notMinimizedLength = Object.keys(newValue).reduce((out, k) => {
           const v = newValue[k];
           if (v.minimized === false) {
@@ -1651,17 +1676,21 @@ Vue.component('LswDataImplorer', {
         }, 0);
         this.$forceUpdate(true);
       },
-      goHome() {
+      goHome(...args) {
+        this.$trace("lsw-dialogs.methods.goHome", [...args]);
         this.$window.LswWindows.show();
       },
-      onOpen(callback) {
+      onOpen(callback, ...args) {
+        this.$trace("lsw-dialogs.methods.onOpen", [callback, ...args]);
         this.hookOnOpen = callback;
       },
-      onClose(callback) {
+      onClose(callback, ...args) {
+        this.$trace("lsw-dialogs.methods.onClose", [callback, ...args]);
         this.hookOnClose = callback;
       }
     },
-    mounted() {
+    mounted(...args) {
+      this.$trace("lsw-dialogs.mounted", [...args]);
       Vue.prototype.$dialogs = this;
       if (Vue.prototype.$lsw) {
         Vue.prototype.$lsw.dialogs = this;
@@ -1670,40 +1699,6 @@ Vue.component('LswDataImplorer', {
       console.log("[*] LswDialogs mounted.");
     }
   });
-
-  if (process.env.NODE_ENV === "test") {
-    setTimeout(() => {
-      return;
-      describe("Científico de JavaScript logra dialogs puro", it => {
-        it("can do it", async function () {
-          const name1promise = LswDialogs.open({
-            id: 'default',
-            priority: 101,
-            template: `
-              <div>
-                <div>Pon tu nombre 1:</div>
-                <input type="text" v-model="value" style="width:100%;" />
-                <button v-on:click="accept">Aceptar</button>
-              </div>
-            `,
-          });
-          const name2promise = LswDialogs.open({
-            id: 'default.1',
-            parentId: 'default',
-            priority: 102,
-            template: `
-              <div>
-                <div>Pon tu nombre 2:</div>
-                <input type="text" v-model="value" style="width:100%;" />
-                <button v-on:click="accept">Aceptar</button>
-              </div>
-            `,
-          });
-          console.log(await Promise.all([name1promise, name2promise]));
-        });
-      });
-    }, 1000 * 6);
-  }
 
 })();
 // Change this component at your convenience:
@@ -1715,15 +1710,15 @@ Vue.component("LswWindowsMainTab", {
                     <div>Process manager</div>
                 </div>
                 <div class="dialog_topbar_buttons">
-                    <button v-if="$consoleHooker?.is_shown === false" class="mini" style="white-space: nowrap;flex: 1; margin-right: 4px;" v-on:click="() => $consoleHooker.show()">🍀</button><button class="mini" v-on:click="viewer.toggleState">-</button>
+                    <button v-if="$consoleHooker?.is_shown === false" class="mini" style="white-space: nowrap;flex: 1; margin-right: 4px;" v-on:click="() => $consoleHooker.show()">💻</button><button class="mini" v-on:click="viewer.toggleState">-</button>
                 </div>
             </div>
             <div class="dialog_body">
                 <div class="main_tab_topbar">
-                    <button class="main_tab_topbar_button" v-on:click="openAgenda">AGENDA</button>
-                    <button class="main_tab_topbar_button" v-on:click="openWiki">WIKI</button>
-                    <button class="main_tab_topbar_button" v-on:click="openRest">DB</button>
-                    <button class="main_tab_topbar_button" v-on:click="openFilesystem">FS</button>
+                    <button class="main_tab_topbar_button" v-on:click="openAgenda">Agenda</button>
+                    <button class="main_tab_topbar_button" v-on:click="openWiki">Wiki</button>
+                    <button class="main_tab_topbar_button" v-on:click="openRest">Data</button>
+                    <button class="main_tab_topbar_button" v-on:click="openFilesystem">Files</button>
                 </div>
                 <div class="pad_normal" v-if="!Object.keys($lsw.dialogs.opened).length">
                     <span>No processes found right now.</span>
@@ -1834,8 +1829,8 @@ Vue.component("LswWindowsViewer", {
 });
 // Change this component at your convenience:
 Vue.component("LswWindowsPivotButton", {
-  template: `<div class="lsw_windows_pivot_button">
-    <button id="windows_pivot_button" v-on:click="onClick" class="">☰</button>
+  template: `<div class="lsw_windows_pivot_button" v-on:click="onClick">
+    <button id="windows_pivot_button" class="">🔴</button>
 </div>`,
   props: {
     viewer: {
@@ -3477,17 +3472,61 @@ Vue.component("LswAgenda", {
       this.$trace("lsw-agenda.methods.goToToday");
       // @TODO: 
     },
-    openInsertTaskDialog() {
+    async openInsertTaskDialog() {
       this.$trace("lsw-agenda.methods.openInsertTaskDialog");
       // @TODO: 
     },
-    openUpdateTaskDialog() {
+    async openUpdateTaskDialog(tarea) {
       this.$trace("lsw-agenda.methods.openUpdateTaskDialog");
       // @TODO: 
+      const data = await this.$dialogs.open({
+        id: "agenda-viewer-update-task-" + this.$lsw.utils.getRandomString(5),
+        title: "Update task details",
+        template: `
+          <div>
+            <lsw-agenda-task-form :task="task" />
+          </div>
+        `,
+        factory: {
+          data: {
+            task: tarea
+          },
+          methods: {}
+        },
+        acceptButton: {
+          text: "Update task",
+        },
+        cancelButton: {
+          text: "Cancel",
+        }
+      });
+      console.log(data);
     },
-    openDeleteTaskDialog() {
+    async openDeleteTaskDialog() {
       this.$trace("lsw-agenda.methods.openDeleteTaskDialog");
       // @TODO: 
+      const data = await this.$dialogs.open({
+        id: "agenda-viewer-delete-task-" + this.$lsw.utils.getRandomString(5),
+        title: "Delete task confirmation",
+        template: `
+          <div>
+            <p>Are you sure you want to cancel task deletion?</p>
+          </div>
+        `,
+        acceptButton: {
+          text: "OK",
+          callback: (id) => {
+            this.$dialogs.accept(id);
+          },
+        },
+        cancelButton: {
+          text: "Cancel",
+          callback: (id) => {
+            this.$dialogs.cancel(id);
+          },
+        }
+      });
+      console.log(data);
     },
   },
   watch: {

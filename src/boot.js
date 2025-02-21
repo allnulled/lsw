@@ -159,6 +159,7 @@ const boot = async function () {
               // LSW Agenda components:
               importer.importVueComponent("lsw-framework/src/components/lsw-calendario/lsw-calendario"),
               importer.importVueComponent("lsw-framework/src/components/lsw-agenda/lsw-agenda/lsw-agenda"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/lsw-agenda-task-form/lsw-agenda-task-form"),
               /////////////////////////////////////////////////////////////////////
               // COMPONENTS::END //////////////////////////////////////////////////
               /////////////////////////////////////////////////////////////////////
