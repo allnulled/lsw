@@ -134,9 +134,14 @@ table.tabla_de_conductometria .minibutton {
 .flex_row.centered {
     align-items: center;
 }
+.flex_1,
 .flex_cell {
     flex: 1;
 }
+.flex_100,
 .flex_cell.expanded {
     flex: 100;
+}
+.nowrap {
+    white-space: nowrap;
 }

@@ -978,6 +978,52 @@
       return error;
     }
 
+    // Método para seleccionar elementos de un store con un filtro
+    select(store, filter) {
+      this.constructor.trace("browsie.select", arguments);
+      this.triggers.emit(`crud.select.one.${store}`, { store, filter });
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(store, 'readonly');
+        const objectStore = transaction.objectStore(store);
+        const request = objectStore.getAll();
+
+        request.onsuccess = () => {
+          const result = request.result.filter(item => {
+            return Object.keys(filter).every(key => item[key] === filter[key]);
+          });
+          resolve(result);
+        };
+        request.onerror = (error) => reject(this._expandError(error, `Error on «browsie.select» operation over store «${store}»: `));
+      });
+    }
+
+    selectMany(store, filterFn = i => true) {
+      this.constructor.trace("browsie.selectMany", arguments);
+      this.triggers.emit(`crud.select.many.${store}`, { store, filterFn });
+    
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(store, 'readonly');
+        const objectStore = transaction.objectStore(store);
+        const request = objectStore.openCursor(); // Usa cursor para recorrer la BD sin cargar todo en memoria
+    
+        const results = [];
+        request.onsuccess = (event) => {
+          const cursor = event.target.result;
+          if (cursor) {
+            if (filterFn(cursor.value)) { // Aplica la función de filtro
+              results.push(cursor.value);
+            }
+            cursor.continue(); // Avanza al siguiente registro
+          } else {
+            resolve(results); // Se terminó el recorrido
+          }
+        };
+    
+        request.onerror = (error) =>
+          reject(this._expandError(error, `Error on «browsie.selectMany» operation over store «${store}»: `));
+      });
+    }    
+
     // Método para insertar varios items en un store
     insertMany(store, items) {
       this.constructor.trace("browsie.insertMany", arguments);
@@ -3312,7 +3358,6 @@ return Store;
   const Timeformat_utils = {};
 
   Timeformat_utils.formatHour = function(horaInput, minutoInput) {
-    console.log("momento recibido en formatHour:", horaInput, minutoInput);
     const hora = ("" + horaInput).padStart(2, '0');
     const minuto = ("" + minutoInput).padStart(2, '0');
     return `${hora}:${minuto}`;
@@ -3320,17 +3365,14 @@ return Store;
 
   Timeformat_utils.formatHourFromMomento = function(momentoBrute, setMeridian = false) {
     const momento = Timeformat_utils.toPlainObject(momentoBrute);
-    console.log("momento recibido en formatHourFromMomento:", momento);
     const hora = ("" + (momento.hora ?? 0)).padStart(2, '0');
     const minuto = ("" + (momento.minuto ?? 0)).padStart(2, '0');
     return `${hora}:${minuto}${setMeridian ? hora >= 12 ? 'pm' : 'am' : ''}`;
   };
 
   Timeformat_utils.addDuracionToMomento = function(momentoBrute, duracion) {
-    console.log(duracion);
     const momentoFinal = {};
     const duracionParsed = Timeformat_parser.parse(duracion)[0];
-    console.log(duracionParsed);
     const props = ["anio", "mes", "dia", "hora", "minuto", "segundo"];
     const propsInDuracion = ["anios", "meses", "dias", "horas", "minutos", "segundos"];
     for(let index=0; index<props.length; index++) {
@@ -18640,14 +18682,29 @@ let trackerCounter = 0;
 Vue.component("LswAgenda", {
   name: "LswAgenda",
   template: `<div class="lsw_agenda">
-    <div class="calendar_viewer">
-        <lsw-calendario ref="calendario"
-            :solo-fecha="true"
-            :al-cambiar-valor="selectedDateTasks" />
+    <div class="flex_row">
+        <div class="flex_100">
+            <div class="calendar_viewer">
+                <lsw-calendario ref="calendario"
+                    :solo-fecha="true"
+                    :al-cambiar-valor="v => loadDateTasks(v)" />
+            </div>
+        </div>
+        <div class="flex_1 flex_column" style="padding:8px; padding-left: 0px; gap: 4px;">
+            <div class="flex_1"><button class="width_100 nowrap" v-on:click="() => openInsertTaskDialog()">New task</button></div>
+            <div class="flex_1"><button class="width_100 nowrap" v-on:click="() => goToToday()">Today?</button></div>
+            <div class="flex_1"><button class="width_100 nowrap" v-on:click="() => goToToday()">Tomorrow?</button></div>
+            <div class="flex_100"></div>
+        </div>
     </div>
-    <div class="box_for_date_details">
-        <div v-for="franja, franjaIndex in selectedDateTasksFormattedPerHour" v-bind:key="'franja_horaria_' + franjaIndex">
-            <div class="hour_lapse_separator" v-on:click="() => toggleHour(franja.hora)">{{ $lsw.timer.utils.formatHourFromMomento(franja) }} · <span class="hour_compromises">{{ $lsw.utils.pluralizar("compromiso", "compromisos", "%i %s", Object.keys(franja.tareas).length) }}</span></div>
+    <div class="no_tasks_message" v-if="isLoading">
+        Please, wait a moment to fetch the data.
+    </div>
+    <div class="box_for_date_details" v-else-if="(!isLoading) && selectedDateTasksFormattedPerHour && selectedDateTasksFormattedPerHour.length">
+        <div class="hour_table" v-for="franja, franjaIndex in selectedDateTasksFormattedPerHour" v-bind:key="'franja_horaria_' + franjaIndex">
+            <div class="hour_lapse_separator" v-on:click="() => toggleHour(franja.hora)">
+                {{ $lsw.timer.utils.formatHourFromMomento(franja) }} · <span class="hour_compromises">{{ $lsw.utils.pluralizar("compromiso", "compromisos", "%i %s", Object.keys(franja.tareas).length) }}</span>
+            </div>
             <div class="hour_lapse_list" v-show="hiddenDateHours.indexOf(franja.hora) === -1">
                 <template v-for="tarea, tareaIndex in franja.tareas">
                     <div class="hour_task_block" :class="{is_completed: tarea.estado === 'done', is_failed: tarea.estado === 'failed', is_pending: tarea.estado === 'pending'}" v-bind:key="'franja_horaria_' + franjaIndex + '_tarea_' + tareaIndex">
@@ -18656,8 +18713,8 @@ Vue.component("LswAgenda", {
                                 ≡</span><span class="hour_task_name pill_middle">
                                 {{ tarea.nombre }}</span><span class="hour_task_details_start pill_middle">
                                 {{ $lsw.timer.utils.formatHourFromMomento(tarea, false) }}</span><span class="hour_task_details_duration pill_middle">
-                                {{ tarea.duracion }}</span><span class="hour_task_editer pill_middle">
-                                ⚙</span><span class="hour_task_editer pill_end">
+                                {{ tarea.duracion }}</span><span class="hour_task_editer pill_middle" v-on:click="() => openUpdateTaskDialog(tarea)">
+                                ⚙</span><span class="hour_task_deleter pill_end" v-on:click="() => openDeleteTaskDialog(tarea)">
                                 ❌</span>
                         </div>
                     </div>
@@ -18675,6 +18732,7 @@ Vue.component("LswAgenda", {
     this.$trace("lsw-agenda.data");
     return {
       counter: 0,
+      isLoading: false,
       selectedDate: undefined,
       selectedDateTasks: undefined,
       selectedDateTasksFormattedPerHour: undefined,
@@ -18692,16 +18750,34 @@ Vue.component("LswAgenda", {
     },
     async loadDateTasks(newDate) {
       this.$trace("lsw-agenda.methods.loadDateTasks");
-      this.selectedDate = newDate;
-      const selectedDate = this.selectedDate;
-      const selectedDateTasks = await this.$lsw.database.select("procedimiento", value => {
-        const isSameYear = value.anio === selectedDate.getFullYear();
-        const isSameMonth = value.mes === selectedDate.getMonth();
-        const isSameDay = value.dia === selectedDate.getDate();
-        return isSameYear && isSameMonth && isSameDay;
-      });
-      this.selectedDateTasks = selectedDateTasks;
-      this.propagateDateTasks();
+      this.isLoading = true;
+      console.log("Loading date tasks of: " + newDate);
+      try {
+        this.selectedDate = newDate;
+        const selectedDate = this.selectedDate;
+        const selectedDateTasks = await this.$lsw.database.selectMany("procedimiento", value => {
+          const isSameYear = value.anio === selectedDate.getFullYear();
+          const isSameMonth = value.mes === (selectedDate.getMonth()+1);
+          const isSameDay = value.dia === selectedDate.getDate();
+          const isAccepted = isSameYear && isSameMonth && isSameDay;
+          console.log("isSameYear", isSameYear);
+          console.log("isSameMonth", isSameMonth);
+          console.log("isSameDay", isSameDay);
+          console.log("isAccepted", isAccepted);
+          console.log(isAccepted);
+          return isAccepted;
+        });
+        console.log("selectedDate");
+        console.log(selectedDate);
+        console.log("selectedDateTasks");
+        console.log(selectedDateTasks);
+        this.selectedDateTasks = selectedDateTasks;
+        this.propagateDateTasks();
+      } catch (error) {
+        console.log("Error loading date taskes:", error);
+      } finally {
+        setTimeout(() => this.isLoading = false, 100);
+      }
     },
     groupTasksByHour(tareas = this.selectedDateTasks) {
       this.$trace("lsw-agenda.methods.groupTasksByHour");
@@ -18739,12 +18815,22 @@ Vue.component("LswAgenda", {
       this.$trace("lsw-agenda.methods.propagateDateTasks");
       this.selectedDateTasksFormattedPerHour = this.groupTasksByHour();
     },
-    saluda(i) {
-      console.log(i);
+    goToToday() {
+      this.$trace("lsw-agenda.methods.goToToday");
+      // @TODO: 
     },
-    increaseCounter() {
-      return trackerCounter++;
-    }
+    openInsertTaskDialog() {
+      this.$trace("lsw-agenda.methods.openInsertTaskDialog");
+      // @TODO: 
+    },
+    openUpdateTaskDialog() {
+      this.$trace("lsw-agenda.methods.openUpdateTaskDialog");
+      // @TODO: 
+    },
+    openDeleteTaskDialog() {
+      this.$trace("lsw-agenda.methods.openDeleteTaskDialog");
+      // @TODO: 
+    },
   },
   watch: {
   },
