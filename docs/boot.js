@@ -124,6 +124,7 @@ const boot = async function () {
               importer.importVueComponent("lsw-framework/src/components/lsw-form-controls/control-types/array-control/array-control"),
               importer.importVueComponent("lsw-framework/src/components/lsw-form-controls/control-types/boolean-control/boolean-control"),
               importer.importVueComponent("lsw-framework/src/components/lsw-form-controls/control-types/number-control/number-control"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-form-controls/control-types/date-control/date-control"),
               // LSW Table component:
               importer.importVueComponent("lsw-framework/src/components/lsw-table/lsw-table/lsw-table"),
               importer.importVueComponent("lsw-framework/src/components/lsw-table/lsw-table-transformers/lsw-table-transformers"),
@@ -302,13 +303,25 @@ const boot = async function () {
               matices: "",
             });
           }
+          const waitFor = function(ms) {
+            return new Promise((resolve, reject) => {
+              setTimeout(() => resolve(), ms);
+            });
+          };
+          const filterDomElements = function(selector, filterCallback, base = document) {
+            return Array.from(base.querySelectorAll(selector)).filter(filterCallback);
+          }
           Working_on_agenda: {
             document.querySelector("#windows_pivot_button").click();
-            setTimeout(() => {
-              Array.from(document.querySelectorAll(".main_tab_topbar > button")).filter(button => {
-                return button.textContent.trim() === "AGENDA";
-              })[0].click();
-            }, 100);
+            await waitFor(100);
+            filterDomElements(".main_tab_topbar > button", button => button.textContent.trim() === "Agenda")[0].click();
+            await waitFor(100);
+            Working_on_update_task_form: {
+              filterDomElements(".lsw_agenda .dias_de_calendario td button", button => button.textContent.trim() === "19")[0].click();
+              await waitFor(100);
+              filterDomElements(".hour_task_editer", el => true)[0].click();
+              await waitFor(100);
+            }
           }
         } catch (error) {
           console.log(error);

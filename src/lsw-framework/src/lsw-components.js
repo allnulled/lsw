@@ -19,7 +19,7 @@ Vue.component("LswCalendario", {
           <button class="boton_de_mover_mes"
             v-on:click="ir_a_mes_anterior"> ◀ </button>
         </div>
-        <div class="like_cell" style="width:100%;">
+        <div class="like_cell" style="width:100%;" :style="!soloFecha ? 'vertical-align: top;' : ''">
           <div class="chivato_de_fecha">{{ obtener_fecha_formateada(fecha_seleccionada) }}</div>
           <div class="chivato_de_fecha" v-if="!soloFecha">a las {{ espaciar_izquierda(hora_seleccionada, 2) }}:{{ espaciar_izquierda(minuto_seleccionado, 2)
             }}:{{
@@ -675,7 +675,7 @@ Vue.component("HiddenControl", {
 Vue.component("StringControl", {
   template: `<div class="StringControl FormControl ControlType">
     <div class="FormLabel" v-if="label">{{ label }}</div>
-    <input v-if="!multiline" class="FormInput" type="text" v-model="value" :placeholder="placeholder" />
+    <input v-if="!multiline" class="FormInput" :class="cssClasses.input || {}" :style="cssStyles.input || {}" type="text" v-model="value" :placeholder="placeholder" />
     <textarea v-else class="FormInput" :class="cssClasses.textarea || {}" :style="cssStyles.textarea || {}" v-model="value" :placeholder="placeholder" />
     <ControlError v-if="error" :error="error" :control="this" />
 </div>`,
@@ -1388,7 +1388,6 @@ Vue.component('LswDataImplorer', {
   Vue.component("LswDialogs", {
     name: "LswDialogs",
     template: `<div class="lws_dialogs_root">
-    {{ notMinimizedLength }}
     <div class="lsw_dialogs"
         v-if="openedLength && notMinimizedLength">
         <div class="lsw_dialogs_box">
@@ -1417,11 +1416,11 @@ Vue.component('LswDataImplorer', {
                         <div class="dialog_footer">
                             <button v-if="dialog && dialog.acceptButton"
                                 class=""
-                                v-on:click="() => dialog.acceptButton.callback ? dialog.acceptButton.callback(dialog.id, dialog) : resolve(dialog.id).close()">{{
+                                v-on:click="() => dialog.acceptButton.callback ? dialog.acceptButton.callback($refs['currentDialogComponent_' + dialog_index][0], dialog, dialog.id, this) : resolve(dialog.id).close()">{{
                                 dialog.acceptButton.text || "Accept" }}</button>
                             <button v-if="dialog && dialog.cancelButton"
                                 class=""
-                                v-on:click="() => dialog.cancelButton.callback ? dialog.cancelButton.callback(dialog.id, dialog) : close(dialog.id)">{{
+                                v-on:click="() => dialog.cancelButton.callback ? dialog.cancelButton.callback($refs['currentDialogComponent_' + dialog_index][0], dialog, dialog.id, this) : close(dialog.id)">{{
                                 dialog.cancelButton.text || "Cancel" }}</button>
                             <button v-else
                                 class=""
@@ -1503,18 +1502,32 @@ Vue.component('LswDataImplorer', {
             throw new Error("Required parameter «data» returned by «factory» to be an object, a function or empty on «LswDialogs.methods.open»");
           }
         })();
+        const scopifyMethods = function(obj, scope) {
+          return Object.keys(obj).reduce((out, k) => {
+            const v = obj[k];
+            if(typeof v !== "function") {
+              out[k] = v;
+            } else {
+              out[k] = v.bind(scope);
+            }
+            return out;
+          }, {});
+        };
         // 1) Este es para el Vue.component:
         const componentId = Dialog.fromIdToComponentName(id);
         const dialogComponent = Object.assign({}, dialogComponentInput, {
           name: componentId,
           template,
-          data(...args) {
+          data(component, ...args) {
             this.$trace(`lsw-dialogs.[${componentId}].data`, ["too long object"]);
             const preData = dialogComponentData.call(this);
             if (typeof preData.value === "undefined") {
               preData.value = "";
             };
             console.log("El data del nuevo componente dialog:", preData);
+            dialogComponentInput.watch = scopifyMethods(dialogComponentInput.watch || {}, component);
+            dialogComponentInput.computed = scopifyMethods(dialogComponentInput.computed || {}, component);
+            dialogComponentInput.methods = scopifyMethods(dialogComponentInput.methods || {}, component);
             return preData;
           },
           watch: (dialogComponentInput.watch || {}),
@@ -2922,7 +2935,7 @@ Vue.component("LswCalendario", {
           <button class="boton_de_mover_mes"
             v-on:click="ir_a_mes_anterior"> ◀ </button>
         </div>
-        <div class="like_cell" style="width:100%;">
+        <div class="like_cell" style="width:100%;" :style="!soloFecha ? 'vertical-align: top;' : ''">
           <div class="chivato_de_fecha">{{ obtener_fecha_formateada(fecha_seleccionada) }}</div>
           <div class="chivato_de_fecha" v-if="!soloFecha">a las {{ espaciar_izquierda(hora_seleccionada, 2) }}:{{ espaciar_izquierda(minuto_seleccionado, 2)
             }}:{{
@@ -3481,23 +3494,16 @@ Vue.component("LswAgenda", {
       // @TODO: 
       const data = await this.$dialogs.open({
         id: "agenda-viewer-update-task-" + this.$lsw.utils.getRandomString(5),
-        title: "Update task details",
+        title: "Update task information",
         template: `
           <div>
-            <lsw-agenda-task-form :task="task" />
+            <lsw-agenda-task-form :task="task" ref="taskForm" />
           </div>
         `,
         factory: {
           data: {
             task: tarea
           },
-          methods: {}
-        },
-        acceptButton: {
-          text: "Update task",
-        },
-        cancelButton: {
-          text: "Cancel",
         }
       });
       console.log(data);
