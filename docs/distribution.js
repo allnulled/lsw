@@ -657,7 +657,34 @@
   }
 })(function () {
 
-  class BrowsieStaticAPI {
+  class BrowsieCheckersAPI {
+
+    static mustBeString(obj, method = "Browsie.mustBeString", id = "?") {
+      if (typeof obj !== "string") {
+        throw new Error(`Required «${id}» to be a string on «${method}»`);
+      }
+    }
+
+    static mustBeArray(obj, method = "Browsie.mustBeArray", id = "?") {
+      if (!Array.isArray(obj)) {
+        throw new Error(`Required «${id}» to be an array on «${method}»`);
+      }
+    }
+
+    static mustBeObject(obj, method = "Browsie.mustBeObject", id = "?") {
+      if (typeof obj !== "object") {
+        throw new Error(`Required «${id}» to be an object on «${method}»`);
+      }
+    }
+
+    static mustBeGreaterThan(obj, comparison = 0, method = "Browsie.mustBeObject", id = "?") {
+      if (obj <= comparison) {
+        throw new Error(`Required «${id}» to be greater than «${comparison}» on «${method}»`);
+      }
+    }
+  }
+
+  class BrowsieStaticAPI extends BrowsieCheckersAPI {
 
     static openedConnections = [];
 
@@ -705,12 +732,15 @@
                   keyPath: "id",
                   autoIncrement: true,
                 });
-                if(!Array.isArray(schemaDefinition[storeName])) {
+                if (!Array.isArray(schemaDefinition[storeName])) {
+                  console.log(schemaDefinition);
                   throw new Error(`Required property «schemaDefinition.${storeName}» to be an array on «LswDatabase.createDatabase»`);
                 }
                 schemaDefinition[storeName].forEach((index) => {
                   const indexName = index.replace(/^\!/, "");
-                  objectStore.createIndex(indexName, indexName, { unique: index.startsWith("!") });
+                  objectStore.createIndex(indexName, indexName, {
+                    unique: index.startsWith("!")
+                  });
                 });
               }
             });
@@ -794,6 +824,8 @@
           db.close();
           reject(new Error('Error al eliminar la base de datos'));
         };
+      }).then(() => {
+        console.log(`[!] Base de datos «${dbName}» eliminada correctamente.`);
       });
     }
 
@@ -857,7 +889,7 @@
 
     static globMatch = TriggersClass.globMatch;
 
-    triggers = new TriggersClass()
+    triggers = new TriggersClass();
 
   }
 
@@ -1000,12 +1032,12 @@
     selectMany(store, filterFn = i => true) {
       this.constructor.trace("browsie.selectMany", arguments);
       this.triggers.emit(`crud.select.many.${store}`, { store, filterFn });
-    
+
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction(store, 'readonly');
         const objectStore = transaction.objectStore(store);
         const request = objectStore.openCursor(); // Usa cursor para recorrer la BD sin cargar todo en memoria
-    
+
         const results = [];
         request.onsuccess = (event) => {
           const cursor = event.target.result;
@@ -1018,21 +1050,25 @@
             resolve(results); // Se terminó el recorrido
           }
         };
-    
+
         request.onerror = (error) =>
           reject(this._expandError(error, `Error on «browsie.selectMany» operation over store «${store}»: `));
       });
-    }    
+    }
 
     // Método para insertar varios items en un store
     insertMany(store, items) {
       this.constructor.trace("browsie.insertMany", arguments);
       this.triggers.emit(`crud.insert.many.${store}`, { store, items });
+      this.constructor.mustBeString(store, "insertMany", "arguments[0]");
+      this.constructor.mustBeArray(items, "insertMany", "arguments[1]");
       return new Promise((resolve, reject) => {
+        if (items.length === 0) {
+          return resolve(false);
+        }
         const transaction = this.db.transaction(store, 'readwrite');
         const objectStore = transaction.objectStore(store);
         let insertedCount = 0;
-
         items.forEach(item => {
           const request = objectStore.add(item);
           request.onsuccess = () => {
@@ -1080,7 +1116,6 @@
         const transaction = this.db.transaction(store, 'readwrite');
         const objectStore = transaction.objectStore(store);
         const request = objectStore.openCursor();
-
         let deletedCount = 0;
         request.onsuccess = () => {
           const cursor = request.result;
@@ -1101,7 +1136,498 @@
     }
   }
 
-  class Browsie extends BrowsieCrudAPI {
+  // @TOCONTINUEFROM
+  class BrowsieMigration {
+
+    static from(...args) {
+      return new this(...args);
+    }
+
+    static createTable(arg) {
+      return this.from({
+        operation: "createTable",
+        parameters: arg
+      });
+    }
+
+    static renameTable(arg) {
+      return this.from({
+        operation: "renameTable",
+        parameters: arg
+      });
+    }
+
+    static deleteTable(arg) {
+      return this.from({
+        operation: "deleteTable",
+        parameters: arg
+      });
+    }
+
+    static createColumn(arg) {
+      return this.from({
+        operation: "createColumn",
+        parameters: arg
+      });
+    }
+
+    static renameColumn(arg) {
+      return this.from({
+        operation: "renameColumn",
+        parameters: arg
+      });
+    }
+
+    static deleteColumn(arg) {
+      return this.from({
+        operation: "deleteColumn",
+        parameters: arg
+      });
+    }
+
+    constructor(options = {}) {
+      LswDatabase.trace("LswDatabaseMigration.constructor");
+      const { operation, parameters } = options;
+      this.$validateOperation(operation);
+      this.$validateParameters(parameters);
+      this.operation = operation;
+      this.parameters = parameters;
+      this.config = {
+        temporaryDatabase: this.parameters.fromDatabase + "_" + this.$getRandomString(5),
+      };
+      this.migrated = false;
+    }
+
+    $getRandomString(len = 10) {
+      LswDatabase.trace("LswDatabaseMigration.$getRandomString");
+      const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+      let out = "";
+      while (out.length < len) {
+        out += alphabet[Math.floor(Math.random() * alphabet.length)];
+      }
+      return out;
+    };
+
+    $validateOperation(operation) {
+      LswDatabase.trace("LswDatabaseMigration.$validateOperation");
+      if (["createTable", "renameTable", "deleteTable", "createColumn", "renameColumn", "deleteColumn", "cloneDatabase", "moveDatabase"].indexOf(operation) === -1) {
+        throw new Error("Required «operation» to be a valid operation on «LswDatabaseMigration.$validateOperation»");
+      }
+    }
+
+    $validateParameters(parameters) {
+      LswDatabase.trace("LswDatabaseMigration.$validateParameters");
+      if (typeof parameters !== "object") {
+        throw new Error("Required «parameters» to be an object on «LswDatabaseMigration.$validateParameters»");
+      }
+    }
+
+    async $$transferBackTemporaryDatabase() {
+      await LswDatabase.deleteDatabase(this.parameters.fromDatabase);
+      await this.$replicateSchema({
+        fromDatabase: this.config.temporaryDatabase,
+        toDatabase: this.parameters.fromDatabase,
+      });
+      await this.$populateDatabase({
+        fromDatabase: this.config.temporaryDatabase,
+        toDatabase: this.parameters.fromDatabase,
+      });
+      await LswDatabase.deleteDatabase(this.config.temporaryDatabase);
+    }
+
+    commit() {
+      LswDatabase.trace("LswDatabaseMigration.commit");
+      return this["$$" + this.operation].call(this).finally(() => {
+        this.migrated = true;
+      });
+    }
+
+    $validateCreateTableParameters() {
+      LswDatabase.trace("LswDatabaseMigration.$validateCreateTableParameters");
+      if (typeof this.parameters.fromDatabase !== "string") {
+        throw new Error("Required «parameters.fromDatabase» to be a string on «LswDatabaseMigration.$validateCreateTableParameters»");
+      }
+      if (typeof this.parameters.table !== "string") {
+        throw new Error("Required «parameters.table» to be a string on «LswDatabaseMigration.$validateCreateTableParameters»");
+      }
+      if (typeof this.parameters.tableDefinition !== "object") {
+        throw new Error("Required «parameters.tableDefinition» to be an object on «LswDatabaseMigration.$validateCreateTableParameters»");
+      }
+    }
+
+    async $$cloneDatabase() {
+      LswDatabase.trace("LswDatabaseMigration.$$cloneDatabase");
+      await this.$replicateSchema({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.parameters.toDatabase,
+      });
+      await this.$populateDatabase({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.parameters.toDatabase,
+      });
+    }
+
+    async $$moveDatabase() {
+      LswDatabase.trace("LswDatabaseMigration.$$moveDatabase");
+      await this.$replicateSchema({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.parameters.toDatabase,
+      });
+      await this.$populateDatabase({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.parameters.toDatabase,
+      });
+      await LswDatabase.deleteDatabase(this.parameters.fromDatabase);
+    }
+
+    async $$createTable() {
+      LswDatabase.trace("LswDatabaseMigration.$$createTable");
+      this.$validateCreateTableParameters();
+      await this.$replicateSchema({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.config.temporaryDatabase,
+        onAlterSchema: schema => {
+          schema[this.parameters.table] = this.parameters.tableDefinition;
+          return schema;
+        },
+      });
+      await this.$populateDatabase({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.config.temporaryDatabase,
+        onMapTableId: false,
+        onMapColumnId: false,
+      });
+      await this.$$transferBackTemporaryDatabase();
+    }
+
+    $validateDeleteTableParameters() {
+      LswDatabase.trace("LswDatabaseMigration.$validateDeleteTableParameters");
+      if (typeof this.parameters.fromDatabase !== "string") {
+        throw new Error("Required «parameters.fromDatabase» to be a string on «LswDatabaseMigration.$validateDeleteTableParameters»");
+      }
+      if (typeof this.parameters.table !== "string") {
+        throw new Error("Required «parameters.table» to be a string on «LswDatabaseMigration.$validateDeleteTableParameters»");
+      }
+    }
+
+    async $$deleteTable() {
+      LswDatabase.trace("LswDatabaseMigration.$$deleteTable");
+      this.$validateDeleteTableParameters();
+      await this.$replicateSchema({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.config.temporaryDatabase,
+        onAlterSchema: schema => {
+          delete schema[this.parameters.table];
+          return schema;
+        },
+      });
+      await this.$populateDatabase({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.config.temporaryDatabase,
+        onMapTableId: false,
+        onMapColumnId: false,
+      });
+      await this.$$transferBackTemporaryDatabase();
+    }
+
+    $validateRenameTableParameters() {
+      LswDatabase.trace("LswDatabaseMigration.$validateRenameTableParameters");
+      if (typeof this.parameters.fromDatabase !== "string") {
+        throw new Error("Required «parameters.fromDatabase» to be a string on «LswDatabaseMigration.$validateDeleteTableParameters»");
+      }
+      if (typeof this.parameters.tableSource !== "string") {
+        throw new Error("Required «parameters.tableSource» to be a string on «LswDatabaseMigration.$validateDeleteTableParameters»");
+      }
+      if (typeof this.parameters.tableDestination !== "string") {
+        throw new Error("Required «parameters.tableDestination» to be a string on «LswDatabaseMigration.$validateDeleteTableParameters»");
+      }
+    }
+
+    async $$renameTable() {
+      LswDatabase.trace("LswDatabaseMigration.$$renameTable");
+      this.$validateRenameTableParameters();
+      const currentSchema = await LswDatabase.getSchema(this.parameters.fromDatabase);
+      await this.$replicateSchema({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.config.temporaryDatabase,
+        onAlterSchema: schema => {
+          delete schema[this.parameters.tableSource];
+          const tableInput = this.adaptSchemaTableAsInput(currentSchema[this.parameters.tableSource]);
+          schema[this.parameters.tableDestination] = tableInput;
+          return schema;
+        },
+      });
+      await this.$populateDatabase({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.config.temporaryDatabase,
+        onMapTableId: tableId => {
+          return this.parameters.tableDestination;
+        },
+        onMapColumnId: false,
+      });
+      await this.$$transferBackTemporaryDatabase();
+    }
+
+    $validateCreateColumnParameters() {
+      LswDatabase.trace("LswDatabaseMigration.$validateCreateColumnParameters");
+      if (typeof this.parameters.fromDatabase !== "string") {
+        throw new Error("Required «parameters.fromDatabase» to be a string on «LswDatabaseMigration.$validateCreateColumnParameters»");
+      }
+      if (typeof this.parameters.table !== "string") {
+        throw new Error("Required «parameters.table» to be a string on «LswDatabaseMigration.$validateCreateColumnParameters»");
+      }
+      if (typeof this.parameters.column !== "string") {
+        throw new Error("Required «parameters.column» to be a string on «LswDatabaseMigration.$validateCreateColumnParameters»");
+      }
+      if (typeof this.parameters.columnDefinition !== "object") {
+        throw new Error("Required «parameters.columnDefinition» to be an object on «LswDatabaseMigration.$validateCreateColumnParameters»");
+      }
+    }
+
+    async $$createColumn() {
+      LswDatabase.trace("LswDatabaseMigration.$$createColumn");
+      this.$validateCreateColumnParameters();
+      const isUnique = !!this.parameters.columnDefinition.isUnique;
+      const columnSymbol = `${isUnique ? "!" : ""}${this.parameters.column}`;
+      await this.$replicateSchema({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.config.temporaryDatabase,
+        table: this.parameters.table,
+        onAlterSchema: schema => {
+          schema[this.parameters.table].push(columnSymbol);
+          return schema;
+        },
+      });
+      await this.$populateDatabase({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.config.temporaryDatabase,
+        onMapTableId: false,
+        onMapColumnId: false,
+      });
+      await this.$$transferBackTemporaryDatabase();
+    }
+
+    $validateDeleteColumnParameters() {
+      LswDatabase.trace("LswDatabaseMigration.$validateDeleteColumnParameters");
+      if (typeof this.parameters.fromDatabase !== "string") {
+        throw new Error("Required «parameters.fromDatabase» to be a string on «LswDatabaseMigration.$validateDeleteColumnParameters»");
+      }
+      if (typeof this.parameters.table !== "string") {
+        throw new Error("Required «parameters.table» to be a string on «LswDatabaseMigration.$validateDeleteColumnParameters»");
+      }
+      if (typeof this.parameters.column !== "string") {
+        throw new Error("Required «parameters.column» to be a string on «LswDatabaseMigration.$validateDeleteColumnParameters»");
+      }
+    }
+
+    async $$deleteColumn() {
+      LswDatabase.trace("LswDatabaseMigration.$$deleteColumn");
+      this.$validateDeleteColumnParameters();
+      await this.$replicateSchema({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.config.temporaryDatabase,
+        onAlterSchema: schema => {
+          console.log(schema);
+          const columnPosition = schema[this.parameters.table].indexOf(this.parameters.column);
+          schema[this.parameters.table].splice(columnPosition, 1);
+          return schema;
+        },
+      });
+      await this.$populateDatabase({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.config.temporaryDatabase,
+        // @TOCONFIGURE: $$deleteColumn needs a specific hook (or none).
+        onMapTableId: false,
+        onMapColumnId: false,
+      });
+      await this.$$transferBackTemporaryDatabase();
+    }
+
+    $validateRenameColumnParameters() {
+      LswDatabase.trace("LswDatabaseMigration.$validateRenameColumnParameters");
+      if (typeof this.parameters.fromDatabase !== "string") {
+        throw new Error("Required «parameters.fromDatabase» to be a string on «LswDatabaseMigration.$validateRenameColumnParameters»");
+      }
+      if (typeof this.parameters.table !== "string") {
+        throw new Error("Required «parameters.table» to be a string on «LswDatabaseMigration.$validateRenameColumnParameters»");
+      }
+      if (typeof this.parameters.columnSource !== "string") {
+        throw new Error("Required «parameters.columnSource» to be a string on «LswDatabaseMigration.$validateRenameColumnParameters»");
+      }
+      if (typeof this.parameters.columnDestination !== "string") {
+        throw new Error("Required «parameters.columnDestination» to be a string on «LswDatabaseMigration.$validateRenameColumnParameters»");
+      }
+    }
+
+    async $$renameColumn() {
+      LswDatabase.trace("LswDatabaseMigration.$$renameColumn");
+      this.$validateRenameColumnParameters();
+      await this.$replicateSchema({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.config.temporaryDatabase,
+        onAlterSchema: schema => {
+          console.log(schema);
+          const columnPosition = schema[this.parameters.table].indexOf(this.parameters.columnSource);
+          schema[this.parameters.table].splice(columnPosition, 1);
+          schema[this.parameters.table].push(this.parameters.columnDestination);
+          return schema;
+        },
+      });
+      await this.$populateDatabase({
+        fromDatabase: this.parameters.fromDatabase,
+        toDatabase: this.config.temporaryDatabase,
+        onMapTableId: false,
+        onMapColumnId: (columnId) => {
+          return columnId;
+        },
+      });
+      await this.$$transferBackTemporaryDatabase();
+    }
+
+    adaptSchemaAsInput(schemaDefinition) {
+      const output = {};
+      const tableIds = Object.keys(schemaDefinition);
+      for (let index = 0; index < tableIds.length; index++) {
+        const storeId = tableIds[index];
+        const tableDefinition = schemaDefinition[storeId];
+        const columns = tableDefinition.indexes;
+        if (!(storeId in output)) {
+          output[storeId] = [];
+        }
+        for (let indexColumn = 0; indexColumn < columns.length; indexColumn++) {
+          const column = columns[indexColumn];
+          const columnId = column.name;
+          const columnInput = this.adaptSchemaColumnAsInput(column, columnId);
+          output[storeId].push(columnInput);
+        }
+      }
+      return output;
+    }
+
+    adaptSchemaTableAsInput(tableDefinition) {
+      const output = [];
+      const columns = tableDefinition.indexes;
+      for (let indexColumn = 0; indexColumn < columns.length; indexColumn++) {
+        const column = columns[indexColumn];
+        const columnId = column.name;
+        const columnInput = this.adaptSchemaColumnAsInput(column, columnId);
+        output.push(columnInput);
+      }
+      return output;
+    }
+
+    adaptSchemaColumnAsInput(column, columnId) {
+      if (column.unique) {
+        return "!" + columnId;
+      } else {
+        return columnId;
+      }
+    }
+
+    async $replicateSchema(scenario) {
+      LswDatabase.trace("LswDatabaseMigration.$replicateSchema");
+      const { fromDatabase, toDatabase, onAlterSchema } = scenario;
+      console.log(`⌛️ Replicating database from «${fromDatabase}» to «${toDatabase}» on «LswDatabaseMigration.$replicateSchema»`);
+      const schemaDefinition = await LswDatabase.getSchema(fromDatabase);
+      const schemaInput = this.adaptSchemaAsInput(schemaDefinition);
+      let alteredSchema = schemaInput;
+      if (onAlterSchema) {
+        alteredSchema = onAlterSchema(schemaInput);
+        if (typeof alteredSchema === "undefined") {
+          throw new Error("Required «onAlterSchema» to return an object on «LswDatabaseMigration.$replicateSchema»")
+        }
+      }
+      console.log("Replicated schema:", alteredSchema);
+      await LswDatabase.createDatabase(toDatabase, alteredSchema);
+    }
+
+    async $populateDatabase(scenario) {
+      LswDatabase.trace("LswDatabaseMigration.$populateDatabase");
+      const { fromDatabase, toDatabase, onMapTableId = false, onMapColumnId = false } = scenario;
+      console.log(`⌛️ Populating database from «${fromDatabase}» to «${toDatabase}» on «LswDatabaseMigration.$populateDatabase»`);
+      const schemaDefinition = await LswDatabase.getSchema(fromDatabase);
+      const tableIds = Object.keys(schemaDefinition);
+      let fromConnection = undefined;
+      let toConnection = undefined;
+      let indexTable = 0;
+      let indexColumn = 0;
+      let tableId = undefined;
+      let alteredTableId = undefined;
+      try {
+        fromConnection = new LswDatabase(fromDatabase);
+        toConnection = new LswDatabase(toDatabase);
+        await fromConnection.open();
+        await toConnection.open();
+        for (indexTable = 0; indexTable < tableIds.length; indexTable++) {
+          tableId = tableIds[indexTable];
+          console.log("table:", tableId);
+          Transfering_tables: {
+            console.log(`⌛️ Transfering table «${tableId}» on «LswDatabaseMigration.$populateDatabase»`);
+            let allRows = await fromConnection.selectMany(tableId, v => true);
+            console.log("What???")
+            alteredTableId = tableId;
+            if (onMapTableId) {
+              alteredTableId = onMapTableId(tableId);
+            }
+            console.log("What??? 222")
+            if (onMapColumnId) {
+              allRows = allRows.reduce((output, row) => {
+                const allKeys = Object.keys(row);
+                const alteredRow = {};
+                for (let indexKeys = 0; indexKeys < allKeys.length; indexKeys++) {
+                  console.log("column:", indexKeys);
+                  const columnId = allKeys[indexKeys];
+                  const alteredColumnId = onMapColumnId(columnId, tableId, alteredTableId, {
+                    fromConnection,
+                    toConnection
+                  }) || columnId;
+                  alteredRow[alteredColumnId] = row[columnId];
+                }
+                output.push(alteredRow);
+                return output;
+              }, []);
+            }
+            console.log("What??? 333")
+            console.log(alteredTableId);
+            console.log(allRows);
+            await toConnection.insertMany(alteredTableId, allRows);
+            console.log("What??? 444")
+          }
+        }
+      } catch (error) {
+        console.log(`💥 Error while populating database on table ${tableId || "-"} (alias «${alteredTableId}»):`, error);
+      } finally {
+        try {
+          await fromConnection.close();
+        } catch (error) {
+          console.log(error);
+        }
+        try {
+          await toConnection.close();
+        } catch (error) {
+          console.log(error);
+        }
+        console.log(`[*] Database «${toDatabase}» population finished successfully.`);
+      }
+    }
+
+  }
+
+  class LswDatabaseMigration extends BrowsieMigration {
+
+  }
+
+  LswDatabaseMigration.default = LswDatabaseMigration;
+  window.LswDatabaseMigration = LswDatabaseMigration;
+  window.BrowsieMigration = BrowsieMigration;
+
+  class BrowsieMigrable extends BrowsieCrudAPI {
+
+    static migration = LswDatabaseMigration;
+
+  }
+
+  class Browsie extends BrowsieMigrable {
 
   }
 
@@ -1110,8 +1636,8 @@
 
   /* Extended API */
 
-  class LswDatabase extends Browsie {
-    
+  class LswDatabase extends BrowsieMigrable {
+
     class = this.constructor;
 
   }
@@ -3372,7 +3898,31 @@ return Store;
     return `${hora}:${minuto}`;
   };
 
+  Timeformat_utils.formatDatestringFromDate = function (dateObject, setUntilDay = false, setMeridian = false) {
+    if(typeof dateObject === "undefined") {
+      return undefined;
+    }
+    const anio = ("" + (dateObject.getFullYear() ?? 0)).padStart(4, '0');
+    const mes = ("" + ((dateObject.getMonth() ?? 0) + 1)).padStart(2, '0');
+    const dia = ("" + (dateObject.getDate() ?? 0)).padStart(2, '0');
+    if(setUntilDay) {
+      return `${anio}/${mes}/${dia}`;
+    }
+    const hora = ("" + (dateObject.getHours() ?? 0)).padStart(2, '0');
+    const minuto = ("" + (dateObject.getMinutes() ?? 0)).padStart(2, '0');
+    return `${anio}/${mes}/${dia} ${hora}:${minuto}${setMeridian ? hora >= 12 ? 'pm' : 'am' : ''}`;
+  };
+
   Timeformat_utils.formatHourFromMomento = function (momentoBrute, setMeridian = false) {
+    const momento = Timeformat_utils.toPlainObject(momentoBrute);
+    const hora = ("" + (momento.hora ?? 0)).padStart(2, '0');
+    const minuto = ("" + (momento.minuto ?? 0)).padStart(2, '0');
+    return `${hora}:${minuto}${setMeridian ? hora >= 12 ? 'pm' : 'am' : ''}`;
+  };
+
+  Timeformat_utils.formatHourFromMomentoCode = function (momentoCode, setMeridian = false) {
+    const momentoBruteList = Timeformat_parser.parse(momentoCode);
+    const momentoBrute = momentoBruteList[0];
     const momento = Timeformat_utils.toPlainObject(momentoBrute);
     const hora = ("" + (momento.hora ?? 0)).padStart(2, '0');
     const minuto = ("" + (momento.minuto ?? 0)).padStart(2, '0');
@@ -9472,154 +10022,6 @@ return Store;
 
   return LswDatabaseAdapter;
 });
-(function (factory) {
-  const mod = factory();
-  if (typeof window !== 'undefined') {
-    window['LswFormControls'] = mod;
-  }
-  if (typeof global !== 'undefined') {
-    global['LswFormControls'] = mod;
-  }
-  if (typeof module !== 'undefined') {
-    module.exports = mod;
-  }
-})(function () {
-
-  class LswFormControlsClass {
-
-    static class = this;
-
-    constructor() {
-      this.mixins = new Map();
-    }
-
-    registerMixin(name, mixin) {
-      if(this.mixins.has(name)) {
-        throw new Error(`Cannot register mixin because it is already registered «${name}» on «LswFormControls.registerMixin»`);
-      }
-      this.mixins.set(name, mixin);
-    }
-
-    unregisterMixin(name) {
-      if(this.mixins.has(name)) {
-        throw new Error(`Cannot unregister mixin because it is not registered «${name}» on «LswFormControls.unregisterMixin»`);
-      }
-      this.mixins.delete(name);
-    }
-
-  }
-
-  const LswFormControls = new LswFormControlsClass();
-
-  LswFormControls.registerMixin("BasicControl", {
-    props: {
-      initialValue: {
-        type: [String,Object,Array,Boolean,Number,undefined],
-        default: () => undefined
-      },
-      onValidate: {
-        type: Function,
-        default: () => true
-      },
-      onChange: {
-        type: Function,
-        default: () => undefined
-      },
-      onDelayedChange: {
-        type: Function,
-        default: () => undefined
-      },
-      delayedTimeout: {
-        type: Number,
-        default: () => 3000
-      },
-      label: {
-        type: String,
-        default: () => ""
-      },
-      formId: {
-        type: String,
-        default: () => "default"
-      },
-      name: {
-        type: String,
-        default: () => undefined
-      },
-      cssStyles: {
-        type: Object,
-        default: () => ({})
-      },
-      cssClasses: {
-        type: Object,
-        default: () => ({})
-      }
-    },
-    data() {
-      return {
-        _delayedChangeTimeoutId: undefined,
-        error: false,
-        value: this.initialValue,
-      }
-    },
-    methods: {
-      setValue(newValue) {
-        this.value = newValue;
-      },
-      getValue() {
-        return this.value;
-      },
-      getError() {
-        return this.error;
-      },
-      setError(error) {
-        this.error = error;
-      },
-      clearError() {
-        this.error = false;
-      },
-      async validate() {
-        if(typeof this.onValidate !== "function") {
-          throw new Error("Required «onValidate» to be a function on «BasicControl.validate»");
-        }
-        try {
-          const value = this.getValue();
-          const result = await this.onValidate(value, this);
-          if(typeof result === "undefined") {
-            this.clearError();
-          } else if(result instanceof Error) {
-            this.setError(result);
-          } else {
-            // @OK
-            this.clearError();
-          }
-          return result;
-        } catch (error) {
-          this.setError(error);
-          return error;
-        }
-      }
-    },
-    watch: {
-      value(newValue) {
-        if(this.onChange === "function") {
-          this.onChange(newValue, this);
-        }
-        if(this.onDelayedChange === "function") {
-          clearTimeout(this._delayedChangeTimeoutId);
-          this._delayedChangeTimeoutId = setTimeout(() => {
-            this.onDelayedChange(newValue, this);
-          }, this.delayedTimeout);
-        }
-      }
-    },
-    mounted() {
-      this.$el.$lswFormControlComponent = this;
-    }
-  })
-  
-  return LswFormControls;
-
-});
 Vue.directive("descriptor", {
   bind(el, binding) {
       const resolveClasses = key => {
@@ -9657,26 +10059,637 @@ styleTag.textContent = `
     padding-left: 0px;
     padding-right: 0px;
     padding-bottom: 0px;
+    padding-top: 0px;
   }
   .bordered_1 {
-    border: 1px solid #CCC;
+    border: 1px solid #999;
+    border-radius: 2pt;
   }
   .with_separator_on_bottom_1 {
-    border-bottom: 1px solid #CCC;
+    border-bottom: 1px solid #999;
+  }
+  .lateral_button {
+    height: 100%;
+  }
+  .lateral_button_cell {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-right: 4px;
+  }
+  .padded_1 {
+    padding: 4px;
+  }
+  .vertically_padded_1 {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .horizontally_padded_1 {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+  .left_padded_1 {
+    padding-left: 4px;
+  }
+  .right_padded_1 {
+    padding-right: 4px;
+  }
+  .top_padded_1 {
+    padding-top: 4px;
+  }
+  .bottom_padded_1 {
+    padding-bottom: 4px;
+  }
+  .calendar_main_panel {
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+  .calendar_buttons_panel_1 {
+    padding-bottom: 4px;
+    padding-top: 4px;
   }
 `;
 document.body.appendChild(styleTag);
 
 window.stylingDescriptor = {
+  "agenda.calendar.buttons_panel_1": "calendar_main_panel calendar_buttons_panel_1",
   "agenda.task_form.title": "title_of_form",
   "agenda.task_form.block": "block_of_form",
-  "agenda.task_form.aggregations.block": "block_of_form with_separator_on_bottom_1"
+  "agenda.task_form.block_of_add_button": "block_of_form vertically_padded_1",
+  "agenda.task_form.block_of_aggregated_field": "bordered_1",
+  "agenda.task_form.section": "with_separator_on_bottom_1",
+  "agenda.task_form.aggregations.block": "block_of_form",
+  "agenda.task_form.aggregations.lateral_button": "lateral_button",
+  "agenda.task_form.aggregations.lateral_button_cell": "lateral_button_cell",
 }
 Vue.directive("focus", {
   inserted: function(el) {
     el.focus();
   }
 });
+(() => {
+  const registerIdInScope = function (id, scope, element) {
+    console.log("[trace][v-form] registerIdInScope");
+    if (typeof id === "undefined" && typeof scope === "undefined") {
+      return false;
+    } else if (typeof scope === "undefined") {
+      return false;
+    } else if (scope === null) {
+      return false;
+    } else if (id === null) {
+      return false;
+    }
+    if (id in scope) {
+      // @EXPERIMENTAL: volver a quitar el comentario si es muy loco.
+      // throw new Error(`Cannot repeat id «${id}» in scope on «registerIdInScope»`);
+    }
+    scope[id] = element;
+    return true;
+  };
+  const capitalize = function (txt) {
+    return txt.substr(0, 1).toUpperCase() + txt.substr(1);
+  };
+  const getRandomString = function (len = 10) {
+    const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+    let out = "";
+    while (out.length < len) {
+      out += alphabet[Math.floor(Math.random() * alphabet.length)];
+    }
+    return out;
+  };
+  const generateGetChildrenFunction = function (el, binding, objectType = "form") {
+    console.log("[trace][v-form] generateGetChildrenFunction");
+    const isForm = objectType === "form";
+    const isControl = (!isForm) && (objectType === "control");
+    const canHaveChildren = isForm || isControl;
+    if (canHaveChildren) {
+      return function () {
+        console.log("[trace][v-form] generateFormObject.getChildren");
+        // @TODO: encontrar nodos hijo en el scope pertinente
+        const id = el.$lswFormMetadata.parameters.selfId;
+        const scope = el.$lswFormMetadata.parameters.selfScope;
+        const scopeIds = Object.keys(scope);
+        const children = [];
+        for (let index = 0; index < scopeIds.length; index++) {
+          const elementId = scopeIds[index];
+          const element = scope[elementId];
+          const elementParentId = element.$lswFormMetadata.parameters.parentId;
+          if (elementParentId === id) {
+            children.push(element);
+          }
+        }
+        const expectation1 = parseInt(el.$lswFormMetadata.parameters.expectedChildren) || -1;
+        if (expectation1 !== -1) {
+          if (expectation1 !== children.length) {
+            throw new Error(`Failed «expectedChildren» on «{${Object.keys(el.$lswFormMetadata.parameters.selfScope).join(", ")}}.${el.$lswFormMetadata.parameters.selfId}»: current=${children.length} / expected=${expectation1}`);
+          }
+        }
+        return children;
+      };
+    } else {
+      throw new Error("Required parameter «objectType» to be a valid option (form, control, input, error) on v-form directive");
+    }
+  };
+  const generateGetValueFunction = function (el, binding, objectType = "form") {
+    console.log("[trace][v-form] generateGetValueFunction");
+    const applyFormat = (...args) => {
+      if (el.$lswFormMetadata.parameters.onFormat) {
+        return el.$lswFormMetadata.parameters.onFormat(...args);
+      }
+      return args[0];
+    };
+    if (el.$lswFormMetadata.parameters.onGetValue) {
+      return function () {
+        const result = el.$lswFormMetadata.parameters.onGetValue(el, binding);
+        return applyFormat(result);
+      };
+    }
+    if (objectType === "form") {
+      return function () {
+        console.log("[trace][v-form] generateFormObject.getValue");
+        const allChildren = this.getChildren();
+        const finalValue = {};
+        for (let index = 0; index < allChildren.length; index++) {
+          const child = allChildren[index];
+          const value = child.$lswFormMetadata.methods.getValue();
+          const prop = child.$lswFormMetadata.parameters.name;
+          finalValue[prop] = value;
+        }
+        return applyFormat(finalValue);
+      };
+    } else if (objectType === "control") {
+      return function () {
+        console.log("[trace][v-form] generateControlObject.getValue");
+        const allChildren = this.getChildren();
+        const finalValue = {};
+        for (let index = 0; index < allChildren.length; index++) {
+          const child = allChildren[index];
+          const value = child.$lswFormMetadata.methods.getValue();
+          const prop = child.$lswFormMetadata.parameters.name;
+          finalValue[prop] = value;
+        }
+        return applyFormat(finalValue);
+      };
+    } else if (objectType === "input") {
+      return function () {
+        console.log("[trace][v-form] generateInputObject.getValue");
+        const tagName = el.tagName.toLowerCase();
+        const valuedTags = ["input", "textarea", "select"];
+        if (valuedTags.indexOf(tagName) !== -1) {
+          return el.value;
+        }
+        return applyFormat(el.textContent);
+      };
+    } else {
+      throw new Error("Required parameter «objectType» to be a valid option (form, control, input, error) on v-form directive");
+    }
+  };
+  const generateSubmitFunction = function (el, binding) {
+    return async function () {
+      console.log("[trace][v-form] generateFormObject.submit");
+      try {
+        const validationResult = await this.validate();
+        const value = await this.getValue();
+        console.log("Final form value:", value);
+        if (el.$lswFormMetadata.parameters.onSubmit) {
+          return el.$lswFormMetadata.parameters.onSubmit(value, el, this);
+        }
+        return value;
+      } catch (error) {
+        this.propagateError(error);
+      }
+    };
+  };
+  const generateCommonValidateFunction = function (el, binding, objectType = "form") {
+    return async function () {
+      console.log(`[trace][v-form] generate${capitalize(objectType)}Object.commonValidate`);
+      const children = this.getChildren();
+      const arisedErrors = [];
+      for (let index = 0; index < children.length; index++) {
+        const child = children[index];
+        try {
+          await child.$lswFormMetadata.methods.validate();
+        } catch (error) {
+          arisedErrors.push(error);
+        }
+      }
+      try {
+        if (el.$lswFormMetadata.parameters.onValidate) {
+          await el.$lswFormMetadata.parameters.onValidate();
+        }
+      } catch (error) {
+        arisedErrors.push(error);
+      }
+      if (arisedErrors.length) {
+        const unifiedErrorMessage = arisedErrors.map(e => `  - ${e.name}: ${e.message}`).join("\n");
+        this.propagateError(unifiedErrorMessage);
+        throw unifiedErrorMessage;
+      }
+      this.propagateSuccess();
+      return true;
+    };
+  }
+  const generateValidateFunction = function (el, binding, objectType = "form") {
+    if (objectType === "form") {
+      return generateCommonValidateFunction(el, binding, "form");
+    } else if (objectType === "control") {
+      return generateCommonValidateFunction(el, binding, "control");
+    } else if (objectType === "input") {
+      return async function () {
+        console.log("[trace][v-form] generateInputObject.validate");
+        if (el.$lswFormMetadata.parameters.onValidate) {
+          try {
+            const value = await this.getValue();
+            await el.$lswFormMetadata.parameters.onValidate(value, el, this);
+            this.propagateSuccess();
+          } catch (error) {
+            this.propagateError(error);
+            throw error;
+          }
+        }
+      };
+    } else {
+      throw new Error("Required parameter «objectType» to be a valid option (form, control, input, error) on v-form directive");
+    }
+  };
+  const generatePropagateErrorFunction = function (el, binding, objectType = "form") {
+    return function (error) {
+      console.log("[trace][v-form] propagateError");
+      console.log(error);
+      Propagate_arriba: {
+        const parentId = el.$lswFormMetadata.parameters.parentId;
+        const parentScope = el.$lswFormMetadata.parameters.parentScope;
+        const notPretendsParent = (!parentScope) || (!parentId);
+        if (notPretendsParent) {
+          break Propagate_arriba;
+        }
+        const notFoundParent = !(parentId in parentScope);
+        if (notFoundParent) {
+          console.log(`[error][v-form] Directive «${el.$lswFormMetadata.tagName} v-form.${el.$lswFormMetadata.type}» could not find «parentId:${parentId}» in parentScope with keys: «${Object.keys(parentScope).join(", ")}»`);
+          console.log(`[error][v-form] This error will be ignored in order to continue fluently the tree-up error propagation as expected.`);
+        }
+        const parentElement = parentScope[parentId];
+        const isFormType = selfScopeElement.$lswFormMetadata.type === "form";
+        const isControlType = selfScopeElement.$lswFormMetadata.type === "control";
+        const shouldPropagateUp = isFormType || isControlType;
+        if (shouldPropagateUp) {
+          parentElement.$lswFormMetadata.methods.propagateError(error);
+        }
+      }
+      Propagate_abajo: {
+        const selfId = el.$lswFormMetadata.parameters.selfId;
+        const selfScope = el.$lswFormMetadata.parameters.selfScope;
+        const selfScopeKeys = Object.keys(selfScope);
+        for (let index = 0; index < selfScopeKeys.length; index++) {
+          const selfScopeKey = selfScopeKeys[index];
+          const selfScopeElement = selfScope[selfScopeKey];
+          const elementParentId = selfScopeElement.$lswFormMetadata.parameters.parentId;
+          const isChild = elementParentId === selfId;
+          const isErrorType = selfScopeElement.$lswFormMetadata.type === "error";
+          const shouldPropagateDown = isChild && isErrorType;
+          if (shouldPropagateDown) {
+            selfScopeElement.$lswFormMetadata.methods.propagateError(error);
+          }
+        }
+      }
+      if (el.$lswFormMetadata.parameters.onError) {
+        try {
+          el.$lswFormMetadata.parameters.onError(error);
+        } catch (error) {
+          console.log(error); // only prints, onError should be safe function.
+        }
+      }
+    };
+  };
+  const generatePropagateSuccessFunction = function (el, binding, objectType = "form") {
+    return function () {
+      console.log("[trace][v-form] propagateSuccess");
+      Propagate_abajo: {
+        const selfId = el.$lswFormMetadata.parameters.selfId;
+        const selfScope = el.$lswFormMetadata.parameters.selfScope;
+        const selfScopeKeys = Object.keys(selfScope);
+        for (let index = 0; index < selfScopeKeys.length; index++) {
+          const selfScopeKey = selfScopeKeys[index];
+          const selfScopeElement = selfScope[selfScopeKey];
+          const elementParentId = selfScopeElement.$lswFormMetadata.parameters.parentId;
+          const isChild = elementParentId === selfId;
+          const isErrorType = selfScopeElement.$lswFormMetadata.type === "error";
+          if (isChild && isErrorType) {
+            selfScopeElement.$lswFormMetadata.methods.propagateSuccess();
+          }
+        }
+        if (el.$lswFormMetadata.parameters.onValidated) {
+          el.$lswFormMetadata.parameters.onValidated(el, binding);
+        }
+      }
+    };
+  };
+  const generateFormObject = function (el, binding) {
+    console.log("[trace][v-form] generateFormObject");
+    return {
+      getChildren: generateGetChildrenFunction(el, binding, "form"),
+      getValue: generateGetValueFunction(el, binding, "form"),
+      submit: generateSubmitFunction(el, binding, "form"),
+      validate: generateValidateFunction(el, binding, "form"),
+      propagateSuccess: generatePropagateSuccessFunction(el, binding, "form"),
+      propagateError: generatePropagateErrorFunction(el, binding, "form"),
+    };
+  };
+  const generateControlObject = function (el, binding) {
+    console.log("[trace][v-form] generateControlObject");
+    return {
+      getChildren: generateGetChildrenFunction(el, binding, "control"),
+      getValue: generateGetValueFunction(el, binding, "control"),
+      validate: generateValidateFunction(el, binding, "control"),
+      propagateSuccess: generatePropagateSuccessFunction(el, binding, "control"),
+      propagateError: generatePropagateErrorFunction(el, binding, "control"),
+    };
+  };
+  const generateInputObject = function (el, binding) {
+    console.log("[trace][v-form] generateErrorObject");
+    return {
+      getChildren: false,
+      getValue: generateGetValueFunction(el, binding, "input"),
+      validate: generateValidateFunction(el, binding, "input"),
+      propagateSuccess: generatePropagateSuccessFunction(el, binding, "input"),
+      propagateError: generatePropagateErrorFunction(el, binding, "input")
+    };
+  };
+  const generateErrorObject = function (el, binding) {
+    console.log("[trace][v-form] generateErrorObject");
+    return {
+      setError: function (error) {
+        console.log("[trace][v-form] generateErrorObject.setError");
+        el.textContent = `${error.name}: ${error.message}`;
+      },
+      clearError: function () {
+        console.log("[trace][v-form] generateErrorObject.clearError");
+        el.textContent = "";
+      },
+      propagateError: function (...args) {
+        console.log("[trace][v-form] generateErrorObject.propagateError");
+        const error = args[0];
+        el.classList.remove("successBox");
+        el.classList.add("errorBox");
+        this.setError(...args);
+        if (el.$lswFormMetadata.parameters.onError) {
+          try {
+            el.$lswFormMetadata.parameters.onError(error, el, this);
+          } catch (error) {
+            console.log(error); // only prints, onError should be safe function.
+          }
+        }
+      },
+      propagateSuccess: function (...args) {
+        console.log("[trace][v-form] generateErrorObject.propagateSuccess");
+        el.classList.remove("errorBox");
+        el.classList.add("successBox");
+        if (el.$lswFormMetadata.parameters.onValidated) {
+          el.$lswFormMetadata.parameters.onValidated(el, this);
+        }
+        if (el.$lswFormMetadata.parameters.onSuccessStatus) {
+          return this.setError(el.$lswFormMetadata.parameters.onSuccessStatus);
+        } else {
+          return this.clearError();
+        }
+      }
+    };
+  };
+  const loadMetadataAsForm = function (el, binding) {
+    console.log("[trace][v-form] loadMetadataAsForm");
+    el.$lswFormMetadata = {
+      type: "form",
+      component: binding.instance,
+      expression: binding.expression,
+      parameters: binding.value,
+      element: el,
+    };
+    const params = binding.value;
+    Validate_parameters: {
+      const { parentId } = params;
+      const { parentScope } = params;
+      const { selfId } = params;
+      const { selfScope } = params;
+      const { onValidate } = params;
+      const { onValidated } = params;
+      const { onSubmit } = params;
+      if (typeof parentId === "undefined") {
+        // @OK. Because form can have no parent.
+      } else if (typeof parentId !== "string") {
+        throw new Error("Required parameter «parentId» to be a string on v-form directive");
+      }
+      if (typeof parentScope === "undefined") {
+        // @OK. Because form can have no parent.
+      } else if (typeof parentScope !== "object") {
+        throw new Error("Required parameter «parentScope» to be an object on v-form directive");
+      }
+      if (typeof selfId !== "string") {
+        throw new Error("Required parameter «selfId» to be a string on v-form directive");
+      }
+      if (typeof selfScope !== "object") {
+        throw new Error("Required parameter «selfScope» to be an object on v-form directive");
+      }
+      if (typeof onValidate === "undefined") {
+        // @OK.
+      } else if (typeof onValidate !== "function") {
+        throw new Error("Required parameter «onValidate» to be a function on v-form directive");
+      }
+      if (typeof onSubmit === "undefined") {
+        // @OK.
+      } else if (typeof onSubmit !== "function") {
+        throw new Error("Required parameter «onSubmit» to be an function on v-form directive");
+      }
+    }
+    Inject_scopes: {
+      const finalSelfId = params.selfId || null;
+      const selfScopedOk = registerIdInScope(finalSelfId, params.selfScope, el);
+      const parentScopedOk = registerIdInScope(finalSelfId, params.parentScope, el);
+      if (!selfScopedOk) {
+        // @ERROR. Because forms requires children.
+        throw new Error("Required v-form.form directive to be able to register «selfId» in «selfScope»");
+      }
+      if (!parentScopedOk) {
+        // @OK. Because form does not need a parent.
+      }
+    }
+    Inject_api: {
+      el.$lswFormMetadata.methods = generateFormObject(el, binding);
+    }
+  };
+  const loadMetadataAsControl = function (el, binding) {
+    console.log("[trace][v-form] loadMetadataAsControl");
+    el.$lswFormMetadata = {
+      type: "control",
+      component: binding.instance,
+      expression: binding.expression,
+      parameters: binding.value,
+      element: el,
+    };
+    const params = binding.value;
+    Validate_parameters: {
+      const { parentId } = params;
+      const { parentScope } = params;
+      const { selfId } = params;
+      const { selfScope } = params;
+      const { onValidate } = params;
+      const { onValidated } = params;
+      const { onSubmit } = params;
+    }
+    Inject_scopes: {
+      const finalSelfId = params.selfId || "control." + getRandomString(10);
+      const selfScopedOk = registerIdInScope(finalSelfId, params.selfScope, el);
+      const parentScopedOk = registerIdInScope(finalSelfId, params.parentScope, el);
+      if (!selfScopedOk) {
+        // @OK. Because control does not need a children.
+      }
+      if (!parentScopedOk) {
+        // @OK. Because control does not need a parent.
+      }
+      if ((!selfScopedOk) && (!parentScopedOk)) {
+        throw new Error("Required v-form.control directive to register «parentId» or «selfId» but not none");
+      }
+    }
+    Inject_api: {
+      el.$lswFormMetadata.methods = generateControlObject(el, binding);
+    }
+  };
+  const loadMetadataAsInput = function (el, binding) {
+    console.log("[trace][v-form] loadMetadataAsInput");
+    el.$lswFormMetadata = {
+      type: "input",
+      component: binding.instance,
+      expression: binding.expression,
+      parameters: binding.value,
+      element: el,
+    };
+    const params = binding.value;
+    Validate_parameters: {
+      const { parentId } = params;
+      const { parentScope } = params;
+      const { selfId } = params;
+      const { selfScope } = params;
+      const { onValidate } = params;
+      const { onValidated } = params;
+      const { onSubmit } = params;
+    }
+    Inject_scopes: {
+      const finalSelfId = params.selfId || "input." + getRandomString(10);
+      const selfScopedOk = registerIdInScope(finalSelfId, params.selfScope, el);
+      const parentScopedOk = registerIdInScope(finalSelfId, params.parentScope, el);
+      if (!selfScopedOk) {
+        // @OK. Because input cannot have a children.
+      }
+      if (!parentScopedOk) {
+        // @ERROR. Because input requires parent.
+        throw new Error("Required v-form.input directive to be able to register «selfId» in «parentScope»");
+      }
+    }
+    Inject_api: {
+      el.$lswFormMetadata.methods = generateInputObject(el, binding);
+    }
+  };
+  const loadMetadataAsError = function (el, binding) {
+    console.log("[trace][v-form] loadMetadataAsError");
+    el.$lswFormMetadata = {
+      type: "error",
+      component: binding.instance,
+      expression: binding.expression,
+      parameters: binding.value,
+      element: el,
+    };
+    const params = binding.value;
+    Validate_parameters: {
+      const { parentId } = params;
+      const { parentScope } = params;
+      const { selfId } = params;
+      const { selfScope } = params;
+      const { onValidate } = params;
+      const { onValidated } = params;
+      const { onSuccessStatus } = params;
+      const { onSubmit } = params;
+    }
+    Inject_scopes: {
+      const finalSelfId = params.selfId || "error." + getRandomString(10);
+      const selfScopedOk = registerIdInScope(finalSelfId, params.selfScope, el);
+      const parentScopedOk = registerIdInScope(finalSelfId, params.parentScope, el);
+      if (!selfScopedOk) {
+        // @OK. Because form does not need a children.
+      }
+      if (!parentScopedOk) {
+        // @ERROR. Because error requires parent.
+        throw new Error("Required v-form.error directive to be able to register «selfId» in «parentScope»");
+      }
+    }
+    Inject_api: {
+      el.$lswFormMetadata.methods = generateErrorObject(el, binding);
+    }
+  };
+  const loadForm = function (el, binding) {
+    console.log("[trace][v-form] loadForm");
+    loadMetadataAsForm(el, binding);
+  };
+  const loadControl = function (el, binding) {
+    console.log("[trace][v-form] loadControl");
+    loadMetadataAsControl(el, binding);
+  };
+  const loadInput = function (el, binding) {
+    console.log("[trace][v-form] loadInput");
+    loadMetadataAsInput(el, binding);
+  };
+  const loadError = function (el, binding) {
+    console.log("[trace][v-form] loadError");
+    loadMetadataAsError(el, binding);
+  };
+  const knownScopes = [];
+  Vue.directive("form", {
+    bind(el, binding) {
+      const { modifiers } = binding;
+      const isForm = "form" in modifiers;
+      const isControl = "control" in modifiers;
+      const isError = "error" in modifiers;
+      const isInput = "input" in modifiers;
+      if (isForm) {
+        loadForm(el, binding);
+        el.setAttribute("data-v-form-type", "form");
+      } else if (isControl) {
+        loadControl(el, binding);
+        el.setAttribute("data-v-form-type", "control");
+      } else if (isError) {
+        loadError(el, binding);
+        el.setAttribute("data-v-form-type", "error");
+      } else if (isInput) {
+        loadInput(el, binding);
+        el.setAttribute("data-v-form-type", "input");
+      } else {
+        throw new Error("Required v-form directive to have 1 modifier: .form .control .input or .error");
+      }
+      Extend_element_for_debug_purposes: {
+        el.setAttribute("data-v-form-parent-id", el.$lswFormMetadata.parameters.parentId);
+        el.setAttribute("data-v-form-self-id", el.$lswFormMetadata.parameters.selfId);
+        const posParentBrute = knownScopes.indexOf(el.$lswFormMetadata.parameters.parentScope);
+        const posSelfBrute = knownScopes.indexOf(el.$lswFormMetadata.parameters.selfScope);
+        let posParent = posParentBrute;
+        let posSelf = posSelfBrute;
+        if (posParent === -1) {
+          knownScopes.push(el.$lswFormMetadata.parameters.parentScope);
+          posParent = knownScopes.length - 1;
+        }
+        if (posSelf === -1) {
+          knownScopes.push(el.$lswFormMetadata.parameters.selfScope);
+          posSelf = knownScopes.length - 1;
+        }
+        el.setAttribute("data-v-form-parent-scope", "{S." + posParent + "}");
+        el.setAttribute("data-v-form-self-scope", "{S." + posSelf + "}");
+      }
+    },
+    unbind(el) {
+      delete el.$lswFormMetadata.component;
+      delete el.$lswFormMetadata.element;
+      delete el.$lswFormMetadata;
+    }
+  });
+})();
 /**!
  * Sortable
  * @author	RubaXa   <trash@rubaxa.org>
@@ -15456,7 +16469,7 @@ socket.on('refrescar', () => {
 Vue.component("LswCalendario", {
   template: `<div class="Component LswCalendario">
   <div style="max-width: 260px;">
-    <div class="like_table" style="border-left: 1px solid white; border-bottom: 1px solid white; border-top: 1px solid white;">
+    <div class="like_table" style="border-collapse: collapse; border: none; border-bottom: 1px solid white;">
       <div class="like_row">
         <div class="like_cell">
           <button class="boton_de_mover_mes"
@@ -15870,559 +16883,320 @@ Vue.component("LswCalendario", {
     }
   }
 });
-Vue.component("ControlBox", {
-  template: `<div class="ControlBox FormControl">
-  <!--Content of the form-->
-  <slot></slot>
-  <!--Buttons of the form-->
-  <div class="ControlBoxButtons" v-if="validateButton || submitButton">
-    <span v-if="validateButton">
-        <button v-on:click="validate">Validate</button>
-    </span>
-    <span v-if="submitButton">
-        <button v-on:click="submit">Submit</button>
-    </span>
-  </div>
-  <!--Error of the form-->
-  <ControlError class="unsized" v-if="error" :error="error" :control="this" style="margin-bottom: 4px;" />
-  <div class="ControlSuccess" v-else-if="showValidatedMessage && (state === 'validated')">
-    ☑️ All fields are valid.
-  </div>
-  <div class="ControlSuccess" v-else-if="showSubmittedMessage && (state === 'submitted')">
-    ☑️ Data was successfully submitted.
-  </div>
-  <div class="ControlPending" v-else-if="state === 'pending'">
-    🕒 One moment, please... 🕒
-  </div>
-  <!--End of the form-->
-</div>`,
-  mixins: [
-
-  ],
-  props: {
-    validateButton: {
-      type: String,
-      required: false
-    },
-    submitButton: {
-      type: String,
-      required: false
-    },
-    onSubmit: {
-      type: Function,
-      default: () => { }
-    },
-    onValidate: {
-      type: Function,
-      default: () => undefined,
-    },
-    formId: {
-      type: String,
-      default: () => "default"
-    },
-    showValidatedMessage: {
-      type: Boolean,
-      default: () => true
-    },
-    showSubmittedMessage: {
-      type: Boolean,
-      default: () => true
-    }
-  },
-  data() {
-    return {
-      validStates: ["pending", "validated", "erroneous", "submitted"],
-      state: "unstarted", // also: "pending", "validated", "erroneous" or "submitted"
-      error: false
-    }
-  },
-  methods: {
-    getControls() {
-      return Array.from(this.$el.querySelectorAll(".FormControl")).filter(control => {
-        return control.$lswFormControlComponent && (control.$lswFormControlComponent.formId === this.formId);
-      });
-    },
-    getValue() {
-      return this.getControls().reduce((output, control) => {
-        const value = control.$lswFormControlComponent.getValue();
-        output[control.$lswFormControlComponent.name] = value;
-        return output;
-      }, {});
-    },
-    getError() {
-      return this.error;
-    },
-    setError(error) {
-      this.error = error;
-    },
-    clearError() {
-      this.error = false;
-    },
-    getState() {
-      return this.state;
-    },
-    setState(state) {
-      if (this.validStates.indexOf(state) === -1) {
-        throw new Error("Required argument «state» to be a valid state on «ControlBox.methods.setState»");
-      }
-      this.state = state;
-    },
-    async validate() {
-      // Block repeated validation for asynchronous tasks respect:
-      if(this.getState() === "pending") {
-        return "Wait for the previous validation to finish";
-      }
-      const allControls = this.getControls();
-      this.clearError();
-      this.setState("pending");
-      try {
-        const errors = [];
-        const unknownObjects = [];
-        for (let index = 0; index < allControls.length; index++) {
-          const control = allControls[index];
-          const result = await control.$lswFormControlComponent.validate();
-          if (result instanceof Error) {
-            errors.push(result);
-          } else if (typeof result !== "undefined") {
-            // Descarta errores no concretados:
-            const isFireWatering = this.isFireWatering(result);
-            if(!isFireWatering) {
-              unknownObjects.push(result);
-            }
-          }
-        }
-        if (errors.length) {
-          const errorsSummary = errors.map((err, index) => `${index + 1}. ${err.name}: ${err.message}`).join("\n");
-          throw new Error(`Cannot validate form due to ${errors.length} error(s) arised on validation:\n${errorsSummary}`);
-        }
-        if (unknownObjects.length) {
-          const unknownzSummary = unknownObjects.map((err, index) => `${index + 1}. ${this.jsonify(err)}`).join("\n");
-          throw new Error(`Cannot validate form due to ${unknownObjects.length} unknown object(s) returned on validation:\n${unknownzSummary}`);
-        }
-        await this.selfValidate();
-        this.clearError();
-        this.setState("validated");
-      } catch (error) {
-        this.handleError(error);
-      }
-    },
-    isFireWatering(result) {
-      const isNotUndefined = typeof result === "undefined";
-      const isNotTrue = result === true;
-      const isNotFalse = result === false;
-      const isNotNull = result === null;
-      const isNotZero = result === 0;
-      return isNotUndefined || isNotTrue || isNotNull || isNotZero || isNotFalse;
-    },
-    async selfValidate() {
-      try {
-        const value = this.getValue();
-        if(this.onValidate) {
-          this.getValue();
-          await this.onValidate(value, this);
-        }
-      } catch (error) {
-        this.handleErrror(error);
-      }
-    },
-    async submit() {
-      try {
-        await this.validate();
-        const value = this.getValue();
-        await this.onSubmit(value, this);
-        this.setState("submitted");
-      } catch (error) {
-        this.handleError(error);
-      }
-    },
-    handleError(error, propagate = true) {
-      this.setError(error);
-      this.setState("erroneous");
-      if (propagate) {
-        throw error;
-      }
-    },
-    jsonify(argInput) {
-      const seen = new WeakSet();
-      return JSON.stringify(argInput, function (key, value) {
-        if (typeof value === "object") {
-          if (seen.has(value)) {
-            return "[Circular]";
-          }
-          if (value !== null) {
-            seen.add(value);
-          }
-        }
-        return value;
-      }, 2);
-    }
-  },
-  watch: {
-
-  },
-  mounted() {
-
-  }
-});
-Vue.component("ControlError", {
-  template: `<div class="ControlError">
-    <pre><span class="errorName">{{ error.name }}:</span> <span class="errorMessage">{{ error.message }}</span> <span class="errorStack">[{{ error.stack }}]</span></pre>
-    <span v-on:click="clearError" class="clearErrorButton">❎</span>
-</div>`,
-  props: {
-    error: {
-      type: Object,
-      required: true
-    },
-    control: {
-      type: Object,
-      required: false
-    }
-  },
-  data() {
-    return {}
-  },
-  methods: {
-    clearError() {
-      return this.control && this.control.clearError();
-    }
-  },
-  watch: {
-    
-  },
-  mounted() {
-    
-  }
-});
-Vue.component("HiddenControl", {
-  template: `<div class="HiddenControl FormControl">
-    
-</div>`,
-  mixins: [LswFormControls.mixins.get("BasicControl")],
-  props: {
-    
-  },
-  data() {
-    return {}
-  },
-  methods: {
-    
-  },
-  watch: {
-    
-  },
-  mounted() {
-    
-  }
-});
-Vue.component("StringControl", {
-  template: `<div class="StringControl FormControl ControlType">
-    <div class="FormLabel" v-if="label">{{ label }}</div>
-    <input v-if="!multiline" class="FormInput" :class="cssClasses.input || {}" :style="cssStyles.input || {}" type="text" v-model="value" :placeholder="placeholder" />
-    <textarea v-else class="FormInput" :class="cssClasses.textarea || {}" :style="cssStyles.textarea || {}" v-model="value" :placeholder="placeholder" />
-    <ControlError v-if="error" :error="error" :control="this" />
-</div>`,
-  mixins: [LswFormControls.mixins.get("BasicControl")],
-  props: {
-    placeholder: {
-      type: String,
-      default: () => {}
-    },
-    multiline: {
-      type: Boolean,
-      default: () => false,
-    },
-  },
-  data() {
-    return {}
-  },
-  methods: {
-    
-  },
-  watch: {
-    
-  },
-  mounted() {
-    
-  }
-});
-Vue.component("ArrayControl", {
-  template: `<div class="ArrayControl FormControl ControlType">
-  
-</div>`,
-  props: {
-    
-  },
-  data() {
-    return {}
-  },
-  methods: {
-    
-  },
-  watch: {
-    
-  },
-  mounted() {
-    
-  }
-});
-Vue.component("BooleanControl", {
-  template: `<div class="BooleanControl FormControl ControlType">
-  
-</div>`,
-  props: {
-    
-  },
-  data() {
-    return {}
-  },
-  methods: {
-    
-  },
-  watch: {
-    
-  },
-  mounted() {
-    
-  }
-});
-Vue.component("NumberControl", {
-  template: `<div class="NumberControl FormControl ControlType">
-  
-</div>`,
-  props: {
-    
-  },
-  data() {
-    return {}
-  },
-  methods: {
-    
-  },
-  watch: {
-    
-  },
-  mounted() {
-    
-  }
-});
-(() => {
-  const defaultState = {
-
-  };
-
-  const predefinedPlaceholders = {
-    filter: `return it.name === 'Carl'`,
-    mapper: `return it.name`,
-    reducer: `return out.concat([it])`,
-    sorter: `return a >= b ? 1 : -1`,
-    modifier: `return all.splice(1,all.length-1,1)`,
-  }
-
-  Vue.component("LswTable", {
-    template: `<div class="lsw_table" style="padding: 5px;">
-    <div>
-        <div style="text-align:right;">
-            <button class="button_separation" v-on:click="showTransformers">Transf: {{ transformers.length }}</button>
+Vue.component("LswTable", {
+  template: `<div class="lsw_table"
+    style="padding-top: 4px;">
+    <div class="position_relative">
+        <div class="position_absolute top_0 right_0"
+            style="font-size: 16px; padding: 3px;">
+            <span class="bordered_1 cursor_pointer"
+                v-on:click="digestOutput">🛜</span>
         </div>
     </div>
-    <table class="basic_table">
+    <table class="collapsed_table lsw_table_itself">
         <thead>
             <tr>
-                <th v-for="header, headerIndex in headers" v-bind:key="'header-' + headerIndex">
+                <th style="width: 1%; padding: 0px;">
+                    <button class="table_menu_div width_100"
+                        v-on:click="toggleMenu"
+                        :class="{activated: isShowingMenu === true}">
+                        <span v-if="hasFiltersApplying">🟡</span>
+                        <span v-else>⚪️</span>
+                    </button>
+                </th>
+                <th class="table_header"
+                    v-for="header, headerIndex in headers"
+                    v-bind:key="'header-' + headerIndex">
                     <div>{{ header }}</div>
+                </th>
+                <th style="width: 100%; padding-right: 0px;">
+                    <div class="flex_row centered">
+                        <div class="flex_100">size of row</div>
+                    </div>
                 </th>
             </tr>
         </thead>
-        <tbody>
-            <tr v-for="row, rowIndex in output" v-bind:key="'row-' + rowIndex">
-                <td v-for="column, columnIndex in row" v-bind:key="'column-' + columnIndex">
-                    {{ column }}
+        <tbody v-if="isShowingMenu">
+            <tr>
+                <td class="table_navigation_menu_cell"
+                    colspan="1000">
+                    <div class="table_navigation_menu">
+                        <div class="flex_row centered">
+                            <div class="flex_1 nowrap">Estás en: </div>
+                            <div class="flex_100 left_padded_1">
+                                <select class="width_100 text_align_center"
+                                    v-model="isShowingSubpanel">
+                                    <option value="Extensor">Extensor ({{ extender.length }})</option>
+                                    <option value="Filtro">Filtro ({{ filter.length }})</option>
+                                    <option value="Ordenador">Ordenador ({{ sorter.length }})</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div v-if="isShowingSubpanel === 'Extensor'">
+                            <textarea spellcheck="false"
+                                v-model="extender"></textarea>
+                        </div>
+                        <div v-if="isShowingSubpanel === 'Filtro'">
+                            <textarea spellcheck="false"
+                                v-model="filter"></textarea>
+                        </div>
+                        <div v-if="isShowingSubpanel === 'Ordenador'">
+                            <textarea spellcheck="false"
+                                v-model="sorter"></textarea>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+        <template v-if="paginatedOutput && headers">
+            <tbody class="this_code_is_duplicated_always">
+                <tr>
+                    <td colspan="1000">
+                        <div class="flex_row centered">
+                            <div class="flex_1 pagination_button_box first_box">
+                                <div class="pagination_button first_button"
+                                    v-on:click="goToFirstPage">⏪</div>
+                            </div>
+                            <div class="flex_1 pagination_button_box">
+                                <div class="pagination_button"
+                                    v-on:click="decreasePage">◀️</div>
+                            </div>
+                            <div class="flex_100 text_align_center">Page {{ currentPage+1 }} out of {{ Math.ceil(output.length /
+                                itemsPerPage) }}</div>
+                            <div class="flex_1 pagination_button_box">
+                                <div class="pagination_button"
+                                    v-on:click="increasePage">▶️</div>
+                            </div>
+                            <div class="flex_1 pagination_button_box last_box">
+                                <div class="pagination_button last_button"
+                                    v-on:click="goToLastPage">⏩</div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody>
+                <template v-for="row, rowIndex in paginatedOutput">
+                    <tr class="row_for_table"
+                        :class="{ odd: rowIndex === 0 ? true : (rowIndex % 2 === 0) ? true : false }"
+                        v-bind:key="'row-for-table-' + rowIndex">
+                        <td class="index_cell">
+                            <button v-on:click="() => toggleRow(rowIndex)"
+                                :class="{activated: selectedRows.indexOf(rowIndex) !== -1}">
+                                {{ rowIndex + (currentPage * itemsPerPage) }}
+                            </button>
+                        </td>
+                        <td v-for="columnKey, columnIndex in headers"
+                            v-bind:key="'column-' + columnIndex">
+                            {{ row[columnKey] ?? "-" }}
+                        </td>
+                        <td>
+                            {{ JSON.stringify(row).length }} bytes
+                        </td>
+                    </tr>
+                    <tr class="row_for_details"
+                        v-show="selectedRows.indexOf(rowIndex) !== -1"
+                        v-bind:key="'row-for-cell-' + rowIndex">
+                        <td class="data_cell"
+                            colspan="1000">
+                            <pre class="">{{ JSON.stringify(row, null, 2) }}</pre>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+            <tbody class="this_code_is_duplicated_always">
+                <tr>
+                    <td colspan="1000">
+                        <div class="flex_row centered">
+                            <div class="flex_1 pagination_button_box first_box">
+                                <div class="pagination_button first_button"
+                                    v-on:click="goToFirstPage">⏪</div>
+                            </div>
+                            <div class="flex_1 pagination_button_box">
+                                <div class="pagination_button"
+                                    v-on:click="decreasePage">◀️</div>
+                            </div>
+                            <div class="flex_100 text_align_center">Page {{ currentPage+1 }} out of {{ Math.ceil(output.length /
+                                itemsPerPage) }}</div>
+                            <div class="flex_1 pagination_button_box">
+                                <div class="pagination_button"
+                                    v-on:click="increasePage">▶️</div>
+                            </div>
+                            <div class="flex_1 pagination_button_box last_box">
+                                <div class="pagination_button last_button"
+                                    v-on:click="goToLastPage">⏩</div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </template>
+        <tbody v-else>
+            <tr>
+                <td colspan="1000">
+                    Aguarde: la tabla está cargando...
                 </td>
             </tr>
         </tbody>
     </table>
 </div>`,
-    props: {
-      initialState: {
-        type: Object,
-        default: () => ({})
-      },
-      initialInput: {
-        type: Array,
-        default: () => []
-      },
-      initialHeaders: {
-        type: Array,
-        default: () => []
-      }
-    },
-    data() {
-      const state = Object.assign(defaultState, this.initialState);
-      const input = [].concat(this.initialInput);
-      return {
-        headers: this.initialHeaders.length ?? undefined,
-        transformers: [],
-        input,
-        output: undefined,
-        isShowingPanelMain: false,
-
-      };
-    },
-    methods: {
-      cloneInput() {
-        return [].concat(this.input);
-      },
-      askForTransformerOfType(transformerType) {
-        return this.$dialogs.open({
-          template: `
-          <div>
-            <control-box ref="form1" form-id="tempdialog">
-              <hidden-control form-id="tempdialog" name="type" :initial-value="transformerType" />
-              <string-control form-id="tempdialog"
-                name="callbackCode" :multiline="true"
-                :label="'Write the new ' + transformerType + ' here:'"
-                :on-change="v => value.callback = v"
-                :placeholder="predefinedPlaceholders[transformerType]"
-                :css-styles="{textarea:'min-height:80px;'}" />
-            </control-box>
-            <div style="text-align: right; padding-right: 4px;">
-              <button v-on:click="() => accept($refs.form1.getValue())">Añadir</button>
-              <button v-on:click="() => close()">Cancelar</button>
-            </div>
-          </div>
-        `,
-          factory() {
-            return {
-              data() {
-                return {
-                  predefinedPlaceholders,
-                  transformerType,
-                }
-              }
-            }
-          }
-        });
-      },
-      isValidTransformer(transformer) {
-        const isObject = typeof transformer === "object";
-        const hasType = typeof transformer.type === "string";
-        const hasCallbackCode = typeof transformer.callbackCode === "string";
-        const isValid = isObject && hasType && hasCallbackCode;
-        console.log("transformer is " + (isValid ? "Valid" : "Invalid"));
-        let specificArguments = [];
-        if (transformer.type === "filter") {
-          specificArguments = specificArguments.concat(["it", "i"]);
-        } else if (transformer.type === "mapper") {
-          specificArguments = specificArguments.concat(["it", "i"]);
-        } else if (transformer.type === "reducer") {
-          specificArguments = specificArguments.concat(["out", "it", "i"]);
-        } else if (transformer.type === "modifier") {
-          specificArguments = specificArguments.concat(["data"]);
-        } else if (transformer.type === "sorter") {
-          specificArguments = specificArguments.concat(["a", "b"]);
-        }
-        Object.assign(transformer, {
-          callback: new Function(...specificArguments, transformer.callbackCode)
-        });
-        return isValid;
-      },
-      async askForFilter() {
-        const answer = await this.askForTransformerOfType("filter");
-        if (!this.isValidTransformer(answer)) return;
-        this.transformers = this.transformers.concat([answer]);
-      },
-      async askForReducer() {
-        const answer = await this.askForTransformerOfType("reducer");
-        if (!this.isValidTransformer(answer)) return;
-        this.transformers = this.transformers.concat([answer]);
-      },
-      async askForMapper() {
-        const answer = await this.askForTransformerOfType("mapper");
-        if (!this.isValidTransformer(answer)) return;
-        this.transformers = this.transformers.concat([answer]);
-      },
-      async askForReducer() {
-        const answer = await this.askForTransformerOfType("reducer");
-        if (!this.isValidTransformer(answer)) return;
-        this.transformers = this.transformers.concat([answer]);
-      },
-      async askForModifier() {
-        const answer = await this.askForTransformerOfType("modifier");
-        if (!this.isValidTransformer(answer)) return;
-        this.transformers = this.transformers.concat([answer]);
-      },
-      async askForSorter() {
-        const answer = await this.askForTransformerOfType("sorter");
-        if (!this.isValidTransformer(answer)) return;
-        this.transformers = this.transformers.concat([answer]);
-      },
-      async askForGrouper() {
-        const answer = await this.askForTransformerOfType("grouper");
-        if (!this.isValidTransformer(answer)) return;
-        this.transformers = this.transformers.concat([answer]);
-      },
-      showTransformers() {
-        const that = this;
-        return this.$dialogs.open({
-          template: `<lsw-table-transformers :table="table" />`,
-          factory() {
-            return {
-              data() {
-                return {
-                  table: that
-                };
-              }
-            }
-          }
-        });
-      },
-      synchronizeOutput(transformers = this.transformers) {
-        let temporaryData = this.cloneInput();
-        Transform: {
-          for (let index = 0; index < transformers.length; index++) {
-            const transformer = transformers[index];
-            if (transformer.type === "filter") {
-              temporaryData = temporaryData.filter(transformer.callback);
-            } else if (transformer.type === "mapper") {
-              temporaryData = temporaryData.map(transformer.callback);
-            } else if (transformer.type === "reducer") {
-              temporaryData = temporaryData.reduce(transformer.callback, []);
-            } else if (transformer.type === "modifier") {
-              temporaryData = transformer.callback(temporaryData);
-            } else if (transformer.type === "sorter") {
-              temporaryData = temporaryData.sort(transformer.callback);
-            } else if (transformer.type === "grouper") {
-              temporaryData = temporaryData.sort(transformer.callback);
-            } else {
-              throw new Error("Required parameter «transformer.type» to be a valid string on «LswTable.methods.synchronizeOutput»");
-            }
-          }
-        }
-        const temporaryHeaders = new Set();
-        Headers: {
-          for (let index = 0; index < temporaryData.length; index++) {
-            const temporaryRow = temporaryData[index];
-            const temporaryKeys = Object.keys(temporaryRow);
-            temporaryKeys.forEach(k => temporaryHeaders.add(k));
-          }
-        }
-        Update_data: {
-          this.headers = temporaryHeaders;
-          this.output = temporaryData;
-        }
-      }
-    },
-    watch: {
-      transformers(value) {
-        this.synchronizeOutput();
-      }
-    },
-    mounted() {
-      this.synchronizeOutput();
+  props: {
+    initialInput: {
+      type: Array,
+      default: () => []
     }
-  });
-})();
+  },
+  data() {
+    this.$trace("lsw-table.data");
+    const input = [].concat(this.initialInput);
+    return {
+      input,
+      isShowingMenu: false,
+      isShowingSubpanel: "none",
+      selectedRows: [],
+      extender: "",
+      filter: "",
+      sorter: "",
+      itemsPerPage: 10,
+      currentPage: 0,
+      output: [],
+      paginatedOutput: [],
+      headers: [],
+    };
+  },
+  methods: {
+    goToFirstPage() {
+      this.$trace("lsw-table.methods.goToFirstPage");
+      this.currentPage = 0;
+    },
+    decreasePage() {
+      this.$trace("lsw-table.methods.decreasePage");
+      if (this.currentPage > 0) {
+        this.currentPage--;
+      }
+    },
+    increasePage() {
+      this.$trace("lsw-table.methods.increasePage");
+      const lastPage = Math.floor(this.output.length / this.itemsPerPage);
+      if (this.currentPage < lastPage) {
+        this.currentPage++;
+      }
+    },
+    goToLastPage() {
+      this.$trace("lsw-table.methods.goToLastPage");
+      const lastPage = Math.floor(this.output.length / this.itemsPerPage);
+      if (this.currentPage !== lastPage) {
+        this.currentPage = lastPage;
+      }
+    },
+    toggleRow(rowIndex) {
+      this.$trace("lsw-table.methods.toggleRow");
+      const pos = this.selectedRows.indexOf(rowIndex);
+      if (pos === -1) {
+        this.selectedRows.push(rowIndex);
+      } else {
+        this.selectedRows.splice(pos, 1);
+      }
+    },
+    toggleMenu() {
+      this.$trace("lsw-table.methods.toggleMenu");
+      this.isShowingMenu = !this.isShowingMenu;
+    },
+    digestOutput() {
+      this.$trace("lsw-table.methods.digestOutput");
+      const input = this.input;
+      let temp = [];
+      const extenderExpression = this.extender.trim() || "{}";
+      const extenderFunction = new Function("it", "i", `return ${extenderExpression}`);
+      const filterExpression = this.filter.trim() || "true";
+      const filterFunction = new Function("it", "i", `return ${filterExpression}`);
+      const sorterExpression = this.sorter.trim() || "0";
+      const sorterFunction = new Function("a", "b", `return ${sorterExpression}`);
+      let tempHeaders = new Set();
+      for (let index = 0; index < input.length; index++) {
+        const row = input[index];
+        let extendedRow = undefined;
+        Apply_extender: {
+          try {
+            const extenderProduct = extenderFunction(row, index) || {};
+            extendedRow = Object.assign({}, row, extenderProduct);
+          } catch (error) {
+            extendedRow = Object.assign({}, row);
+          }
+        }
+        Apply_filter: {
+          try {
+            const filterProduct = filterFunction(extendedRow, index);
+            if (filterProduct === true) {
+              temp.push(extendedRow);
+            }
+          } catch (error) {
+            // @OK.
+          }
+        }
+        Extract_headers: {
+          try {
+            Object.keys(extendedRow).forEach(key => {
+              tempHeaders.add(key);
+            });
+          } catch (error) {
+            // @OK.
+          }
+        }
+      }
+      Apply_sorter: {
+        try {
+          temp = temp.sort(sorterFunction);
+        } catch (error) {
+          // @OK.
+        }
+      }
+      this.headers = tempHeaders;
+      this.output = temp;
+      this.digestPagination();
+    },
+    digestPagination() {
+      this.$trace("lsw-table.methods.digestPagination");
+      const page = this.currentPage;
+      const items = this.itemsPerPage;
+      const firstPosition = items * (page);
+      this.selectedRows = [];
+      this.paginatedOutput = [].concat(this.output).splice(firstPosition, items);
+    },
+    saveCurrentTransformer() {
+      this.$trace("lsw-table.methods.saveCurrentTransformer");
+    }
+  },
+  watch: {
+    itemsPerPage(value) {
+      this.$trace("lsw-table.watch.itemsPerPage");
+      this.digestPagination();
+    },
+    currentPage(value) {
+      this.$trace("lsw-table.watch.currentPage");
+      this.digestPagination();
+    }
+  },
+  computed: {
+    hasFiltersApplying() {
+      this.$trace("lsw-table.computed.hasFiltersApplying");
+      if (this.extender.length) {
+        return true;
+      }
+      if (this.filter.length) {
+        return true;
+      }
+      if (this.sorter.length) {
+        return true;
+      };
+      return false;
+    }
+  },
+  mounted() {
+    this.$trace("lsw-table.mounted");
+    this.digestOutput();
+  }
+});
 Vue.component("LswTableTransformers", {
   template: `<div class="lsw_table_transformers">
     Transformers here.
@@ -17680,7 +18454,8 @@ Vue.component("LswDatabaseBreadcrumb", {
 Vue.component("LswPageDatabases", {
   template: `<div>
     <h3>All databases</h3>
-    <table class="basic_table">
+    <lsw-table :initial-input="databases" v-if="databases"></lsw-table>
+    <table class="basic_table top_aligned">
         <thead>
             <tr>
                 <th>Nº</th>
@@ -17740,7 +18515,8 @@ Vue.component("LswPageRows", {
   template: `<div>
     <h3>Rows of {{ args.database }}.{{ args.table }}</h3>
     <lsw-database-breadcrumb :breadcrumb="breadcrumb" :database-explorer="databaseExplorer" />
-    <table class="basic_table">
+    <lsw-table :initial-input="rows" v-if="rows"></lsw-table>
+    <table class="basic_table top_aligned">
         <thead>
             <tr>
                 <th>Nº</th>
@@ -17833,7 +18609,7 @@ Vue.component("LswPageRow", {
   template: `<div>
     <h3>Row on {{ args.database }}.{{ args.table }}#{{ args.rowid }}</h3>
     <lsw-database-breadcrumb :breadcrumb="breadcrumb" :database-explorer="databaseExplorer" />
-    <table class="basic_table" v-if="row">
+    <table class="basic_table top_aligned" v-if="row">
         <thead>
             <tr>
                 <th>Nº</th>
@@ -17842,10 +18618,10 @@ Vue.component("LswPageRow", {
             </tr>
         </thead>
         <tbody>
-            <tr v-for="prop, propIndex in row" v-bind:key="'prop_index_' + propIndex">
-                <td>{{ propIndex + 1 }}</td>
+            <tr v-for="prop, propName, propCounter in row" v-bind:key="'prop_index_' + propName">
+                <td>{{ propCounter + 1 }}</td>
                 <td>
-                    {{ propIndex }}
+                    {{ propName }}
                 </td>
                 <td>
                     {{ prop }}
@@ -17914,7 +18690,7 @@ Vue.component("LswPageRow", {
       this.connection = new LswDatabaseAdapter(this.database);
       await this.connection.open();
       const matches = await this.connection.select(this.table, it => it.id === this.rowid);
-      this.rowid = matches[0];
+      this.row = matches[0];
     }
   },
   mounted() {
@@ -17945,38 +18721,46 @@ Vue.component("LswPageSchema", {
 Vue.component("LswPageTables", {
   template: `<div>
     <h3>Tables of {{ args.database }}</h3>
-    <lsw-database-breadcrumb :breadcrumb="breadcrumb" :database-explorer="databaseExplorer" />
-    <table class="basic_table">
-        <thead>
-            <tr>
-                <th>Nº</th>
-                <th>Table</th>
-                <th class="width_100">Columns</th>
-            </tr>
-        </thead>
-        <tbody v-if="tables">
-            <tr v-for="table, tableIndex, tableCounter in tables"
-                v-bind:key="'table_id_' + table.name">
-                <td>
-                    {{ tableCounter + 1 }}
-                </td>
-                <td>
-                    <a href="javascript:void(0)"
-                        v-on:click="() => openTable(tableIndex)">{{ tableIndex }}</a>
-                </td>
-                <td>
-                    <!--div>- keyPath: {{ table.keyPath }}</div-->
-                    <div v-if="table.autoIncrement">Is autoincrement</div>
-                    <div v-for="subprop, subpropIndex in table.indexes"
-                        v-bind:key="'table_' + table.name + '_index_' + subpropIndex">
-                        <div>
-                            {{ subpropIndex + 1 }}. {{ subprop.name }} ({{ [subprop.unique ? "unique" : false, subprop.multiEntry ? "multientry" : false].filter(it => !!it).join(", ") }})
+    <lsw-database-breadcrumb :breadcrumb="breadcrumb"
+        :database-explorer="databaseExplorer" />
+    <lsw-table :initial-input="tables" v-if="tables"></lsw-table>
+    <div style="padding: 4px;">
+        <table class="basic_table top_aligned">
+            <thead>
+                <tr>
+                    <th>Nº</th>
+                    <th>Table</th>
+                    <th class="width_100">Columns</th>
+                </tr>
+            </thead>
+            <tbody v-if="tables">
+                <tr v-for="table, tableIndex, tableCounter in tables"
+                    v-bind:key="'table_id_' + table.name">
+                    <td>
+                        {{ tableCounter + 1 }}
+                    </td>
+                    <td>
+                        <a href="javascript:void(0)"
+                            v-on:click="() => openTable(tableIndex)">{{ tableIndex }}</a>
+                    </td>
+                    <td>
+                        <!--div>- keyPath: {{ table.keyPath }}</div-->
+                        <div v-if="table.autoIncrement">Is autoincrement</div>
+                        <div v-for="subprop, subpropIndex in table.indexes"
+                            v-bind:key="'table_' + table.name + '_index_' + subpropIndex">
+                            <div>
+                                {{ subpropIndex + 1 }}. {{ subprop.name }} 
+                                <span v-if="subprop.unique || subprop.multientry">
+                                    [{{ [subprop.unique ? "unique" : false, subprop.multiEntry ?
+                                "multientry" : false].filter(it => !!it).join(", ") }}]
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>`,
   props: {
     databaseExplorer: {
@@ -18372,7 +19156,7 @@ Vue.component("LswWiki", {
 Vue.component("LswCalendario", {
   template: `<div class="Component LswCalendario">
   <div style="max-width: 260px;">
-    <div class="like_table" style="border-left: 1px solid white; border-bottom: 1px solid white; border-top: 1px solid white;">
+    <div class="like_table" style="border-collapse: collapse; border: none; border-bottom: 1px solid white;">
       <div class="like_row">
         <div class="like_cell">
           <button class="boton_de_mover_mes"
@@ -18786,206 +19570,835 @@ Vue.component("LswCalendario", {
     }
   }
 });
-let trackerCounter = 0;
-
-Vue.component("LswAgenda", {
-  name: "LswAgenda",
-  template: `<div class="lsw_agenda">
-    <div class="flex_row">
-        <div class="flex_100">
-            <div class="calendar_viewer">
-                <lsw-calendario ref="calendario"
-                    :solo-fecha="true"
-                    :al-cambiar-valor="v => loadDateTasks(v)" />
-            </div>
-        </div>
-        <div class="flex_1 flex_column" style="padding:8px; padding-left: 0px; gap: 4px;">
-            <div class="flex_1"><button class="width_100 nowrap" v-on:click="() => openInsertTaskDialog()">New task</button></div>
-            <div class="flex_1"><button class="width_100 nowrap" v-on:click="() => goToToday()">Today?</button></div>
-            <div class="flex_1"><button class="width_100 nowrap" v-on:click="() => goToToday()">Tomorrow?</button></div>
-            <div class="flex_100"></div>
-        </div>
-    </div>
-    <div class="no_tasks_message" v-if="isLoading">
-        Please, wait a moment to fetch the data.
-    </div>
-    <div class="box_for_date_details" v-else-if="(!isLoading) && selectedDateTasksFormattedPerHour && selectedDateTasksFormattedPerHour.length">
-        <div class="hour_table" v-for="franja, franjaIndex in selectedDateTasksFormattedPerHour" v-bind:key="'franja_horaria_' + franjaIndex">
-            <div class="hour_lapse_separator" v-on:click="() => toggleHour(franja.hora)">
-                {{ $lsw.timer.utils.formatHourFromMomento(franja) }} · <span class="hour_compromises">{{ $lsw.utils.pluralizar("compromiso", "compromisos", "%i %s", Object.keys(franja.tareas).length) }}</span>
-            </div>
-            <div class="hour_lapse_list" v-show="hiddenDateHours.indexOf(franja.hora) === -1">
-                <template v-for="tarea, tareaIndex in franja.tareas">
-                    <div class="hour_task_block" :class="{is_completed: tarea.estado === 'done', is_failed: tarea.estado === 'failed', is_pending: tarea.estado === 'pending'}" v-bind:key="'franja_horaria_' + franjaIndex + '_tarea_' + tareaIndex">
-                        <div class="hour_task_pill pill">
-                            <span class="hour_task_dragger pill_start">
-                                ≡</span><span class="hour_task_name pill_middle">
-                                {{ tarea.nombre }}</span><span class="hour_task_details_start pill_middle">
-                                {{ $lsw.timer.utils.formatHourFromMomento(tarea, false) }}</span><span class="hour_task_details_duration pill_middle">
-                                {{ tarea.duracion }}</span><span class="hour_task_editer pill_middle" v-on:click="() => openUpdateTaskDialog(tarea)">
-                                ⚙</span><span class="hour_task_deleter pill_end" v-on:click="() => openDeleteTaskDialog(tarea)">
-                                ❌</span>
-                        </div>
-                    </div>
-                </template>
-            </div>
-        </div>
-    </div>
-    <div class="no_tasks_message"
-        v-else>
-        There are no tasks assigned to this day.
-    </div>
+Vue.component("LswAgendaAccionAdd", {
+  template: `<div class="LswAgendaAccionAdd" style="padding-top: 4px;">
+  <template v-if="formMetadata">
+    <lsw-agenda-form :form-metadata="formMetadata"></lsw-agenda-form>
+  </template>
 </div>`,
   props: {},
   data() {
-    this.$trace("lsw-agenda.data");
+    this.$trace("lsw-agenda-accion-add.data");
     return {
-      counter: 0,
-      isLoading: false,
-      selectedDate: undefined,
-      selectedDateTasks: undefined,
-      selectedDateTasksFormattedPerHour: undefined,
-      hiddenDateHours: [],
+      refers_to_concept: "",
+      has_duration: "",
+      starts_at: "",
+      has_emotions: "",
+      has_details: "",
+      has_description: "",
+      has_steps: "",
+      has_reasoning: "",
+      has_expectations: "",
+      has_learning: "",
+      has_intention: "",
+      has_result: "",
+      has_history: "",
+      has_consequences: "",
+      // Campos para el formulario:
+      formScope: Object.freeze({}), // El scope que usará el formulario que queremos.
+      formMetadata: false, // Los metadatos, que incluyen fields y form.
     };
   },
   methods: {
-    toggleHour(hourInt) {
-      const pos = this.hiddenDateHours.indexOf(hourInt);
-      if(pos === -1) {
-        this.hiddenDateHours.push(hourInt);
-      } else {
-        this.hiddenDateHours.splice(pos, 1);
-      }
-    },
-    async loadDateTasks(newDate) {
-      this.$trace("lsw-agenda.methods.loadDateTasks");
-      this.isLoading = true;
-      console.log("Loading date tasks of: " + newDate);
-      try {
-        this.selectedDate = newDate;
-        const selectedDate = this.selectedDate;
-        const selectedDateTasks = await this.$lsw.database.selectMany("procedimiento", value => {
-          const isSameYear = value.anio === selectedDate.getFullYear();
-          const isSameMonth = value.mes === (selectedDate.getMonth()+1);
-          const isSameDay = value.dia === selectedDate.getDate();
-          const isAccepted = isSameYear && isSameMonth && isSameDay;
-          console.log("isSameYear", isSameYear);
-          console.log("isSameMonth", isSameMonth);
-          console.log("isSameDay", isSameDay);
-          console.log("isAccepted", isAccepted);
-          console.log(isAccepted);
-          return isAccepted;
-        });
-        console.log("selectedDate");
-        console.log(selectedDate);
-        console.log("selectedDateTasks");
-        console.log(selectedDateTasks);
-        this.selectedDateTasks = selectedDateTasks;
-        this.propagateDateTasks();
-      } catch (error) {
-        console.log("Error loading date taskes:", error);
-      } finally {
-        setTimeout(() => this.isLoading = false, 100);
-      }
-    },
-    groupTasksByHour(tareas = this.selectedDateTasks) {
-      this.$trace("lsw-agenda.methods.groupTasksByHour");
-      const mapaHoras = new Map();
-      for (let i = 0; i < tareas.length; i++) {
-        const tarea = tareas[i];
-        const { hora, minuto } = tarea;
-        if (!mapaHoras.has(hora)) {
-          mapaHoras.set(hora, []);
+    loadFormMetadata() {
+      const outterFormScope = {};
+      const fields = [{
+        type: "input",
+        enunciate: "Concepto al que se refiere:",
+        code1: "it.refers_to_concept",
+        code2: "refers_to_concept",
+        code3: "string",
+        explanation: "tiene que coincidir con el «has_name» del concepto para que funcionen los propagadores correspondientes.",
+        placeholder: "Ej: Desayunar",
+        errorConfig: {
+          parentId: "refers_to_concept",
+          parentScope: outterFormScope,
+        },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "refers_to_concept",
+          selfScope: outterFormScope,
+          name: "refers_to_concept"
         }
-        mapaHoras.get(hora).push(tarea);
-      }
-      const resultado = [];
-      for (const [hora, lista] of mapaHoras) {
-        // Ordenar tareas por minuto
-        for (let j = 1; j < lista.length; j++) {
-          let k = j;
-          while (k > 0 && lista[k - 1].minuto > lista[k].minuto) {
-            [lista[k - 1], lista[k]] = [lista[k], lista[k - 1]];
-            k--;
+      }, {
+        type: "input",
+        enunciate: "Duración:",
+        code1: "it.has_duration",
+        code2: "has_duration",
+        code3: "string",
+        explanation: "tiene que cumplir con el formato «0y 0mon 0d 0h 0min 0s» para referir a una duración.",
+        placeholder: "Ej: 0y 0mon 0d 0h 0min",
+        errorConfig: {
+          parentId: "has_duration",
+          parentScope: outterFormScope,
+          onSuccessStatus: {
+            name: "OK",
+            message: "El campo cumple con un formato válido."
+          }
+        },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "has_duration",
+          selfScope: outterFormScope,
+          name: "has_duration",
+          onValidate: function(value) {
+            const result = Timeformat_parser.parse(value);
+            if(result.length !== 1) {
+              throw new Error("Only 1 expression allowed");
+            }
+            if(result[0].tipo !== "Duracion") {
+              throw new Error("Only 1 expression of type «Duración» allowed");
+            }
           }
         }
-        resultado.push({ hora: Number(hora), tareas: lista });
-      }
-      for (let i = 1; i < resultado.length; i++) {
-        let j = i;
-        while (j > 0 && resultado[j - 1].hora > resultado[j].hora) {
-          [resultado[j - 1], resultado[j]] = [resultado[j], resultado[j - 1]];
-          j--;
-        }
-      }
-      return resultado;
-    },
-    propagateDateTasks() {
-      this.$trace("lsw-agenda.methods.propagateDateTasks");
-      this.selectedDateTasksFormattedPerHour = this.groupTasksByHour();
-    },
-    goToToday() {
-      this.$trace("lsw-agenda.methods.goToToday");
-      // @TODO: 
-    },
-    async openInsertTaskDialog() {
-      this.$trace("lsw-agenda.methods.openInsertTaskDialog");
-      // @TODO: 
-    },
-    async openUpdateTaskDialog(tarea) {
-      this.$trace("lsw-agenda.methods.openUpdateTaskDialog");
-      // @TODO: 
-      const data = await this.$dialogs.open({
-        id: "agenda-viewer-update-task-" + this.$lsw.utils.getRandomString(5),
-        title: "Update task information",
-        template: `
-          <div>
-            <lsw-agenda-task-form :task="task" ref="taskForm" />
-          </div>
-        `,
-        factory: {
-          data: {
-            task: tarea
-          },
-        }
-      });
-      console.log(data);
-    },
-    async openDeleteTaskDialog() {
-      this.$trace("lsw-agenda.methods.openDeleteTaskDialog");
-      // @TODO: 
-      const data = await this.$dialogs.open({
-        id: "agenda-viewer-delete-task-" + this.$lsw.utils.getRandomString(5),
-        title: "Delete task confirmation",
-        template: `
-          <div>
-            <p>Are you sure you want to cancel task deletion?</p>
-          </div>
-        `,
-        acceptButton: {
-          text: "OK",
-          callback: (id) => {
-            this.$dialogs.accept(id);
-          },
+      }, {
+        type: "input",
+        enunciate: "Inicio:",
+        code1: "it.starts_at",
+        code2: "starts_at",
+        code3: "string",
+        explanation: "tiene que cumplir con el formato «2025/01/01 23:59» para ser válido.",
+        placeholder: "2025/01/01 00:00",
+        errorConfig: {
+          parentId: "starts_at",
+          parentScope: outterFormScope,
+          onSuccessStatus: {
+            name: "OK",
+            message: "El campo cumple con un formato válido."
+          }
         },
-        cancelButton: {
-          text: "Cancel",
-          callback: (id) => {
-            this.$dialogs.cancel(id);
-          },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "starts_at",
+          selfScope: outterFormScope,
+          name: "starts_at",
+          onValidate: function(value) {
+            const result = Timeformat_parser.parse(value);
+            if(result.length !== 1) {
+              throw new Error("Only 1 expression allowed");
+            }
+            if(result[0].tipo !== "FechaHora") {
+              throw new Error("Only 1 expression of type «FechaHora» allowed");
+            }
+          }
         }
+      }, {
+        type: "select",
+        enunciate: "Estado:",
+        code1: "it.has_state",
+        code2: "has_state",
+        code3: "string",
+        explanation: "tiene que ser uno entre «pendiente», «fallido» y «completo»",
+        options: [{
+          value: "pendiente",
+          text: "Pendiente"
+        }, {
+          value: "fallido",
+          text: "Fallido"
+        }, {
+          value: "completo",
+          text: "Completo"
+        }],
+        errorConfig: {
+          parentId: "has_state",
+          parentScope: outterFormScope,
+        },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "has_state",
+          selfScope: outterFormScope,
+          name: "has_state"
+        }
+      }, {
+        type: "input",
+        enunciate: "Emociones asociadas:",
+        code1: "it.has_emotions",
+        code2: "has_emotions",
+        code3: "string",
+        explanation: "blablabla.",
+        placeholder: "blabla",
+        errorConfig: {
+          parentId: "has_emotions",
+          parentScope: outterFormScope,
+        },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "has_emotions",
+          selfScope: outterFormScope,
+          name: "has_emotions"
+        }
+      }, {
+        type: "input",
+        enunciate: "Detalles:",
+        code1: "it.has_details",
+        code2: "has_details",
+        code3: "string",
+        explanation: "blablabla.",
+        placeholder: "blabla",
+        errorConfig: {
+          parentId: "has_details",
+          parentScope: outterFormScope,
+        },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "has_details",
+          selfScope: outterFormScope,
+          name: "has_details"
+        }
+      }, {
+        type: "input",
+        enunciate: "Descripción:",
+        code1: "it.has_description",
+        code2: "has_description",
+        code3: "string",
+        explanation: "blablabla.",
+        placeholder: "blabla",
+        errorConfig: {
+          parentId: "has_description",
+          parentScope: outterFormScope,
+        },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "has_description",
+          selfScope: outterFormScope,
+          name: "has_description"
+        }
+      }, {
+        type: "input",
+        enunciate: "Pasos:",
+        code1: "it.has_steps",
+        code2: "has_steps",
+        code3: "string",
+        explanation: "blablabla.",
+        placeholder: "blabla",
+        errorConfig: {
+          parentId: "has_steps",
+          parentScope: outterFormScope,
+        },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "has_steps",
+          selfScope: outterFormScope,
+          name: "has_steps"
+        }
+      }, {
+        type: "input",
+        enunciate: "Razonamiento:",
+        code1: "it.has_reasoning",
+        code2: "has_reasoning",
+        code3: "string",
+        explanation: "blablabla.",
+        placeholder: "blabla",
+        errorConfig: {
+          parentId: "has_reasoning",
+          parentScope: outterFormScope,
+        },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "has_reasoning",
+          selfScope: outterFormScope,
+          name: "has_reasoning"
+        }
+      }, {
+        type: "input",
+        enunciate: "Expectativas:",
+        code1: "it.has_expectations",
+        code2: "has_expectations",
+        code3: "string",
+        explanation: "blablabla.",
+        placeholder: "blabla",
+        errorConfig: {
+          parentId: "has_expectations",
+          parentScope: outterFormScope,
+        },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "has_expectations",
+          selfScope: outterFormScope,
+          name: "has_expectations"
+        }
+      }, {
+        type: "input",
+        enunciate: "Aprendizaje:",
+        code1: "it.has_learning",
+        code2: "has_learning",
+        code3: "string",
+        explanation: "blablabla.",
+        placeholder: "blabla",
+        errorConfig: {
+          parentId: "has_learning",
+          parentScope: outterFormScope,
+        },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "has_learning",
+          selfScope: outterFormScope,
+          name: "has_learning"
+        }
+      }, {
+        type: "input",
+        enunciate: "Intención:",
+        code1: "it.has_intention",
+        code2: "has_intention",
+        code3: "string",
+        explanation: "blablabla.",
+        placeholder: "blabla",
+        errorConfig: {
+          parentId: "has_intention",
+          parentScope: outterFormScope,
+        },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "has_intention",
+          selfScope: outterFormScope,
+          name: "has_intention"
+        }
+      }, {
+        type: "input",
+        enunciate: "Resultado:",
+        code1: "it.has_result",
+        code2: "has_result",
+        code3: "string",
+        explanation: "blablabla.",
+        placeholder: "blabla",
+        errorConfig: {
+          parentId: "has_result",
+          parentScope: outterFormScope,
+        },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "has_result",
+          selfScope: outterFormScope,
+          name: "has_result"
+        }
+      }, {
+        type: "input",
+        enunciate: "Historia:",
+        code1: "it.has_history",
+        code2: "has_history",
+        code3: "string",
+        explanation: "blablabla.",
+        placeholder: "blabla",
+        errorConfig: {
+          parentId: "has_history",
+          parentScope: outterFormScope,
+        },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "has_history",
+          selfScope: outterFormScope,
+          name: "has_history"
+        }
+      }, {
+        type: "input",
+        enunciate: "Consequencias:",
+        code1: "it.has_consequences",
+        code2: "has_consequences",
+        code3: "string",
+        explanation: "blablabla.",
+        placeholder: "blabla",
+        errorConfig: {
+          parentId: "has_consequences",
+          parentScope: outterFormScope,
+        },
+        inputConfig: {
+          parentId: "formularioInicial",
+          parentScope: outterFormScope,
+          selfId: "has_consequences",
+          selfScope: outterFormScope,
+          name: "has_consequences"
+        }
+      }, ];
+      this.formMetadata = Object.freeze({
+        form: {
+          selfScope: outterFormScope,
+          selfId: "formularioInicial",
+          onSubmit: async (value) => {
+            const id = await this.$lsw.database.insert("accion", value);
+            console.log("ID:", id);
+            this.$parent.selectContext("agenda");
+          }
+        },
+        fields: fields,
       });
-      console.log(data);
+    }
+  },
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-agenda-accion-add.mounted");
+      this.loadFormMetadata();
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswAgendaAccionSearch", {
+  template: `<div class="LswAgendaAccionSearch">
+  <lsw-table :initial-input="[{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)}]"></lsw-table>
+</div>`,
+  props: {},
+  data() {
+    this.$trace("lsw-agenda-accion-search.data");
+    return {};
+  },
+  methods: {},
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-agenda-accion-search.mounted");
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswAgendaBreadcrumb", {
+  name: "LswAgendaBreadcrumb",
+  template: `<div class="lsw_agenda_breadcrumb">
+    <div class="flex_row centered">
+        <div class="right_padded_1">
+            <button v-on:click="() => goToSection('agenda')">📆</button>
+        </div>
+        <div class="agenda_breadcrumb flex_100">
+            <div class="agenda_bradcrumb_item"
+                v-for="pathItem, pathIndex in pathItems"
+                v-bind:key="'agenda-breadcrumb-path-item-' + pathIndex">
+                <span v-if="pathIndex !== 0"> » </span>
+                <span class="agenda_breadcrumb_link"
+                    v-if="pathItem.link">
+                    <a :href="pathItem.link">{{ pathItem.label }}</a>
+                </span>
+                <span class="agenda_breadcrumb_link"
+                    v-else-if="pathItem.section">
+                    <span v-on:click="() => goToSection(pathItem.section)">{{ pathItem.label }}</span>
+                </span>
+                <span class="agenda_breadcrumb_link"
+                    v-else-if="pathItem.event">
+                    <span v-on:click="pathItem.event">{{ pathItem.label }}</span>
+                </span>
+                <span class="agenda_breadcrumb_link only_label"
+                    v-else-if="pathItem.label">
+                    <span>{{ pathItem.label }}</span>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>`,
+  props: {
+    agenda: {
+      type: Object,
+      default: () => null
     },
+    pathItems: {
+      type: Array,
+      required: true
+    }
+  },
+  data() {
+    this.$trace("lsw-agenda-breadcrumb.data");
+    return {
+      
+    };
+  },
+  methods: {
+    goToSection(section) {
+      this.$trace("lsw-agenda-breadcrumb.methods.goToSection");
+      if(this.agenda) {
+        this.agenda.selectContext(section);
+      }
+    }
   },
   watch: {
+
   },
   async mounted() {
     try {
-      this.$trace("lsw-agenda.mounted");
-      const selectedDate = this.$refs.calendario.getValue();
-      this.loadDateTasks(selectedDate);
+      this.$trace("lsw-agenda-breadcrumb.mounted");
     } catch (error) {
+      console.log(error);
+    }
+  }
+});
+const outterFormScope = {};
+
+Vue.component("LswAgendaConceptoAdd", {
+  template: `<div class="LswAgendaConceptoAdd">
+  <template v-if="formMetadata">
+    <lsw-agenda-form :form-metadata="formMetadata"></lsw-agenda-form>
+  </template>
+</div>`,
+  props: {},
+  data() {
+    this.$trace("lsw-agenda-concepto-add.data");
+    return {
+      formMetadata: false
+    };
+  },
+  methods: {
+    sendForm(v) {
+      this.$trace("lsw-agenda-concepto-add.methods.sendForm");
+      console.log("Sedingin form...", v);
+    },
+    loadFormMetadata() {
+      this.$trace("lsw-agenda-concepto-add.methods.loadFormMetadata");
+      this.formMetadata = {
+        form: {
+          selfScope: outterFormScope,
+          selfId: "formularioInicial",
+          expectedChildren: 1,
+          onSubmit: (v) => {
+            this.sendForm(v);
+          }
+        },
+        fields: [{
+          type: "input",
+          enunciate: "Consequencias:",
+          code1: "it.has_consequences",
+          code2: "has_consequences",
+          code3: "string",
+          explanation: "blablabla.",
+          placeholder: "blabla",
+          errorConfig: {
+            parentId: "has_consequences",
+            parentScope: outterFormScope,
+          },
+          inputConfig: {
+            parentId: "formularioInicial",
+            parentScope: outterFormScope,
+            selfId: "has_consequences",
+            selfScope: outterFormScope,
+            name: "has_consequences"
+          }
+        }]
+      }
+    }
+  },
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-agenda-concepto-add.mounted");
+      this.loadFormMetadata();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswAgendaConceptoSearch", {
+  template: `<div class="LswAgendaConceptoSearch">
+  LswAgendaConceptoSearch
+</div>`,
+  props: {},
+  data() {
+    this.$trace("lsw-agenda-concepto-search.data");
+    return {};
+  },
+  methods: {},
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-agenda-concepto-search.mounted");
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswAgendaEventoSearch", {
+  template: `<div class="LswAgendaEventoSearch">
+  LswAgendaEventoSearch
+</div>`,
+  props: {},
+  data() {
+    this.$trace("lsw-agenda-evento-search.data");
+    return {};
+  },
+  methods: {},
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-agenda-evento-search.mounted");
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+
+Vue.component("LswAgendaForm", {
+  template: `<div>
+    <div class="form_structure"
+        v-form.form="formMetadata.form"
+        ref="agenda_form">
+        <div class="form_item text_align_right">
+            <button v-on:click="() => $refs.agenda_form.$lswFormMetadata.methods.submit()">Submit</button>
+        </div>
+        <div class="form_item"
+            v-for="field, fieldIndex in formMetadata.fields"
+            v-bind:key="'form_field_' + fieldIndex">
+            <div class="form_label">
+                <div class="enunciate_box2">
+                    <div class="enunciate">
+                        <span class="enunciate_text">{{ fieldIndex + 1 }}. {{ field.enunciate }}</span>
+                        <span class="coderef">
+                            <span class="codenote as_note">como</span>
+                            <span class="codetext codetype">{{ field.code3 }}</span>
+                            <span class="codenote as_note">en</span>
+                            <span class="codetext codetype">{{ field.code1 }}</span>
+                        </span>
+                        <span class="explanation_block">
+                            <span class="iconref"
+                                style="flex:100;">
+                                <span class="info_icon"
+                                    v-on:click="() => toggleExplanation(field.code2)">ℹ️</span>
+                            </span>
+                            <span class="explanation"
+                                v-if="expandedExplanations.indexOf(field.code2) !== -1">{{ field.explanation }}</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <template v-if="field.type === 'input'">
+                <input class="form_control"
+                    type="text"
+                    :placeholder="field.placeholder"
+                    v-form.input="field.inputConfig" />
+                <div class="validationBox"
+                    v-form.error="field.errorConfig"></div>
+            </template>
+            <template v-else-if="field.type === 'textarea'">
+                <textarea class="form_control"
+                    :placeholder="field.placeholder"
+                    v-form.input="field.inputConfig" />
+                <div class="validationBox"
+                    v-form.error="field.errorConfig"></div>
+            </template>
+            <template v-else-if="field.type === 'select'">
+                <select class="form_control" v-form.input="field.inputConfig">
+                    <option :value="option.value" v-for="option, optionIndex in field.options" v-bind:key="'field_' + fieldIndex + '_selector_option_' + optionIndex">
+                        {{ option.text }}
+                    </option>
+                </select>
+                <div class="validationBox"
+                    v-form.error="field.errorConfig"></div>
+            </template>
+        </div>
+        <div class="form_item text_align_right">
+            <button v-on:click="() => $refs.agenda_form.$lswFormMetadata.methods.submit()">Submit</button>
+        </div>
+    </div>
+</div>`,
+  props: {
+    formMetadata: {
+      type: Object,
+      required: true,
+    }
+  },
+  data() {
+    this.$trace("lsw-agenda-form.data");
+    this.validateFormMetadata(this.formMetadata);
+    return {
+      expandedExplanations: [],
+      formScope: {},
+      formState: {}
+    };
+  },
+  methods: {
+    validateFormMetadata(v) {
+      const isObject = typeof v === "object";
+      const hasFormAsObject = typeof v.form === "object";
+      const hasFieldsAsArray = Array.isArray(v.fields);
+      if(!isObject) {
+        throw new Error("Required parameter «formMetadata» to be an object on «LswAgendaForm.methods.validateFormMetadata»");
+      }
+      if(!hasFormAsObject) {
+        throw new Error("Required parameter «formMetadata.form» to be an object on «LswAgendaForm.methods.validateFormMetadata»");
+      }
+      if(!hasFieldsAsArray) {
+        throw new Error("Required parameter «formMetadata.fields» to be an array on «LswAgendaForm.methods.validateFormMetadata»");
+      }
+    },
+    toggleExplanation(id) {
+      const pos = this.expandedExplanations.indexOf(id);
+      if(pos === -1) {
+        this.expandedExplanations.push(id);
+      } else {
+        this.expandedExplanations.splice(pos, 1);
+      }
+    },
+    loadFields() {
+      this.$window.F = this.$refs.agenda_form;
+    }
+  },
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-agenda-form.mounted");
+      this.loadFields();
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswAgendaImpresionAdd", {
+  template: `<div class="LswAgendaImpresionAdd">
+  LswAgendaImpresionAdd
+</div>`,
+  props: {},
+  data() {
+    this.$trace("lsw-agenda-impresion-add.data");
+    return {};
+  },
+  methods: {},
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-agenda-impresion-add.mounted");
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswAgendaImpresionSearch", {
+  template: `<div class="LswAgendaImpresionSearch">
+  LswAgendaImpresionSearch
+</div>`,
+  props: {},
+  data() {
+    this.$trace("lsw-agenda-impresion-search.data");
+    return {};
+  },
+  methods: {},
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-agenda-impresion-search.mounted");
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswAgendaInfraccionSearch", {
+  template: `<div class="LswAgendaInfraccionSearch">
+  LswAgendaInfraccionSearch
+</div>`,
+  props: {},
+  data() {
+    this.$trace("lsw-agenda-infraccion-search.data");
+    return {};
+  },
+  methods: {},
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-agenda-infraccion-search.mounted");
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswAgendaLimitadorAdd", {
+  template: `<div class="LswAgendaLimitadorAdd">
+  LswAgendaLimitadorAdd
+</div>`,
+  props: {},
+  data() {
+    this.$trace("lsw-agenda-limitador-add.data");
+    return {};
+  },
+  methods: {},
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-agenda-limitador-add.mounted");
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswAgendaLimitadorSearch", {
+  template: `<div class="LswAgendaLimitadorSearch">
+  LswAgendaLimitadorSearch
+</div>`,
+  props: {},
+  data() {
+    this.$trace("lsw-agenda-limitador-search.data");
+    return {};
+  },
+  methods: {},
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-agenda-limitador-search.mounted");
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswAgendaPostimpresionSearch", {
+  template: `<div class="LswAgendaPostimpresionSearch">
+  LswAgendaPostimpresionSearch
+</div>`,
+  props: {},
+  data() {
+    this.$trace("lsw-agenda-postimpresion-search.data");
+    return {};
+  },
+  methods: {},
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-agenda-postimpresion-search.mounted");
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswAgendaPropagacionSearch", {
+  template: `<div class="LswAgendaPropagacionSearch">
+  LswAgendaPropagacionSearch
+</div>`,
+  props: {},
+  data() {
+    this.$trace("lsw-agenda-propagacion-search.data");
+    return {};
+  },
+  methods: {},
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-agenda-propagacion-search.mounted");
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswAgendaPropagadorSearch", {
+  template: `<div class="LswAgendaPropagadorSearch">
+  LswAgendaPropagadorSearch
+</div>`,
+  props: {},
+  data() {
+    this.$trace("lsw-agenda-propagador-search.data");
+    return {};
+  },
+  methods: {},
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-agenda-propagador-search.mounted");
+    } catch(error) {
       console.log(error);
     }
   }

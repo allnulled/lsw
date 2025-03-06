@@ -184,4 +184,10 @@ module.exports = [{
   sourceType: "git",
   source: "https://github.com/allnulled/lsw-proxifier.git",
   version: "last"
+}, {
+  name: "@allnulled/v-form",
+  path: "src/lsw-framework/src/directives/v-form",
+  sourceType: "git",
+  source: "https://github.com/allnulled/v-form.git",
+  version: "last"
 }]

@@ -20,6 +20,23 @@ h3 {
     border-bottom-right-radius: 2pt;
 }
 
+table.collapsed_table {
+    border-collapse: collapse;
+    border: 0px solid white;
+}
+table.collapsed_table > thead > tr > th {
+    /*padding: 8px;*/
+    background-color: #AAA;
+    color: black;
+    border-right: 1px solid white;
+    vertical-align: middle;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+table.collapsed_table > thead > tr > th:last-child {
+    border-right: none solid white;
+}
+
 table.basic_table {
     border-collapse: collapse;
     border: 0px solid white;
@@ -32,10 +49,16 @@ table.basic_table > tbody > tr:nth-child(even) {
     background-color: #DDD;
 }
 table.basic_table > thead > tr > th {
-    padding: 8px;
+    /*padding: 8px;*/
     background-color: #AAA;
     color: black;
     border-right: 1px solid white;
+    vertical-align: middle;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+table.basic_table > thead > tr > th:last-child {
+    border-right: none solid white;
 }
 
 /* INLINE RULES */

@@ -21,10 +21,14 @@ button {
     background-color: black;
     color: white;
     margin-bottom: 0px;
+    min-width: 25px;
 }
 .like_button:hover,
 button:hover {
     background-color: #336;
+}
+button.activated {
+    background-color: #33B;
 }
 
 button.mini {
@@ -43,7 +47,10 @@ input[type="text"] {
     height: 25px;
     outline: none;
 }
-
+select,
+select > option {
+    font-family: Arial;
+}
 /* API de Conductometria */
 :root {
     --cmt_border_color_1: #114;
@@ -144,4 +151,44 @@ table.tabla_de_conductometria .minibutton {
 }
 .nowrap {
     white-space: nowrap;
+}
+.position_relative {
+    position: relative;
+}
+.position_absolute {
+    position: absolute;
+}
+.top_auto {
+    top: auto;
+}
+.top_0 {
+    top: 0;
+}
+
+.bottom_auto {
+    bottom: auto;
+}
+.bottom_0 {
+    bottom: 0;
+}
+
+.left_auto {
+    left: auto;
+}
+.left_0 {
+    left: 0;
+}
+
+.right_auto {
+    right: auto;
+}
+.right_0 {
+    right: 0;
+}
+.cursor_pointer {   
+    cursor: pointer;
+}
+
+.HiddenMenu {
+    background-color: rgba(255,255,255,0.7);
 }

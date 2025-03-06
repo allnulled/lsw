@@ -117,6 +117,8 @@ const boot = async function () {
               // COMPONENTS::START ////////////////////////////////////////////////
               /////////////////////////////////////////////////////////////////////
               // LSW Form controls API & components:
+              /*
+              // Antes:
               importer.importVueComponent("lsw-framework/src/components/lsw-form-controls/control-box/control-box"),
               importer.importVueComponent("lsw-framework/src/components/lsw-form-controls/control-error/control-error"),
               importer.importVueComponent("lsw-framework/src/components/lsw-form-controls/control-types/hidden-control/hidden-control"),
@@ -125,6 +127,15 @@ const boot = async function () {
               importer.importVueComponent("lsw-framework/src/components/lsw-form-controls/control-types/boolean-control/boolean-control"),
               importer.importVueComponent("lsw-framework/src/components/lsw-form-controls/control-types/number-control/number-control"),
               importer.importVueComponent("lsw-framework/src/components/lsw-form-controls/control-types/date-control/date-control"),
+              //*/
+              // Ahora:
+              importer.scriptSrc("lsw-framework/src/directives/v-form/v-form.js"),
+              /*
+              importer.scriptSrc("lsw-framework/src/components/lsw-form-controls/directives/v-form-point/v-form-point.js"),
+              importer.scriptSrc("lsw-framework/src/components/lsw-form-controls/directives/v-form-control/v-form-control.js"),
+              importer.scriptSrc("lsw-framework/src/components/lsw-form-controls/directives/v-form-input/v-form-input.js"),
+              importer.scriptSrc("lsw-framework/src/components/lsw-form-controls/directives/v-form-error/v-form-error.js"),
+              //*/
               // LSW Table component:
               importer.importVueComponent("lsw-framework/src/components/lsw-table/lsw-table/lsw-table"),
               importer.importVueComponent("lsw-framework/src/components/lsw-table/lsw-table-transformers/lsw-table-transformers"),
@@ -160,14 +171,28 @@ const boot = async function () {
               // LSW Agenda components:
               importer.importVueComponent("lsw-framework/src/components/lsw-calendario/lsw-calendario"),
               importer.importVueComponent("lsw-framework/src/components/lsw-agenda/lsw-agenda/lsw-agenda"),
-              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/lsw-agenda-task-form/lsw-agenda-task-form"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-breadcrumb/lsw-agenda-breadcrumb"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-form/lsw-agenda-form"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-accion-add/lsw-agenda-accion-add"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-accion-search/lsw-agenda-accion-search"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-concepto-add/lsw-agenda-concepto-add"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-concepto-search/lsw-agenda-concepto-search"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-evento-search/lsw-agenda-evento-search"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-impresion-add/lsw-agenda-impresion-add"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-impresion-search/lsw-agenda-impresion-search"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-infraccion-search/lsw-agenda-infraccion-search"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-limitador-add/lsw-agenda-limitador-add"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-limitador-search/lsw-agenda-limitador-search"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-postimpresion-search/lsw-agenda-postimpresion-search"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-propagacion-search/lsw-agenda-propagacion-search"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-agenda/components/lsw-agenda-propagador-search/lsw-agenda-propagador-search"),
               /////////////////////////////////////////////////////////////////////
               // COMPONENTS::END //////////////////////////////////////////////////
               /////////////////////////////////////////////////////////////////////
               // LSW Reloadable script:
               importer.scriptSrc("lsw-framework/src/apis/lsw-reloader/reloadable.js"),
             ]);
-            
+
           }
           Third_wave: {
             await importer.linkStylesheet("lsw-framework/src/styles/lsw-styling-structure.css");
@@ -180,16 +205,34 @@ const boot = async function () {
         }
       }
     } // End of Step 1: import logic
-    Step_1a_setup_databases: {
+    Step_2_wait_for_dependencies_to_be_loaded_or_fail: {
+      let intervalId = undefined;
+      await new Promise((resolve, reject) => {
+        intervalId = setInterval(() => {
+          const hasBrowsie = typeof Browsie !== "undefined";
+          const hasDatabase = typeof LswDatabase !== "undefined";
+          const isCompleted = hasBrowsie && hasDatabase;
+          if(isCompleted) {
+            return resolve();
+          }
+        }, 10);
+        setTimeout(() => {
+          clearInterval(intervalId);
+          return reject(new Error("Could not load all dependencies on «boot.js»"));
+        }, 1000 * 3000);
+      });
+    }
+    Step_3_setup_databases: {
+      break Step_3_setup_databases;
       if (process.env.NODE_ENV === "test") {
         await LswDatabase.deleteDatabase("lsw_default_database");
       }
       await LswDatabase.createDatabase("lsw_default_database", Object.assign({}, {
         // Tablas de agenda:
-        concepto: "nombre,categorias,sinonimos,antonimos,similares,relacionados".split(","),
+        accion: "refers_to_concept,has_duration,starts_at,has_emotions,has_details,has_description,has_steps,has_reasoning,has_expectations,has_moraline,has_intention,has_result,has_history,has_consequences".split(","),
+        concepto: "has_name".split(","),
+        limitador: "nombre,contenido".split(","),
         propagacion: "concepto_origen,concepto_destino,formula,descripcion".split(","),
-        procedimiento: "nombre,anio,mes,dia,hora,minuto,resumen,conclusion,relato,matices".split(","),
-        actitud: "nombre,anio,mes,dia,hora,minuto,resumen,conclusion,relato,matices".split(","),
       }, {
         // Tablas de wiki:
         articulos: "titulo,referencias,contenido,categorias".split(","),
@@ -214,7 +257,7 @@ const boot = async function () {
         // */
       }));
     }
-    Step_2_organize_api: {
+    Step_4_organize_api: {
       Vue.prototype.$window = window;
       Vue.prototype.$console = console;
       Vue.prototype.$vue = Vue;
@@ -231,84 +274,60 @@ const boot = async function () {
       Vue.prototype.$lsw.wiki = null;
       Vue.prototype.$lsw.agenda = null;
     } // End of Step 2: organize api
-    Step_3_deploy_app: {
+    Step_5_deploy_app: {
       const vueInstance = new Vue({
         render: h => h(Vue.options.components.App),
       }).$mount("#app");
     }
-    Step_4_inject_development_point: {
+    Step_6_inject_development_point: {
       window.on_application_mounted.promise.then(async () => {
         try {
           console.log("Application is ready here!");
           Vue.prototype.$consoleHooker.instance.restoreConsole();
           Fill_database: {
-            await Vue.prototype.$lsw.database.insert("procedimiento", {
-              nombre: "Desayunar",
-              subconceptos: "ajo, cacao, leche, tostada, miel, mermelada",
-              anio: 2025,
-              mes: 2,
-              dia: 19,
-              hora: 8,
-              minuto: 0,
-              estado: "done",
-              duracion: "50min",
-              resumen: "",
-              conclusion: "",
-              relato: "",
-              matices: "",
+            await Vue.prototype.$lsw.database.insert("accion", {
+              refers_to_concept: "Desayunar",
+              has_details: "ajo, cacao, leche, tostada, miel, mermelada",
+              starts_at: "2025/02/19 08:00",
+              has_state: "done",
+              has_duration: "50min",
+              has_description: "",
+              has_moraline: "",
             });
-            await Vue.prototype.$lsw.database.insert("procedimiento", {
-              nombre: "Comer",
-              subconceptos: "comida en general",
-              anio: 2025,
-              mes: 2,
-              dia: 19,
-              hora: 14,
-              minuto: 0,
-              estado: "pending",
-              duracion: "50min",
-              resumen: "",
-              conclusion: "",
-              relato: "",
-              matices: "",
+            await Vue.prototype.$lsw.database.insert("accion", {
+              refers_to_concept: "Comer",
+              has_details: "comida en general",
+              starts_at: "2025/02/19 14:00",
+              has_state: "pending",
+              has_duration: "50min",
+              has_description: "",
+              has_moraline: "",
             });
-            await Vue.prototype.$lsw.database.insert("procedimiento", {
-              nombre: "Cenar",
-              subconceptos: "sopa, tortilla",
-              anio: 2025,
-              mes: 2,
-              dia: 19,
-              hora: 21,
-              minuto: 0,
-              estado: "failed",
-              duracion: "50min",
-              resumen: "",
-              conclusion: "",
-              relato: "",
-              matices: "",
+            await Vue.prototype.$lsw.database.insert("accion", {
+              refers_to_concept: "Cenar",
+              has_details: "sopa, tortilla",
+              starts_at: "2025/02/19 21:00",
+              has_state: "failed",
+              has_duration: "50min",
+              has_description: "",
+              has_moraline: "",
             });
-            await Vue.prototype.$lsw.database.insert("procedimiento", {
-              nombre: "Cenar",
-              subconceptos: "sopa, tortilla",
-              anio: 2025,
-              mes: 2,
-              dia: 19,
-              hora: 21,
-              minuto: 0,
-              estado: "pending",
-              duracion: "50min",
-              resumen: "",
-              conclusion: "",
-              relato: "",
-              matices: "",
+            await Vue.prototype.$lsw.database.insert("accion", {
+              refers_to_concept: "Cenar",
+              has_details: "sopa, tortilla",
+              starts_at: "2025/02/19 14:00",
+              has_state: "pending",
+              has_duration: "50min",
+              has_description: "",
+              has_moraline: "",
             });
           }
-          const waitFor = function(ms) {
+          const waitFor = function (ms) {
             return new Promise((resolve, reject) => {
               setTimeout(() => resolve(), ms);
             });
           };
-          const filterDomElements = function(selector, filterCallback, base = document) {
+          const filterDomElements = function (selector, filterCallback, base = document) {
             return Array.from(base.querySelectorAll(selector)).filter(filterCallback);
           }
           Working_on_agenda: {
@@ -316,10 +335,10 @@ const boot = async function () {
             await waitFor(100);
             filterDomElements(".main_tab_topbar > button", button => button.textContent.trim() === "Agenda")[0].click();
             await waitFor(100);
-            Working_on_update_task_form: {
+            Working_on_insert_task_form: {
               filterDomElements(".lsw_agenda .dias_de_calendario td button", button => button.textContent.trim() === "19")[0].click();
               await waitFor(100);
-              filterDomElements(".hour_task_editer", el => true)[0].click();
+              filterDomElements(".lsw_agenda", el => true)[0].__vue__.selectContext("accion.add");
               await waitFor(100);
             }
           }

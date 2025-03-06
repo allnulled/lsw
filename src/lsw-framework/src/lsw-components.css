@@ -52,7 +52,6 @@ table.tabla_para_horas input {
     width: 100%;
 }
 .Component.LswCalendario button {
-    border-radius: 0pt;
     
 }
 tr.fila_de_dias_de_semana > td {
@@ -66,6 +65,7 @@ tr.fila_de_dias_de_semana > td {
 tbody.dias_de_calendario > tr > td {
     padding: 0px;
     border-right: 1px solid white;
+    border-bottom: 1px solid white;
 }
 tbody.dias_de_calendario > tr > td > span {
     display: inline-block;
@@ -79,85 +79,82 @@ tbody.dias_de_calendario > tr > td > span > button {
     width: 100%;
     height: 100%;
 }
-.ControlBox {
-    
-}
-.ControlBoxButtons {
-    text-align: right;
-}
-.ControlSuccess {
-    background-color: #67c767 !important;
-    border: 1px solid green !important;
-}
-.ControlPending {
-    background-color: #66c0d0 !important;
-    border: 1px solid blue !important;
-}
-.ControlSuccess,
-.ControlPending,
-.ControlError {
-    max-height: 60px;
-    overflow: scroll;
-    border: 1px solid red;
-    border-radius: 2pt;
-    margin-top: 4px;
-    padding: 4px;
-    background-color: #ce4444;
-    color: black;
-    position: relative;
-}
-.ControlSuccess.unsized,
-.ControlPending.unsized,
-.ControlError.unsized {
-    max-height: 200px;
-}
-.ControlError .errorName {
-    
-}
-.ControlError .errorMessage {
-
-}
-.ControlError .errorStack {
-    display: none;
-}
-
-.ControlError pre {
-    padding: 0px;
-    margin: 0px;
-    font-family: Arial;
-    white-space: pre-wrap;
-}
-.ControlError .clearErrorButton {
-    margin-right: 4px;
-    padding: 0px;
-    cursor: pointer;
-    float: right;
-    position: absolute;
-    top: 4px;
-    right: 0px;
-    bottom: auto;
-    left: auto;
-}
-.HiddenControl {
-    
-}
-.StringControl {
-    
-}
-.ArrayControl {
-    
-}
-.BooleanControl {
-    
-}
-.NumberControl {
-    
-}
 .lsw_table {
     
 }
 .lsw_table .button_separation {
     margin-left: 4px;
+}
+.lsw_table_itself {
+    
+}
+table.lsw_table_itself > thead > tr > th {
+    text-align: left;
+}
+table.lsw_table_itself > thead > tr > th.table_header {
+    padding: 4px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    text-align: left;
+}
+.table_menu_button {
+    background-color: transparent;
+    color: black;
+    border: 1px solid black;
+}
+.table_navigation_menu_cell {
+    padding: 0px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+.table_navigation_menu {
+    border: 3px double #999;
+    border-radius: 2pt;
+    border-top-left-radius: 2pt;
+    border-top-right-radius: 2pt;
+    padding: 4px;
+}
+.lsw_table_itself > tbody > tr > td {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-left: 1px solid #999;
+}
+.lsw_table_itself > tbody > tr > td:first-child {
+    border-left: 0px solid #999;
+}
+.lsw_table_itself > tbody > tr > td.index_cell {
+    text-align: right;
+}
+.lsw_table_itself > tbody > tr > td.data_cell {
+    padding: 1px;
+}
+.lsw_table_itself > tbody > tr > td.data_cell > pre {
+    margin: 0px;
+    border: 1px solid #999;
+    border-radius: 2pt;
+    background-color: #DDD;
+    font-size: 12px;
+    font-family: Arial;
+    white-space: pre;
+    overflow: scroll;
+    padding: 4px;
+}
+
+.lsw_table_itself > tbody > tr.row_for_table.odd {
+    background-color: #BBB;
+}
+
+.lsw_table .pagination_button {
+    font-size: 25px;
+    cursor: pointer;
+}
+.lsw_table .pagination_button_box {
+    padding-left: 1px;
+}
+.lsw_table .pagination_button_box.first_box {
+    padding-left: 0px;
 }
 .lsw_data_implorer {
     
@@ -512,10 +509,14 @@ button {
     background-color: black;
     color: white;
     margin-bottom: 0px;
+    min-width: 25px;
 }
 .like_button:hover,
 button:hover {
     background-color: #336;
+}
+button.activated {
+    background-color: #33B;
 }
 
 button.mini {
@@ -534,7 +535,10 @@ input[type="text"] {
     height: 25px;
     outline: none;
 }
-
+select,
+select > option {
+    font-family: Arial;
+}
 /* API de Conductometria */
 :root {
     --cmt_border_color_1: #114;
@@ -636,19 +640,63 @@ table.tabla_de_conductometria .minibutton {
 .nowrap {
     white-space: nowrap;
 }
-.basic_table {
-    width: 100%;
+.position_relative {
+    position: relative;
 }
-.basic_table th,
-.basic_table td {
+.position_absolute {
+    position: absolute;
+}
+.top_auto {
+    top: auto;
+}
+.top_0 {
+    top: 0;
+}
+
+.bottom_auto {
+    bottom: auto;
+}
+.bottom_0 {
+    bottom: 0;
+}
+
+.left_auto {
+    left: auto;
+}
+.left_0 {
+    left: 0;
+}
+
+.right_auto {
+    right: auto;
+}
+.right_0 {
+    right: 0;
+}
+.cursor_pointer {   
+    cursor: pointer;
+}
+
+.HiddenMenu {
+    background-color: rgba(255,255,255,0.7);
+}
+
+
+.database_breadcrumb {
+    padding: 4px;
+    padding-top: 0px;
+}
+.database_breadcrumb_box {
+    padding: 4px;
+    border: 1px solid #999;
+    background-color: #DDD;
+    text-shadow: 0 0 1px black;
+}
+
+
+table.top_aligned > tbody > tr > td {
     vertical-align: top;
-    text-align: left;
 }
-
-
-
-
-
 
 
 .lsw_filesystem_explorer {
@@ -876,7 +924,6 @@ table.tabla_para_horas input {
     width: 100%;
 }
 .Component.LswCalendario button {
-    border-radius: 0pt;
     
 }
 tr.fila_de_dias_de_semana > td {
@@ -890,6 +937,7 @@ tr.fila_de_dias_de_semana > td {
 tbody.dias_de_calendario > tr > td {
     padding: 0px;
     border-right: 1px solid white;
+    border-bottom: 1px solid white;
 }
 tbody.dias_de_calendario > tr > td > span {
     display: inline-block;
@@ -903,124 +951,139 @@ tbody.dias_de_calendario > tr > td > span > button {
     width: 100%;
     height: 100%;
 }
-.lsw_agenda {
-    
-}
-.calendar_viewer {
-    padding: 8px;
-}
-.no_tasks_message {
-    padding: 8px;
-}
-.hour_separator_cell {
-    background-color: #113;
-    color: white;
-    padding: 4px;
-    font-weight: bold;
+.LswAgendaAccionAdd {
+
 }
 
-.hour_lapse_separator {
-    background-color: #112;
-    color: white;
-    padding: 4px;
-    cursor: pointer;
-    border-bottom: 1px solid #AAA;
+.LswAgendaAccionSearch {
+
 }
-.hour_lapse_list {
-    background-color: #CCC;
+.lsw_agenda_breadcrumb {
+    padding-left: 0px;
+    padding-right: 0px;
 }
-.hour_task_block {
-    display: inline-block;
-    padding: 4px;
-    border-bottom: 1px solid #AAA;
-}
-.hour_task_pill {
+.agenda_breadcrumb {
     display: flex;
     flex-direction: row;
-    align-items: center;
-    min-height: 25px;
-    height: 25px;
+    gap: 4px;
+    border: 1px solid #999;
+    border-radius: 2pt;
+    padding: 4px;
+    background-color: rgba(193, 193, 193, 0.51);
 }
-.hour_task_pill * {
-    background-color: white;
+.agenda_breadcrumb_item {
+    flex: 1;
+    padding: 4px;
 }
-.hour_task_dragger {
-    cursor: grab;
+.agenda_breadcrumb_link {
+    color: black;
+    font-weight: normal;
+    cursor: pointer;
 }
-.box_for_date_details {
-    padding: 8px;
+.agenda_breadcrumb_link:hover {
+    text-decoration: underline;
+}
+.agenda_breadcrumb_link.only_label {
+    font-weight: normal;
+    text-decoration: none;
+    cursor: inherit;
+}
+.LswAgendaConceptoAdd {
+
+}
+.LswAgendaConceptoSearch {
+
+}
+.LswAgendaEventoSearch {
+
+}
+.form_item {
     padding-top: 4px;
+    padding-bottom: 4px;
+    border-top: 1px solid #CCC;
 }
-.hour_task_details_start,
-.hour_task_details_duration {
-    background-color: rgb(165, 165, 219);
+select.form_control {
+    width: 100%;
 }
-.hour_task_name {
-    cursor: pointer;
+.enunciate_box2 {
+    padding-bottom: 2px;
 }
-.hour_compromises {
-    font-size: 10px;
-}
-.hour_table {
-    border-left: 1px solid #114;
-    border-right: 1px solid #114;
-    border-bottom: 1px solid #114;
-}
-
-.pill_start,
-.pill_middle,
-.pill_end {
-    display: inline-block;
-    height: 25px;
-    padding: 5px;
-}
-.pill_start {
-    flex: 1;
-    display: inline-block;
-    border: 1px solid black;
-    border-radius: 2pt;
-    border-top-right-radius: 0pt;
-    border-bottom-right-radius: 0pt;
+.enunciate {
     font-weight: bold;
-    white-space: nowrap;
-    padding-top:2px;
+    display: block;
 }
-.pill_middle,
-.pill_end {
-    flex: 1;
-    display: inline-block;
-    border: 1px solid black;
-    border-left: none;
+.enunciate > .enunciate_text {
+    display: inline;
+    white-space: nowrap;
+}
+.enunciate_box {
+    padding-left: 4px;
+    float: right;
+}
+.enunciate > .coderef {
+    display: inline;
+    padding-bottom: 2px;
+}
+.enunciate > .coderef > .codenote {
+    display: inline;
+    font-weight: normal;
+    font-size: 9px;
+    white-space: nowrap;
+    padding-right: 2px;
+}
+.enunciate > .coderef > .codenote.as_note {
+    padding-left: 2px;
+}
+.enunciate > .coderef > .codetext {
+    display: inline;
+    font-weight: normal;
+    font-family: monospace;
+    font-size: 8px;
+    white-space: nowrap;
+}
+.enunciate > .coderef > .codetype {
     font-size: 10px;
-    white-space: nowrap;
+    background-color: #CCC;
+    box-shadow: 0 0 2px black;
+    padding: 0px;
+    padding-left: 4px;
+    padding-right: 4px;
 }
-.pill_middle {
-    border-radius: 0pt;
+.validationBox {
+    display: none;
+    padding: 4px;
+    border: 1px solid #999;
+    margin-top: 1px;
 }
-.pill_end {
-    border: 1px solid black;
-    border-left: none;
-    border-radius: 2pt;
-    border-top-left-radius: 0pt;
-    border-bottom-left-radius: 0pt;
-    font-size: 10px;
-    white-space: nowrap;
+.validationBox.errorBox {
+    display: block;
+    background-color: rgb(207, 100, 100);
 }
+.validationBox.successBox {
+    display: block;
+    background-color: rgb(127, 223, 127);
+}
+.LswAgendaImpresionAdd {
 
-.hour_task_block.is_completed .hour_task_name {
-    background-color: #46c01a;
 }
-.hour_task_block.is_pending .hour_task_name {
-    background-color: #e5df23;
-}
-.hour_task_block.is_failed .hour_task_name {
-    background-color: #a83b14;
-}
-.hour_task_editer {}
-.hour_task_deleter {}
+.LswAgendaImpresionSearch {
 
-.hour_task_editer,
-.hour_task_deleter {
-    cursor: pointer;
 }
+.LswAgendaInfraccionSearch {
 
+}
+.LswAgendaLimitadorAdd {
+
+}
+.LswAgendaLimitadorSearch {
+
+}
+.LswAgendaPostimpresionSearch {
+
+}
+.LswAgendaPropagacionSearch {
+
+}
+.LswAgendaPropagadorSearch {
+
+}
