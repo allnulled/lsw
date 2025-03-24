@@ -1,0 +1,20 @@
+{
+  "auto.translation.1": "type",
+  "auto.translation.2": "class",
+  "auto.translation.3": "extends",
+  "auto.translation.4": "Object",
+  "auto.translation.5": "vendor",
+  "auto.translation.6": "lsw",
+  "auto.translation.7": "namespace",
+  "auto.translation.8": "LswCircuiter",
+  "auto.translation.9": "source code",
+  "auto.translation.10": "La clase está definida así:\n",
+  "auto.translation.11": "LswCommander",
+  "auto.translation.12": "description",
+  "auto.translation.13": "Este método se encarga de pasar los PROXIES a SCHEMA para el LswDatabase. No los registra: devuelve el schema resultante solamente.",
+  "auto.translation.14": "returns",
+  "auto.translation.15": "the general adaptation of SchemaEntity class to Schema Definition Object for LswDatabase.",
+  "auto.translation.16": "Este método se encarga de pasar los PROXIES a SCHEMA para el LswDatabase. Sí los registra en la instancia actual: no solo devuelve el schema.",
+  "auto.translation.17": "Class",
+  "auto.translation.18": "LswSchema"
+}

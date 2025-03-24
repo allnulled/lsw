@@ -1,0 +1,13 @@
+{
+  "TODO": "ΟΛΟΙ",
+  "proporcionar conexión por patrón singleton": "παροχή σύνδεσης μοτίβου singleton",
+  "Firstly, we create the object and the resolve function.": "Πρώτον, δημιουργούμε το αντικείμενο και τη λειτουργία επίλυσης.",
+  "Luego cargamos la API de base de datos.": "Μετά φορτώνουμε τη βάση δεδομένων API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "Και στο τέλος καθορίζουμε τις λειτουργίες εκκίνησης και κλεισίματος, και επιστρέφουμε το αντικείμενο του API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Ο φορτωτής API είναι η λειτουργία που είναι υπεύθυνη για την τοποθέτηση ολόκληρου του API,\nότι στο τέλος είναι ένα αντικείμενο που είναι προσβάσιμο, κανονικά,\nή ως «αυτό» στις μεθόδους του ίδιου του πλαισίου,\nή ως παράμετρος.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Λέγεται ότι το API είναι πάντα προσβάσιμο γιατί, γενικά, αυτό το έργο υιοθετεί μοτίβα ή ιδέες του λειτουργικού προγραμματισμού. Και προσπαθήστε, αν και όχι αυστηρά, ότι όλες οι μεταβλητές που χρησιμοποιούνται στη λειτουργία παρέχονται μέσω `αυτό' ή μέσω παραμέτρων είναι μια ρήτρα στο στυλ προγραμματισμού μου.",
+  "ATENCIÓN": "ΠΡΟΣΟΧΗ",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "οι ενότητες πρέπει να είναι κατά σειρά φορτίου, διαφορετικά εφαρμόζουν τη δική σας στρατηγική ή να την ολοκληρώσουν ως 1 ομάδα.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Λέγεται ότι το API είναι πάντα προσβάσιμο γιατί, γενικά, αυτό το έργο υιοθετεί μοτίβα ή ιδέες του λειτουργικού προγραμματισμού. Και προσπαθήστε (όχι αυστηρά) ότι όλες οι μεταβλητές που χρησιμοποιούνται στη λειτουργία παρέχονται μέσω `αυτό' ή μέσω παραμέτρων είναι μια ρήτρα στο στυλ προγραμματισμού μου.",
+  "i18n.hello": "Γεια σε όλους!"
+}

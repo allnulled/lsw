@@ -1,0 +1,13 @@
+{
+  "TODO": "모든 제품",
+  "proporcionar conexión por patrón singleton": "singleton 패턴 연결 제공",
+  "Firstly, we create the object and the resolve function.": "첫째, 우리는 객체와 해결 함수를 만듭니다.",
+  "Luego cargamos la API de base de datos.": "그런 다음 데이터베이스 API를로드합니다.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "그리고 결국 우리는 시작과 가까운 기능을 정의하고, 우리는 API의 객체를 반환합니다.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Loader API는 전체 API를 장착 할 책임있는 기능입니다.\n그 끝에 접근 할 수있는 객체, 일반적으로,\n또는 프레임 워크 자체의 방법에서 `this`로,\n또는 매개변수로.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "API가 항상 접근하기 때문에 일반적으로이 프로젝트는 기능적인 프로그래밍의 패턴이나 아이디어를 채택합니다. 그리고 시도하지만, 엄격하지 않지만, 함수에 사용되는 모든 변수는 `this`를 통해 제공되거나 매개 변수는 내 프로그래밍 스타일에 대한 항목입니다.",
+  "ATENCIÓN": "관련 기사",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "모듈은 로드의 순서에 있어야 합니다, 그렇지 않으면 자신의 전략을 실행하거나 1 그룹으로 포장.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "API가 항상 접근하기 때문에 일반적으로이 프로젝트는 기능적인 프로그래밍의 패턴이나 아이디어를 채택합니다. 함수에 사용되는 모든 변수는 `this`를 통해 제공되거나 매개변수를 통해 내 프로그래밍 스타일의 항목입니다.",
+  "i18n.hello": "안녕하세요, 여러분!"
+}

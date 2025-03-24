@@ -190,4 +190,76 @@ module.exports = [{
   sourceType: "git",
   source: "https://github.com/allnulled/v-form.git",
   version: "last"
+}, {
+  name: "@allnulled/lsw-class-register",
+  path: "src/lsw-framework/src/apis/lsw-class-register",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-class-register.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-configurer",
+  path: "src/lsw-framework/src/apis/lsw-configurer",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-configurer.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-database-virtualizer",
+  path: "src/lsw-framework/src/apis/lsw-database-virtualizer",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-database-virtualizer.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-depender",
+  path: "src/lsw-framework/src/apis/lsw-depender",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-depender.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-dom",
+  path: "src/lsw-framework/src/apis/lsw-dom",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-dom.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-lifecycle",
+  path: "src/lsw-framework/src/apis/lsw-lifecycle",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-lifecycle.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-randomizer",
+  path: "src/lsw-framework/src/apis/lsw-randomizer",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-randomizer.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-schema",
+  path: "src/lsw-framework/src/apis/lsw-schema",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-schema.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-database-ui",
+  path: "src/lsw-framework/src/components/lsw-database-ui",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-database-ui.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-formtypes",
+  path: "src/lsw-framework/src/components/lsw-formtypes",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-formtypes.git",
+  version: "last"
+}, {
+  name: "@allnulled/lsw-schema-based-form",
+  path: "src/lsw-framework/src/components/lsw-schema-based-form",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-schema-based-form.git",
+  version: "last"
+}, {
+  name: "@allnulled/v-xform",
+  path: "src/lsw-framework/src/directives/v-xform",
+  sourceType: "git",
+  source: "https://github.com/allnulled/v-xform.git",
+  version: "last"
 }]

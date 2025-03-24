@@ -1,0 +1,13 @@
+{
+  "TODO": "MINDEN",
+  "proporcionar conexión por patrón singleton": "a szimpla minta kapcsolat",
+  "Firstly, we create the object and the resolve function.": "Először is létrehozzuk az objektumot és a megoldási funkciót.",
+  "Luego cargamos la API de base de datos.": "Ezután betöltjük az API adatbázist.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "És végül meghatározzuk a kezdő és záró funkciókat, és visszatérünk az API objektumához.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "A Loader API a teljes API felszereléséért felelős funkció,\nhogy a végén olyan objektum, amely általában hozzáférhető,\nvagy „ez” a keretrendszer módszereiben,\nvagy mint paraméter.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Azt mondják, hogy az API mindig elérhető, mert általában ez a projekt a funkcionális programozás mintáit vagy ötleteit fogadja el. És próbálja meg, bár nem szigorúan, hogy a funkcióban használt összes változót \"ez\" vagy paramétereken keresztül nyújtják, a programozási stílusomban záradék.",
+  "ATENCIÓN": "TANÁCIÓ",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "a moduloknak a terhelés érdekében kell lenniük, különben saját stratégiáját kell végrehajtaniuk, vagy 1 csoportként kell becsomagolni.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Azt mondják, hogy az API mindig elérhető, mert általában ez a projekt a funkcionális programozás mintáit vagy ötleteit fogadja el. És próbálja meg (nem szigorúan), hogy a funkcióban használt összes változót \"ez\" vagy paramétereken keresztül nyújtják, a programozási stílusomban záradék.",
+  "i18n.hello": "Hello, mindenki!"
+}

@@ -1,0 +1,13 @@
+{
+  "TODO": "ทั้งหมด",
+  "proporcionar conexión por patrón singleton": "ให้การเชื่อมต่อรูปแบบซิงเกิลตัน",
+  "Firstly, we create the object and the resolve function.": "อย่างแรก เราสร้างวัตถุและฟังก์ชันแก้ไข.",
+  "Luego cargamos la API de base de datos.": "จากนั้นเราโหลดฐานข้อมูล API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "และสุดท้ายเรานิยามฟังก์ชันเริ่มต้นและปิด และเราคืนวัตถุของ API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Arter API คือฟังก์ชันที่รับผิดชอบในการเพิ่ม API ทั้งหมด\nว่าในที่สุดวัตถุที่เข้าถึงได้ โดยปกติแล้ว\nหรือในวิธีการสร้างโครงร่าง\nหรือเป็นพารามิเตอร์\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "ว่ากันว่า API เข้าถึงได้ตลอด เพราะโดยทั่วไปแล้ว โปรเจกต์นี้รับเอารูปแบบ หรือแนวคิดของการเขียนโปรแกรม และลอง แม้จะไม่เข้มงวดก็ตาม ตัวแปรทั้งหมดที่ใช้ในฟังก์ชันนั้น ถูกจัดให้ผ่าน 'นี่' หรือพารามิเตอร์.",
+  "ATENCIÓN": "สัดส่วน",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "โมดูลต้องเป็นลําดับของการโหลด ไม่เช่นนั้นจะใช้กลยุทธ์ของคุณเอง หรือการห่อขึ้นเป็น 1 กลุ่ม.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "ว่ากันว่า API เข้าถึงได้ตลอด เพราะโดยทั่วไปแล้ว โปรเจกต์นี้รับเอารูปแบบ หรือแนวคิดของการเขียนโปรแกรม และพยายาม (ไม่จํากัด) ว่าตัวแปรทั้งหมดที่ถูกใช้ในฟังก์ชันนั้น ถูกกําหนดผ่านทาง 'นี่' หรือพารามิเตอร์ คือข้อกําหนดในการเขียนโปรแกรมของผม.",
+  "i18n.hello": "สวัสดีทุกคน!"
+}

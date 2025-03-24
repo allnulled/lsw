@@ -1,0 +1,13 @@
+{
+  "TODO": "همه چیز",
+  "proporcionar conexión por patrón singleton": "اتصال الگوی تکتون",
+  "Firstly, we create the object and the resolve function.": "اول، ما جسم و تابع حل را ایجاد می کنیم.",
+  "Luego cargamos la API de base de datos.": "سپس API پایگاه داده را بارگذاری می کنیم.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "و در پایان ما توابع شروع و نزدیک را تعریف می کنیم و ما جسم API را باز می گردانیم.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "REST API تابعی است که مسئول نصب کل API است.\nدر پایان یک شیء است که در دسترس است، به طور معمول،\nیا به عنوان \"این\" در روش های خود چارچوب،\nیا به عنوان پارامتر.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "گفته می شود که API همیشه در دسترس است زیرا به طور کلی، این پروژه الگوهای یا ایده های برنامه نویسی عملکردی را اتخاذ می کند. و سعی کنید، اگرچه نه به شدت، که تمام متغیرهای مورد استفاده در تابع از طریق \"این\" یا از طریق پارامترهای یک بند در سبک برنامه نویسی من ارائه شده است.",
+  "ATENCIÓN": "ATTENING",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "ماژول ها باید به منظور بارگذاری باشند، در غیر این صورت استراتژی خود را پیاده سازی کنید یا آن را به عنوان یک گروه تنظیم کنید.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "گفته می شود که API همیشه در دسترس است زیرا به طور کلی، این پروژه الگوهای یا ایده های برنامه نویسی عملکردی را اتخاذ می کند. و سعی کنید (نه به شدت) که تمام متغیرهای مورد استفاده در تابع از طریق \"این\" یا از طریق پارامترهای یک بند در سبک برنامه نویسی من ارائه شده است.",
+  "i18n.hello": "سلام، همه!"
+}

@@ -1,0 +1,13 @@
+{
+  "TODO": "ВСИЧКИ",
+  "proporcionar conexión por patrón singleton": "осигуряване на свързване на единични модели",
+  "Firstly, we create the object and the resolve function.": "Първо, създаваме обекта и функцията за решаване.",
+  "Luego cargamos la API de base de datos.": "След това зареждаме базата данни API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "И в крайна сметка ние определяме началото и затварянето на функциите и връщаме обекта на API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "API е функцията, която е отговорна за монтиране на целия API,\nче накрая е обект, който е достъпен, обикновено,\nили по-скоро като \"това\" в методите на самата рамка,\nили като параметър.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Казва се, че API е винаги достъпен, защото като цяло този проект приема модели или идеи за функционално програмиране. И се опитайте, въпреки че не е строго, че всички променливи, използвани във функцията се предоставят чрез това или чрез параметри е клауза в моя стил на програмиране.",
+  "ATENCIÓN": "ВНИМАНИЕ",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "модулите трябва да бъдат в ред на натоварване, в противен случай да прилагат собствената си стратегия или да я опаковат като 1 група.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Казва се, че API е винаги достъпен, защото като цяло този проект приема модели или идеи за функционално програмиране. И се опитайте (не строго), че всички променливи, използвани във функцията се предоставят чрез това или чрез параметри е клауза в моя стил на програмиране.",
+  "i18n.hello": "Здравейте, всички!"
+}

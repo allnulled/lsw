@@ -1,0 +1,13 @@
+{
+  "TODO": "TUTTO",
+  "proporcionar conexión por patrón singleton": "fornire connessione modello singleton",
+  "Firstly, we create the object and the resolve function.": "In primo luogo, creiamo l'oggetto e la funzione di risoluzione.",
+  "Luego cargamos la API de base de datos.": "Poi carichiamo l'API del database.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "E alla fine definiamo le funzioni di avvio e chiusura, e ritorniamo l'oggetto dell'API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "L'API Loader è la funzione responsabile del montaggio dell'intera API,\nche alla fine è un oggetto accessibile, normalmente,\no come `questo` nei metodi del quadro stesso,\no come parametro.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Si dice che l'API è sempre accessibile perché, in generale, questo progetto adotta modelli o idee di programmazione funzionale. E prova, anche se non strettamente, che tutte le variabili utilizzate nella funzione sono fornite tramite `this` o tramite parametri è una clausola nel mio stile di programmazione.",
+  "ATENCIÓN": "ATTENZIONE",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "i moduli devono essere in ordine di carico, altrimenti implementare la propria strategia o avvolgerla come 1 gruppo.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Si dice che l'API è sempre accessibile perché, in generale, questo progetto adotta modelli o idee di programmazione funzionale. E provare (non rigorosamente) che tutte le variabili utilizzate nella funzione sono fornite tramite `this` o tramite parametri è una clausola nel mio stile di programmazione.",
+  "i18n.hello": "Ciao a tutti!"
+}

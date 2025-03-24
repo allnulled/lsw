@@ -1,0 +1,13 @@
+{
+  "TODO": "所有人",
+  "proporcionar conexión por patrón singleton": "提供单通模式连接",
+  "Firstly, we create the object and the resolve function.": "首先,我们创建对象和决心功能.",
+  "Luego cargamos la API de base de datos.": "然后装入数据库API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "最后我们定义了开始和关闭的功能,我们返回API的对象.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "装入器 API 是负责安装整个API的函数,\n最终是一个可以访问的对象,通常,\n或作为框架本身方法中的`这一',\n或者作为一个参数。\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "据说,API总是可以访问,因为一般而言,这个项目采用了功能编程的模式或想法. 并且尝试,虽然不严格,但功能中所使用的所有变量都是通过‘这个'或者通过参数提供的,这是我编程风格中的一个条款.",
+  "ATENCIÓN": "注意事项",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "模块必须是装入的顺序,否则将执行自己的策略或将其包装为1组.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "据说,API总是可以访问,因为一般而言,这个项目采用了功能编程的模式或想法. 并且尝试(不严格),函数中所使用的所有变量都是通过\"this\"或参数提供的,这是我编程风格中的一个条款.",
+  "i18n.hello": "大家好! 大家好! 你们好!"
+}

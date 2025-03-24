@@ -1,0 +1,13 @@
+{
+  "TODO": "GACH",
+  "proporcionar conexión por patrón singleton": "a chur ar fáil nasc patrún singleton",
+  "Firstly, we create the object and the resolve function.": "Ar an gcéad dul síos, cruthaímid an rud agus an fheidhm réitigh.",
+  "Luego cargamos la API de base de datos.": "Ansin luchtú muid an API bunachar sonraí.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "Agus sa deireadh againn a shainiú na feidhmeanna tús agus gar, agus muid ar ais ar an réad an API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Is é an API Luchtóir an fheidhm atá freagrach as gléasta an API ar fad,\ngo bhfuil sa deireadh rud atá inrochtana, de ghnáth,\nnó mar `this` i modhanna an chreata féin,\nnó mar pharaiméadar.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Deirtear go bhfuil an API inrochtana i gcónaí mar, go ginearálta, glacann an tionscadal seo patrúin nó smaointe cláir feidhme. Agus déan iarracht, cé nach docht, go bhfuil gach athróg a úsáidtear san fheidhm ar fáil trí `s seo ` nó trí pharaiméadair clásal i mo stíl clár.",
+  "ATENCIÓN": "AMHARC AR GACH EOLAS",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "ní mór modúil a bheith in ord an ualaigh, a chur i bhfeidhm ar shlí eile do straitéis féin nó é a wrap suas mar 1 ghrúpa.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Deirtear go bhfuil an API inrochtana i gcónaí mar, go ginearálta, glacann an tionscadal seo patrúin nó smaointe cláir feidhme. Agus iarracht (ní go docht) go bhfuil gach athróg a úsáidtear san fheidhm ar fáil trí `s seo ` nó trí pharaiméadair clásal i mo stíl clár.",
+  "i18n.hello": "Dia duit, gach duine!"
+}

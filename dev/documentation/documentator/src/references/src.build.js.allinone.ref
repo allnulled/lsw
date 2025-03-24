@@ -1,0 +1,4 @@
+@$section: Building process
+@$priority: 100
+@descripción:
+Esta lista contiene los ficheros que serán incluidos en `dist/memofactory.js`.

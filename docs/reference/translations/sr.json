@@ -1,0 +1,13 @@
+{
+  "TODO": "SVE",
+  "proporcionar conexión por patrón singleton": "обезбеди везу синглетонских образаца",
+  "Firstly, we create the object and the resolve function.": "Prvo, mi stvaramo objekat i funkciju rešenosti.",
+  "Luego cargamos la API de base de datos.": "Onda napunimo bazu podataka API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "Na kraju definišemo start i bliske funkcije i vratimo objekat API-ja.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Лоадер АПИ је функција која је одговорна за монтирање целог АПИ,\nda je na kraju objekt koji je dostupan, normalno,\nili kao \"ovo\" u metodama samog okvira,\nili kao parametar.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Kažu da je API uvek dostupan jer, generalno, ovaj projekat usvaja obrasce ili ideje funkcionalnog programiranja. И покушајте, иако не строго, да су све променљиве које се користе у функцији обезбеђене преко \"ово\" или параметрима је клаузула у мом стилу програмирања.",
+  "ATENCIÓN": "PAŽNJA",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "модули морају бити у реду за оптерећење, иначе спроведите сопствену стратегију или је завршите као 1 група.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Kažu da je API uvek dostupan jer, generalno, ovaj projekat usvaja obrasce ili ideje funkcionalnog programiranja. И покушајте (не строго) да су све променљиве које се користе у функцији обезбеђене преко \"ово\" или параметрима је клаузула у мом стилу програмирања.",
+  "i18n.hello": "Zdravo svima!"
+}

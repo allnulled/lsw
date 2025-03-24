@@ -1,0 +1,13 @@
+{
+  "TODO": "VISI",
+  "proporcionar conexión por patrón singleton": "nodrošināt singleton šablonu savienojumu",
+  "Firstly, we create the object and the resolve function.": "Pirmkārt, mēs radām objektu un izšķirtspējas funkciju.",
+  "Luego cargamos la API de base de datos.": "Tad mēs ielādējam datu bāzes API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "Un beigās mēs definējam sākuma un tuvu funkcijas, un mēs atgriežam objektu API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Loader API ir funkcija, kas ir atbildīga par visu API uzstādīšanu,\nka beigās ir objekts, kas ir pieejams, parasti,\nvai kā \"šo\" pašas sistēmas metodēs,\nvai kā parametru.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Tiek teikts, ka API vienmēr ir pieejams, jo kopumā šis projekts pieņem modeļus vai idejas par funkcionālo programmēšanu. Un mēģiniet, lai gan ne stingri, ka visi funkciju izmantotie mainīgie tiek nodrošināti ar 'šis' vai ar parametriem ir noteikums manā programmēšanas stilā.",
+  "ATENCIÓN": "UZTURĒŠANA",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "moduļiem jābūt secībā slodzes, citādi īstenot savu stratēģiju vai wrap to līdz kā 1 grupa.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Tiek teikts, ka API vienmēr ir pieejams, jo kopumā šis projekts pieņem modeļus vai idejas par funkcionālo programmēšanu. Un mēģiniet (ne stingri) ka visi funkciju izmantotie mainīgie tiek nodrošināti caur 'šis' vai ar parametriem ir noteikums manā programmēšanas stilā.",
+  "i18n.hello": "Sveicināti!"
+}

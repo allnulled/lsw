@@ -1,3 +1,5 @@
+node_modules
+dev/documentation/documentator/src/translations/output
 dev/bundlers/htmlbundler
 dev/bundlers/vuebundler
 src/lsw-framework/src/apis/lsw-commander
@@ -18,11 +20,15 @@ src/lsw-framework/src/apis/lsw-cycler
 src/lsw-framework/src/apis/lsw-compromiser
 src/lsw-framework/src/apis/lsw-filesystem
 src/lsw-framework/src/apis/lsw-proxifier
-src/lsw-framework/src/apis/lsw-proxifieri
-src/lsw-framework/src/directives/v-descriptor
-src/lsw-framework/src/directives/v-focus
-src/lsw-framework/src/directives/v-call
-src/lsw-framework/src/directives/v-form
+src/lsw-framework/src/apis/v-call
+src/lsw-framework/src/apis/lsw-class-register
+src/lsw-framework/src/apis/lsw-configurer
+src/lsw-framework/src/apis/lsw-database-virtualizer
+src/lsw-framework/src/apis/lsw-depender
+src/lsw-framework/src/apis/lsw-dom
+src/lsw-framework/src/apis/lsw-lifecycle
+src/lsw-framework/src/apis/lsw-randomizer
+src/lsw-framework/src/apis/lsw-schema
 src/lsw-framework/src/components/lsw-calendario
 src/lsw-framework/src/components/lsw-dialogs
 src/lsw-framework/src/components/lsw-windows
@@ -34,3 +40,10 @@ src/lsw-framework/src/components/lsw-wiki
 src/lsw-framework/src/components/lsw-agenda
 src/lsw-framework/src/components/lsw-form-controls
 src/lsw-framework/src/components/lsw-table
+src/lsw-framework/src/components/lsw-formtypes
+src/lsw-framework/src/components/lsw-schema-based-form
+src/lsw-framework/src/directives/v-descriptor
+src/lsw-framework/src/directives/v-focus
+src/lsw-framework/src/directives/v-call
+src/lsw-framework/src/directives/v-form
+src/lsw-framework/src/directives/v-xform

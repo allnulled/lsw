@@ -1,0 +1,13 @@
+{
+  "TODO": "TOUT",
+  "proporcionar conexión por patrón singleton": "fournir un modèle de connexion unique",
+  "Firstly, we create the object and the resolve function.": "Premièrement, nous créons l'objet et la fonction de résolution.",
+  "Luego cargamos la API de base de datos.": "Ensuite, nous chargeons l'API de base de données.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "Et à la fin, nous définissons les fonctions de démarrage et de fermeture, et nous retournons l'objet de l'API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "L'API de charge est la fonction qui est responsable du montage de toute l'API,\nque dans la fin est un objet qui est accessible, normalement,\nou comme «ceci» dans les méthodes du cadre lui-même,\nou comme paramètre.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "On dit que l'API est toujours accessible car, en général, ce projet adopte des modèles ou des idées de programmation fonctionnelle. Et essayez, bien que pas strictement, que toutes les variables utilisées dans la fonction sont fournies via `ce` ou via les paramètres est une clause dans mon style de programmation.",
+  "ATENCIÓN": "ATTENTION",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "les modules doivent être en ordre de charge, sinon mettre en œuvre votre propre stratégie ou l'envelopper comme 1 groupe.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "On dit que l'API est toujours accessible car, en général, ce projet adopte des modèles ou des idées de programmation fonctionnelle. Et essayez (pas strictement) que toutes les variables utilisées dans la fonction sont fournies via `ce` ou via les paramètres est une clause dans mon style de programmation.",
+  "i18n.hello": "Bonjour, tout le monde !"
+}

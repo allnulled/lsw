@@ -1,0 +1,200 @@
+{
+  "files": {
+    "index.html": {
+      "sections": {
+        "0. Prelude": [
+          {
+            "$file": "/home/carlos/Escritorio/lsw/src/lsw-framework/src/apis/lsw-schema/lsw-schema.js",
+            "$location": {
+              "start": {
+                "offset": 824,
+                "line": 39,
+                "column": 1
+              },
+              "end": {
+                "offset": 858,
+                "line": 40,
+                "column": 1
+              }
+            },
+            "$code": "  const LswSchema = class {\n\n    $trace(methodId, argsList) {\n      if(this.$options && this.$options.trace) {\n        console.log(\"[trace][lsw-schema][\" + methodId + \"] \" + argsList.length);\n      }\n    }\n\n    static Signature = LswSchemaSignature;\n\n    static createSignature(creatorCallback, creatorParameters, creatorScope) {\n      return this.Signature.create(creatorCallback, creatorParameters, creatorScope);\n    }\n\n    onValidateSchema(schema) {\n      this.$trace(\"onValidateSchema\", arguments);\n      // @OVERRIDABLE\n    }\n\n    onValidateTable(id, definition, schema) {\n      this.$trace(\"onValidateTable\", arguments);\n      // @OVERRIDABLE\n    }\n\n    onValidateColumn(id, definition, tableId, schema) {\n      this.$trace(\"onValidateColumn\", arguments);\n      // @OVERRIDABLE\n    }\n\n    onFusionateSchema(schema) {\n      this.$trace(\"onFusionateSchema\", arguments);\n      // @OVERRIDABLE\n    }\n\n    onFusionateTable(table, tableId, schema) {\n      this.$trace(\"onFusionateTable\", arguments);\n      // @OVERRIDABLE\n    }\n\n    onFusionateColumn(column, columnId, tableId, schema) {\n      this.$trace(\"onFusionateColumn\", arguments);\n      // @OVERRIDABLE\n    }\n\n    static create(...args) {\n      return new this(...args);\n    }\n\n    constructor(options = {}) {\n      this.$cache = {\n        schemaForLsw: null\n      };\n      this.$schema = {\n        hasTables: {\n\n        }\n      };\n      this.$options = options;\n    }\n    \n    getDatabaseSchemaForLsw(refresh = false) {\n      this.$trace(\"getDatabaseSchemaForLsw\", arguments);\n      if(refresh) {\n        this.$cache.schemaForLsw = null;\n      }\n      if(this.$cache.schemaForLsw) {\n        return this.$cache.schemaForLsw;\n      }\n      const schemaForLsw = {};\n      for(let tableId in this.$schema.hasTables) {\n        const tableData = this.$schema.hasTables[tableId];\n        let tableSchema = [];\n        for(let columnId in tableData.hasColumns) {\n          const columnData = tableData.hasColumns[columnId];\n          const prefix = columnData.isUnique ? \"!\" : \"\";\n          tableSchema.push(prefix + columnId);\n        }\n        schemaForLsw[tableId] = tableSchema;\n      }\n      this.$cache.schemaForLsw = schemaForLsw;\n      return schemaForLsw;\n    }\n\n    /**\n     * \n     * @$section: Lsw Framework » Lsw Schema API « LswSchema class » loadSchemaByProxies method\n     * @description: Este método se encarga de pasar los PROXIES a SCHEMA para el LswDatabase. Sí los registra en la instancia actual: no solo devuelve el schema.\n     * @returns: the general adaptation of SchemaEntity class to Schema Definition Object for LswDatabase.\n     */\n    loadSchemaByProxies(aspectId = \"SchemaEntity\") {\n      this.$trace(\"loadSchemaByProxies\", arguments);\n      const schema = this.getSchemaByProxies(aspectId);\n      return this.registerSchema(schema);\n    }\n\n    /**\n     * \n     * @$section: Lsw Framework » Lsw Schema API « LswSchema class » getSchemaByProxies method\n     * @description: Este método se encarga de pasar los PROXIES a SCHEMA para el LswDatabase. Sí los registra en la instancia actual: no solo devuelve el schema.\n     * @returns: the general adaptation of SchemaEntity class to Schema Definition Object for LswDatabase.\n     */\n    getSchemaByProxies(aspectId = \"SchemaEntity\") {\n      this.$trace(\"getSchemaByProxies\", arguments);\n      const allSchemaEntities = Object.values($proxifier.$definitions).filter(d => d[aspectId]).map(d => d[aspectId]);\n      const schemaTemp = new LswSchema();\n      for(let index=0; index<allSchemaEntities.length; index++) {\n        const SchemaEntityClass = allSchemaEntities[index];\n        const lswDatabaseSchema = this.adaptSchemaEntityToDatabaseSchema(SchemaEntityClass);\n        schemaTemp.registerSchema(lswDatabaseSchema);\n      }\n      return schemaTemp.$schema;\n    }\n\n    /**\n     * \n     * @$section: Lsw Framework » Lsw Schema API « LswSchema class » adaptSchemaEntityToDatabaseSchema method\n     * @description: Este método se encarga de pasar los PROXIES a SCHEMA para el LswDatabase. No los registra: devuelve el schema resultante solamente.\n     * @returns: the general adaptation of SchemaEntity class to Schema Definition Object for LswDatabase.\n     */\n    adaptSchemaEntityToDatabaseSchema(SchemaEntityClass) {\n      this.$trace(\"adaptSchemaEntityToDatabaseSchema\", arguments);\n      const schema = { hasTables: {} };\n      const data = SchemaEntityClass.toObject();\n      schema.hasTables[data.name] = {\n        hasEntityId: SchemaEntityClass.getEntityId(),\n        hasColumns: data.properties\n      };\n      return schema;\n    }\n\n    registerSchema(partialSchema = {}) {\n      this.$trace(\"registerSchema\", arguments);\n      if (typeof partialSchema !== \"object\") {\n        throw new Error(\"Required parameter «partialSchema» to be an object on «LswSchema.registerSchema»\");\n      }\n      this.$validateSchema(partialSchema);\n      this.$fusionateSchema(partialSchema);\n      return this;\n    }\n\n    $validateSchema(schema) {\n      this.$trace(\"$validateSchema\", arguments);\n      Native: {\n        this.$validateSchemaNative(schema);\n      }\n      Core_process: {\n        if (\"hasTables\" in schema) {\n          const tableIds = Object.keys(schema.hasTables);\n          Iterating_tables:\n          for (let indexTable = 0; indexTable < tableIds.length; indexTable++) {\n            const tableId = tableIds[indexTable];\n            const table = schema.hasTables[tableId];\n            this.$validateTableNative(table, tableId, schema);\n            if (!(\"hasColumns\" in table)) {\n              continue Iterating_tables;\n            }\n            const columnIds = Object.keys(table.hasColumns);\n            Iterating_columns:\n            for (let indexColumn = 0; indexColumn < columnIds.length; indexColumn++) {\n              const columnId = columnIds[indexColumn];\n              const column = table.hasColumns[columnId];\n              this.$validateColumnNative(column, columnId, tableId, schema);\n            }\n          }\n        }\n      }\n      User: {\n        this.onValidateSchema(schema);\n      }\n    }\n\n    $fusionateSchema(partialSchema) {\n      this.$trace(\"$fusionateSchema\", arguments);\n      const tableIds = Object.keys(partialSchema?.hasTables || {});\n      Debug_purposes: {\n        const columnIds = tableIds.map(tableId => Object.keys(partialSchema.hasTables[tableId].hasColumns || {}).map(columnId => [tableId, columnId].join(\".\")));\n        const tablesMessage = tableIds.length === 0 ? \"No tables to fusionate\" : \"Tables to fusionate:\\n - \" + tableIds.join(\"\\n - \");\n        const columnsMessage = columnIds.length === 0 ? \"No columns to fusionate\" : \"Columns to fusionate:\\n - \" + columnIds.join(\"\\n - \");\n        console.log(`[*] ${tablesMessage}`);\n        console.log(`[*] ${columnsMessage}`);\n      }\n      this.$fusionateSchemaNative(partialSchema);\n      Iterating_tables:\n      for (let indexTable = 0; indexTable < tableIds.length; indexTable++) {\n        const tableId = tableIds[indexTable];\n        const tableInfo = partialSchema.hasTables[tableId];\n        this.$fusionateTableNative(tableInfo, tableId, partialSchema);\n        const columnIds = Object.keys(tableInfo.columns || {});\n        Iterating_columns:\n        for (let indexColumn = 0; indexColumn < columnIds.length; indexColumn++) {\n          const columnId = columnIds[indexColumn];\n          const columnInfo = tableInfo.columns[columnId];\n          this.$fusionateColumnNative(columnInfo, columnId, tableId, partialSchema);\n        }\n      }\n    }\n\n    $validateSchemaNative(schema) {\n      this.$trace(\"$validateSchemaNative\", arguments);\n      Native: {\n        const ensureSchema = $ensure(schema).type(\"object\").to.have.key(\"hasTables\");\n        ensureSchema.its(\"hasTables\").type(\"object\");\n      }\n      User: {\n        this.onValidateSchema(schema);\n      }\n    }\n\n    $validateTableNative(definition, id, schema) {\n      this.$trace(\"$validateTableNative\", arguments);\n      Native: {\n        const ensureTable = $ensure(definition).type(\"object\").to.have.key(\"hasColumns\");\n        const ensureHasColumns = ensureTable.its(\"hasColumns\").type(\"object\");\n        const columnIds = Object.keys(ensureHasColumns.$subject);\n        for(let index=0; index<columnIds.length; index++) {\n          const columnId = columnIds[index];\n          const ensureColumn = ensureHasColumns.its(columnId).type(\"object\");\n          console.log(ensureColumn.$subject);\n          ensureColumn.its(\"isType\").type(\"string\");\n          ensureColumn.its(\"isUnique\").type([\"boolean\", \"undefined\"]);\n          ensureColumn.its(\"refersTo\").type([\"object\", \"undefined\", \"boolean\"]);\n          if(typeof ensureColumn.$subject.refersTo === \"object\") {\n            const ensureRefersTo = ensureColumn.its(\"refersTo\").type(\"object\");\n            ensureRefersTo.to.have.keys([\"entity\", \"property\"]);\n            ensureRefersTo.its(\"entity\").type(\"string\");\n            ensureRefersTo.its(\"property\").type(\"string\");\n          }\n          ensureColumn.its(\"isFormType\").type(\"string\");\n          ensureColumn.its(\"hasValidator\").type([\"string\", \"boolean\", \"function\", \"undefined\"]);\n          ensureColumn.its(\"hasFormatter\").type([\"string\", \"boolean\", \"function\", \"undefined\"]);\n          ensureColumn.its(\"hasLabel\").type([\"string\", \"boolean\", \"undefined\"]);\n          ensureColumn.its(\"hasDescription\").type([\"string\", \"boolean\", \"undefined\"]);\n          ensureColumn.its(\"hasPlaceholder\").type([\"string\", \"boolean\", \"undefined\"]);\n        }\n      }\n      User: {\n        this.onValidateTable(id, definition, schema);\n      }\n    }\n\n    $validateColumnNative(id, definition, tableId, schema) {\n      this.$trace(\"$validateColumnNative\", arguments);\n      Native: {\n        // !@OK: the validation is already made on the $validateTableNative\n      }\n      User: {\n        this.onValidateColumn(id, definition, tableId, schema);\n      }\n    }\n\n    $fusionateSchemaNative(partialSchema) {\n      this.$trace(\"$fusionateSchemaNative\", arguments);\n      Native_fusion: {\n        \n      }\n      User_fusion: {\n        this.onFusionateSchema(partialSchema);\n      }\n    }\n\n    $fusionateTableNative(tableInfo, tableId, partialSchema) {\n      this.$trace(\"$fusionateTableNative\", arguments);\n      Native_fusion: {\n        const isKnown = tableId in this.$schema.hasTables;\n        if(!isKnown) {\n          this.$schema.hasTables[tableId] = tableInfo;\n        } else {\n          throw new Error(`Schema cannot fusionate table «${tableId}» to schema for second time on «$fusionateTableNative»`);\n        }\n      }\n      User_fusion: {\n        this.onFusionateTable(tableInfo, tableId, partialSchema);\n      }\n    }\n\n    $fusionateColumnNative(columnInfo, columnId, tableId, partialSchema) {\n      this.$trace(\"$fusionateColumnNative\", arguments);\n      Native_fusion: {\n        const isKnown = columnId in this.$schema.hasTables[tableId].hasColumns;\n        if(!isKnown) {\n          this.$schema.hasTables[tableId].hasColumns[columnId] = columnInfo;\n        } else {\n          throw new Error(`Schema cannot fusionate column «${tableId}.${columnId}» to schema for second time on «$fusionateTableNative»`);\n        }\n      }\n      User_fusion: {\n        this.onFusionateColumn(columnInfo, columnId, tableId, partialSchema);\n      }\n    }\n\n  };\n  \n  // Last global injection for a unique main instance:\n  window.$lswSchema = LswSchema.create();\n",
+            "$code.label": "LswSchema class",
+            "$output": "index.html"
+          }
+        ],
+        "Lsw Framework » Lsw Circuiter API » LswCircuiter class": [
+          {
+            "$file": "/home/carlos/Escritorio/lsw/src/lsw-framework/src/apis/lsw-circuiter/async-circuit.js",
+            "$location": {
+              "start": {
+                "offset": 290,
+                "line": 14,
+                "column": 3
+              },
+              "end": {
+                "offset": 524,
+                "line": 25,
+                "column": 6
+              }
+            },
+            "$section": "Lsw Framework » Lsw Circuiter API » LswCircuiter class\n",
+            "type": "class",
+            "extends": "Object",
+            "vendor": "lsw",
+            "namespace": "LswCircuiter",
+            "source code": "La clase está definida así:\n",
+            "$output": "index.html"
+          },
+          {
+            "$file": "/home/carlos/Escritorio/lsw/src/lsw-framework/src/apis/lsw-circuiter/async-circuit.js",
+            "$location": {
+              "start": {
+                "offset": 525,
+                "line": 26,
+                "column": 1
+              },
+              "end": {
+                "offset": 630,
+                "line": 27,
+                "column": 1
+              }
+            },
+            "$section": "Lsw Framework » Lsw Circuiter API » LswCircuiter class",
+            "$code": "  class AsyncCircuit {\n\n    static create(...args) {\n      return new this(...args);\n    }\n\n    constructor() {\n      this.middlewares = [];\n    }\n\n    hook(callback) {\n      this.middlewares.push(callback);\n      return this;\n    }\n\n    prehook(callback) {\n      this.middlewares.unshift(callback);\n      return this;\n    }\n\n    unhook(callback) {\n      const pos = this.middlewares.indexOf(callback);\n      if(pos !== -1) {\n        this.middlewares.splice(pos, 1);\n      }\n      return this;\n    }\n\n    // Función principal para parsear el árbol\n    parse(node) {\n      // Si el nodo es un array (ejecutar en paralelo)\n      if (Array.isArray(node)) {\n        const code = node.map(cb => this.parse(cb)).join(',');\n        return `Promise.all([${code}])`; // Convertimos todo en un Promise.all\n      }\n\n      // Si es un objeto con $type y $callbacks\n      if (node && typeof node === 'object') {\n        Inject_middlewares: {\n          for(let index__middleware=0; index__middleware<this.middlewares.length; index__middleware++) {\n            const middleware = this.middlewares[index__middleware];\n            const result = middleware(node);\n          }\n        }\n        const { $type, $callbacks } = node;\n        const callbacks = $callbacks.map(cb => (typeof cb === 'function' ? `(${cb.toString()})()` : this.parse(cb)));\n        // Dependiendo del tipo, generamos el código adecuado\n        switch ($type) {\n          case 'parallel':\n            return `Promise.all([\\n  ${callbacks.join(',')}\\n  ])`; // Ejecutar en paralelo\n          case 'serie':\n            return `(async () => {\\n  ${callbacks.map(cb => `await ${cb}`).join('; ')}\\n  })()`; // Ejecutar en serie\n          case 'race':\n            return `Promise.race([\\n  ${callbacks.join(',')}\\n  ])`; // Ejecutar en carrera\n          case 'sync':\n            return `(() => {\\n  ${callbacks.join(';\\n  ')};\\n  return Promise.resolve();\\n  })()`; // Ejecutar síncrono\n          default:\n            throw new Error(`Required property «$type» to be one known but found «${$type}» on «this.parse»`);\n        }\n      }\n\n      // Si el nodo es una función, la transformamos directamente\n      if (typeof node === 'function') {\n        return `(${node.toString()})()`; // Convertimos la función en una llamada inmediata\n      }\n\n      throw new Error(`Required argument «node» to be of known type but found «${typeof $type}» on «this.parse»`);\n    }\n\n    // Método que ejecuta el código generado por eval\n    async execute(node, externalScope = {}) {\n      const code = this.parse(node);\n      const AsyncFunction = (async function() {}).constructor;\n      const argKeys = Object.keys(externalScope).join(\", \");\n      const argValues = Object.values(externalScope);\n      const asyncFunction = new AsyncFunction(argKeys, code);\n      return await asyncFunction(...argValues); // Ejecutamos el código generado con eval\n    }\n  }\n",
+            "$code.label": "AsyncCircuit class",
+            "$output": "index.html"
+          }
+        ],
+        "Lsw Framework » Lsw Commander API » LswCommander class": [
+          {
+            "$file": "/home/carlos/Escritorio/lsw/src/lsw-framework/src/apis/lsw-commander/url-command.js",
+            "$location": {
+              "start": {
+                "offset": 797,
+                "line": 31,
+                "column": 3
+              },
+              "end": {
+                "offset": 1031,
+                "line": 42,
+                "column": 6
+              }
+            },
+            "$section": "Lsw Framework » Lsw Commander API » LswCommander class\n",
+            "type": "class",
+            "extends": "Object",
+            "vendor": "lsw",
+            "namespace": "LswCommander",
+            "source code": "La clase está definida así:\n",
+            "$output": "index.html"
+          },
+          {
+            "$file": "/home/carlos/Escritorio/lsw/src/lsw-framework/src/apis/lsw-commander/url-command.js",
+            "$location": {
+              "start": {
+                "offset": 1032,
+                "line": 43,
+                "column": 1
+              },
+              "end": {
+                "offset": 1137,
+                "line": 44,
+                "column": 1
+              }
+            },
+            "$section": "Lsw Framework » Lsw Commander API » LswCommander class",
+            "$code": "  const LswCommander = class {\n\n    static from(...args) {\n      return new this(...args);\n    }\n\n    onRun(callback, args) {\n      try {\n        let output = undefined;\n        if (typeof this.$beforeRun === \"function\") {\n          this.$beforeRun(...args);\n        }\n        output = callback(...args);\n        if (typeof this.$afterRun === \"function\") {\n          this.$afterRun(...args);\n        }\n        return output;\n      } catch (error) {\n        if (typeof this.$onError === \"function\") {\n          const output = this.$onError(error);\n          if (typeof output !== \"undefined\") {\n            return output;\n          }\n        }\n        throw error;\n      }\n    }\n\n    constructor(handlers) {\n      this.$handlers = handlers;\n      this.$beforeRun = undefined;\n      this.$afterRun = undefined;\n      this.$onError = undefined;\n      this.command = (url, queryParamsExtender = {}) => {\n        if (!url) throw new Error(\"URL is required\");\n        if (typeof url !== \"string\") throw new Error(\"URL must be a string\");\n        if (typeof this.$handlers !== \"object\" || this.$handlers === null) {\n          throw new Error(\"Handlers must be a valid object\");\n        }\n        const [path, queryString] = url.split(\"?\");\n        const queryParams = queryString ? Object.fromEntries(new URLSearchParams(queryString).entries()) : {};\n        Object.assign(queryParams, queryParamsExtender);\n        const pathParts = path.split(\"/\").filter(Boolean);\n        let currentHandler = this.$handlers;\n        for (const part of pathParts) {\n          if (currentHandler[part] === undefined) {\n            throw new Error(`Handler for path \"${path}\" not found`);\n          }\n          currentHandler = currentHandler[part];\n        }\n        if (typeof currentHandler !== \"function\") {\n          throw new Error(`Handler at path \"${path}\" is not a function`);\n        }\n        const isSpreadable = isOnlyConsecutiveNumbers(queryParams);\n        if (isSpreadable && isSpreadable.length) {\n          return this.onRun(currentHandler, isSpreadable);\n        } else if (queryParams.argumentsOrder) {\n          const args = [];\n          const argKeys = queryParams.argumentsOrder.split(\",\").map(arg => arg.trim());\n          for (let index = 0; index < argKeys.length; index++) {\n            const argKey = argKeys[index];\n            const argValue = queryParams[argKey] || null;\n            args.push(argValue);\n          }\n          return this.onRun(currentHandler, args);\n        } else {\n          return this.onRun(currentHandler, [queryParams]);\n        }\n      };\n    }\n    get run() {\n      return this.command;\n    }\n    beforeRun(callback) {\n      if (typeof callback !== \"function\") {\n        throw new Error(\"Required parameter «callback» to be a function on «beforeRun»\");\n      }\n      this.$beforeRun = callback;\n    }\n    afterRun(callback) {\n      if (typeof callback !== \"function\") {\n        throw new Error(\"Required parameter «callback» to be a function on «afterRun»\");\n      }\n      this.$afterRun = callback;\n    }\n    onError(callback) {\n      if (typeof callback !== \"function\") {\n        throw new Error(\"Required parameter «callback» to be a function on «onError»\");\n      }\n      this.$onError = callback;\n    }\n  };\n",
+            "$code.label": "LswCommander class",
+            "$output": "index.html"
+          }
+        ],
+        "Lsw Framework » Lsw Schema API » LswSchema class": [
+          {
+            "$file": "/home/carlos/Escritorio/lsw/src/lsw-framework/src/apis/lsw-schema/lsw-schema.js",
+            "$location": {
+              "start": {
+                "offset": 627,
+                "line": 30,
+                "column": 3
+              },
+              "end": {
+                "offset": 823,
+                "line": 38,
+                "column": 6
+              }
+            },
+            "$section": "Lsw Framework » Lsw Schema API » LswSchema class",
+            "type": "Class",
+            "vendor": "lsw",
+            "namespace": "LswSchema",
+            "source code": "La clase está definida así:\n",
+            "$output": "index.html"
+          }
+        ],
+        "Lsw Framework » Lsw Schema API « LswSchema class » loadSchemaByProxies method": [
+          {
+            "$file": "/home/carlos/Escritorio/lsw/src/lsw-framework/src/apis/lsw-schema/lsw-schema.js",
+            "$location": {
+              "start": {
+                "offset": 3086,
+                "line": 123,
+                "column": 5
+              },
+              "end": {
+                "offset": 3471,
+                "line": 128,
+                "column": 8
+              }
+            },
+            "$section": "Lsw Framework » Lsw Schema API « LswSchema class » loadSchemaByProxies method",
+            "description": "Este método se encarga de pasar los PROXIES a SCHEMA para el LswDatabase. Sí los registra en la instancia actual: no solo devuelve el schema.",
+            "returns": "the general adaptation of SchemaEntity class to Schema Definition Object for LswDatabase.",
+            "$output": "index.html"
+          }
+        ],
+        "Lsw Framework » Lsw Schema API « LswSchema class » getSchemaByProxies method": [
+          {
+            "$file": "/home/carlos/Escritorio/lsw/src/lsw-framework/src/apis/lsw-schema/lsw-schema.js",
+            "$location": {
+              "start": {
+                "offset": 3687,
+                "line": 135,
+                "column": 5
+              },
+              "end": {
+                "offset": 4071,
+                "line": 140,
+                "column": 8
+              }
+            },
+            "$section": "Lsw Framework » Lsw Schema API « LswSchema class » getSchemaByProxies method",
+            "description": "Este método se encarga de pasar los PROXIES a SCHEMA para el LswDatabase. Sí los registra en la instancia actual: no solo devuelve el schema.",
+            "returns": "the general adaptation of SchemaEntity class to Schema Definition Object for LswDatabase.",
+            "$output": "index.html"
+          }
+        ],
+        "Lsw Framework » Lsw Schema API « LswSchema class » adaptSchemaEntityToDatabaseSchema method": [
+          {
+            "$file": "/home/carlos/Escritorio/lsw/src/lsw-framework/src/apis/lsw-schema/lsw-schema.js",
+            "$location": {
+              "start": {
+                "offset": 4662,
+                "line": 153,
+                "column": 5
+              },
+              "end": {
+                "offset": 5051,
+                "line": 158,
+                "column": 8
+              }
+            },
+            "$section": "Lsw Framework » Lsw Schema API « LswSchema class » adaptSchemaEntityToDatabaseSchema method",
+            "description": "Este método se encarga de pasar los PROXIES a SCHEMA para el LswDatabase. No los registra: devuelve el schema resultante solamente.",
+            "returns": "the general adaptation of SchemaEntity class to Schema Definition Object for LswDatabase.",
+            "$output": "index.html"
+          }
+        ]
+      }
+    }
+  }
+}

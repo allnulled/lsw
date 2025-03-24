@@ -1,0 +1,13 @@
+{
+  "TODO": "ALLT",
+  "proporcionar conexión por patrón singleton": "ge singleton mönsteranslutning",
+  "Firstly, we create the object and the resolve function.": "För det första skapar vi objektet och lösningsfunktionen.",
+  "Luego cargamos la API de base de datos.": "Sedan laddar vi databasen API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "Och i slutändan definierar vi start- och slutfunktionerna, och vi returnerar objektet för API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Loader API är den funktion som är ansvarig för montering av hela API,\natt i slutändan är ett objekt som är tillgängligt, normalt,\neller som \"detta\" i själva ramverkets metoder,\nEller som en parameter.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Det sägs att API alltid är tillgängligt eftersom detta projekt i allmänhet antar mönster eller idéer om funktionell programmering. Och försök, även om inte strikt, att alla variabler som används i funktionen tillhandahålls via \"detta\" eller via parametrar är en klausul i min programmeringsstil.",
+  "ATENCIÓN": "FÖRHANDLING",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "moduler måste vara för belastning, annars implementera din egen strategi eller slå upp den som en grupp.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Det sägs att API alltid är tillgängligt eftersom detta projekt i allmänhet antar mönster eller idéer om funktionell programmering. Och försök (inte strikt) att alla variabler som används i funktionen tillhandahålls via \"detta\" eller via parametrar är en klausul i min programmeringsstil.",
+  "i18n.hello": "Hej, alla!"
+}

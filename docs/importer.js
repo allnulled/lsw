@@ -147,7 +147,7 @@
         this.$prependTrace(`Loaded «${moduleType}» from «${moduleId}»`);
         this.$updateLoaderBar();
         if ((this.modules_loaded + 1) >= this.modules_total) {
-          this.$removeIntersitial();
+          // this.$removeIntersitial();
         }
       } catch (error) {
         if (this.is_loaded) {

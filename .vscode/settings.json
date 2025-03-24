@@ -1,0 +1,9 @@
+{
+    "search.exclude": {
+        "**/docs/boot.js": true,
+        "**/distribution.js": true,
+        "**/distribution.css": true,
+        "**/src/lsw-framework/lsw-framework.js": true,
+        "**/src/lsw-framework/src/lsw-components.js": true
+    }
+}

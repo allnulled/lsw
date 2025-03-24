@@ -1,0 +1,13 @@
+{
+  "TODO": "MALI",
+  "proporcionar conexión por patrón singleton": "suteikti vienspalvį modelio ryšį",
+  "Firstly, we create the object and the resolve function.": "Pirma, mes kuriame objektą ir sprendžiamąją funkciją.",
+  "Luego cargamos la API de base de datos.": "Tada mes įkelti duomenų bazę API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "Galų gale, mes apibrėžti pradžios ir uždarymo funkcijas, ir mes grąžinti API objektą.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Krautuvas API yra funkcija, kuri yra atsakinga už montavimo visą API,\nkad pabaigoje yra objektas, kuris yra prieinamas, paprastai,\narba kaip \"tai\" pačios sistemos metoduose,\narba kaip parametras.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Teigta, kad API visada yra prieinamas, nes iš esmės šiame projekte naudojami funkcinio programavimo modeliai arba idėjos. Pamėginkite, nors ir ne griežtai, kad visi šiai funkcijai naudojami kintamieji būtų pateikti per \"šį\" arba parametrus, - tai mano programavimo stiliaus sąlyga.",
+  "ATENCIÓN": "DĖMESIO",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "moduliai turi būti pagal apkrovos, kitaip įgyvendinti savo strategiją arba wrap jį kaip 1 grupė.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Teigta, kad API visada yra prieinamas, nes iš esmės šiame projekte naudojami funkcinio programavimo modeliai arba idėjos. Pamėginkite (ne griežtai), kad visi šiai funkcijai naudojami kintamieji būtų pateikti per \"šį\" arba parametrus, yra sąlyga mano programavimo stiliuje.",
+  "i18n.hello": "Sveiki, visi!"
+}

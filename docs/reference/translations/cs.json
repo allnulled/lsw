@@ -1,0 +1,13 @@
+{
+  "TODO": "VŠEDLOUHÉ",
+  "proporcionar conexión por patrón singleton": "poskytují připojení k jednomu vzoru",
+  "Firstly, we create the object and the resolve function.": "Za prvé, vytvoříme objekt a funkci řešení.",
+  "Luego cargamos la API de base de datos.": "Poté načteme databázový API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "A nakonec definujeme počáteční a těsné funkce a vrátíme objekt API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Loader API je funkce, která je zodpovědná za montáž celého API,\nže na konci je objekt, který je dostupný, obvykle,\nnebo jako `this` v metodách samotného rámce,\nnebo jako parametr.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Říká se, že API je vždy přístupná, protože obecně tento projekt přijímá vzory nebo myšlenky funkčního programování. A zkuste, i když není přísně, že všechny proměnné používané ve funkci jsou poskytovány prostřednictvím `this` nebo pomocí parametrů je klauzule v mém programovacím stylu.",
+  "ATENCIÓN": "POZOR",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "moduly musí být v pořadí zatížení, jinak implementovat vlastní strategii nebo zabalit jako 1 skupinu.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Říká se, že API je vždy přístupná, protože obecně tento projekt přijímá vzory nebo myšlenky funkčního programování. A zkusit (nepřísně) všechny proměnné používané ve funkci jsou poskytovány prostřednictvím `thisa nebo pomocí parametrů je klauzule v mém programovacím stylu.",
+  "i18n.hello": "Dobrý den, všichni!"
+}

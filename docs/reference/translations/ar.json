@@ -1,0 +1,13 @@
+{
+  "TODO": "جميع",
+  "proporcionar conexión por patrón singleton": ":: الربط بين نمط واحد",
+  "Firstly, we create the object and the resolve function.": "أولاً، نخلق الهدف ووظيفة التصميم.",
+  "Luego cargamos la API de base de datos.": "ثم نحمل قاعدة البيانات.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "وفي النهاية نعرّف البداية والمهام الوشيكة، ونعيد الهدف من مذكرة التفاهم.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "الـ (لوايدر آي) هي المهمة التي هي المسؤولة عن ترقية جميع الـ (إم آي)\nأنه في نهاية المطاف هو شيء يمكن الوصول إليه، عادة،\nأو \" هذا في أساليب الإطار نفسه،\nأو كمباراة\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "It is said that the API is always accessible because, in general, this project adopts patterns or ideas of functional programming. وحاول، على الرغم من أنه ليس تماما، أن تقدم جميع المتغيرات المستخدمة في الوظيفة عن طريق \" هذا \" أو عن طريق البارامترات شرط في أسلوبي في البرمجة.",
+  "ATENCIÓN": "الاهتمام",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "يجب أن تكون الوحدات جاهزة للشحن وإلا ستنفذ إستراتيجيتك الخاصة أو تنهيها كمجموعة واحدة.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "It is said that the API is always accessible because, in general, this project adopts patterns or ideas of functional programming. وحاول (ليس تماما) أن تقدم جميع المتغيرات المستخدمة في الوظيفة عن طريق ' ' هذا أو عن طريق البارامترات هو شرط في أسلوب برمجتي.",
+  "i18n.hello": "مرحباً جميعاً!"
+}

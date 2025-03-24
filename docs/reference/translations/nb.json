@@ -1,0 +1,13 @@
+{
+  "TODO": "ALLE",
+  "proporcionar conexión por patrón singleton": "gi enkeltton mønster tilkobling",
+  "Firstly, we create the object and the resolve function.": "For det første skaper vi objektet og løsningsfunksjonen.",
+  "Luego cargamos la API de base de datos.": "Deretter laster vi database API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "Og til slutt definerer vi start og lukke funksjoner, og vi returnerer objektet til API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Loader API er funksjonen som er ansvarlig for montering av hele API.\nsom til slutt er et objekt som normalt er tilgjengelig,\neller som «dette» i selve rammen,\neller som parameter.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Det sies at API alltid er tilgjengelig fordi dette prosjektet generelt tar i bruk mønstre eller ideer om funksjonell programmering. Og prøv, selv om ikke strengt, at alle variabler som brukes i funksjonen er gitt via \\\"dette\\\" eller via parametre er en klausul i min programmeringsstil.",
+  "ATENCIÓN": "ÅTTENSJON",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "moduler må være i rekkefølge av belastning, ellers implementere din egen strategi eller pakke den opp som en gruppe.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Det sies at API alltid er tilgjengelig fordi dette prosjektet generelt tar i bruk mønstre eller ideer om funksjonell programmering. Og prøv (ikke strengt) at alle variabler som brukes i funksjonen er gitt via \\\"dette\\\" eller via parametre er en klausul i min programmeringsstil.",
+  "i18n.hello": "Hei, alle sammen!"
+}

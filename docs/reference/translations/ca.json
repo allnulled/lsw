@@ -1,0 +1,13 @@
+{
+  "TODO": "TOTS",
+  "proporcionar conexión por patrón singleton": "proporcionar connexió de patró singleton",
+  "Firstly, we create the object and the resolve function.": "Primer, creem l'objecte i la funció de resolució.",
+  "Luego cargamos la API de base de datos.": "Després càrregaem l' API de la base de dades.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "I al final definim les funcions d'inici i de tancament, i tornem l'objecte de l' API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "L' API Carregador és la funció responsable de muntar tota l' API,\nque al final és un objecte que és accessible, normalment,\no com a Hongria en els mètodes de treball propi,\no com a paràmetre.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Es diu que l' API sempre és accessible perquè, en general, aquest projecte adopta patrons o idees de programació funcional. I proveu, encara que no sigui estrictament, que totes les variables usades en la funció siguin proporcionades via larvutezeu o via paràmetres és una clàusula del meu estil de programació.",
+  "ATENCIÓN": "ATTENTIÓCONSTELLATION NAME (OPTIONAL)",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "els mòduls han d' estar en ordre de carregar, altrament, implementar la vostra pròpia estratègia o ordenar-la com a un grup.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Es diu que l' API sempre és accessible perquè, en general, aquest projecte adopta patrons o idees de programació funcional. I proveu (no estrictament) que totes les variables usades en la funció es proveeixen via ascii, o via paràmetres és una clàusula del meu estil de programació.",
+  "i18n.hello": "Hola a tots!"
+}

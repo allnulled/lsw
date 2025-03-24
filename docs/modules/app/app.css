@@ -1,0 +1,329 @@
+* {
+    box-sizing: border-box;
+}
+html,body {
+    padding: 0px;
+    margin: 0px;
+}
+
+html,
+button,
+input,
+textarea {
+    font-family: Arial;
+    font-size: 13px;
+}
+
+.like_button,
+button {
+    border: 1px solid black;
+    border-radius: 3pt;
+    padding: 4px;
+    font-family: Arial;
+    font-size: 13px;
+    cursor: pointer;
+    background-color: black;
+    color: white;
+    margin-bottom: 0px;
+    min-width: 25px;
+    overflow: hidden;
+}
+.like_button:hover,
+button:hover {
+    background-color: #336;
+}
+button.activated {
+    background-color: #33B;
+}
+button.mini {
+    padding: 4px;
+    padding-right: 4px;
+    padding-left: 4px;
+    min-width: 20px;
+}
+button.bright_border {
+    border: 1px solid #227C86;
+}
+button[disabled] {
+    cursor: default;
+    background-color: #484848;
+}
+textarea {
+    outline: none;
+    width: 100%;
+    min-height:60px;
+    resize: vertical;
+}
+input[type="radio"],
+input[type="checkbox"] {
+    cursor: pointer;
+}
+input[type="text"] {
+    min-height: 26px;
+    outline: none;
+}
+select,
+select > option {
+    font-family: Arial;
+}
+/* API de Conductometria */
+:root {
+    --cmt_border_color_1: #114;
+}
+.conductometria_viewer_1 {
+    max-height: 200px;
+    overflow: scroll;
+    border: 1px solid #333;
+    font-size: 10px;
+    font-family: monospace;
+    background-color: white;
+    margin: 0px;
+    margin-top: 4px;
+}
+table.tabla_de_conductometria {
+    width: 100%;
+    border-collapse: collapse;
+    border-left: 1px solid var(--cmt_border_color_1);
+    border-right: 1px solid var(--cmt_border_color_1);
+}
+table.tabla_de_conductometria td.celda_fecha {
+    padding: 8px;
+    background-color: #000;
+    color: white;
+    cursor: pointer;
+}
+table.tabla_de_conductometria td.celda_fecha.activated {
+    background-color: #333;
+    color: #FFF;
+}
+table.tabla_de_conductometria td.celda_hora,
+table.tabla_de_conductometria td.celda_contenido {
+    vertical-align: top;
+    border-bottom: 1px solid var(--cmt_border_color_1);
+}
+table.tabla_de_conductometria td.celda_hora {
+    background-color: #224;
+    color: white;
+    border-right: 1px solid var(--cmt_border_color_1);
+}
+table.tabla_de_conductometria td.celda_contenido {
+    width: 100%;
+    background-color: white;
+    vertical-align: middle;
+}
+table.tabla_de_conductometria td.celda_contenido > span {
+    display: inline-block;
+    height: 100%;
+}
+
+table.tabla_de_conductometria tr.passed td.celda_contenido {
+    background-color: orange;
+}
+table.tabla_de_conductometria tr.current td.celda_contenido {
+    background-color: red;
+}
+table.tabla_de_conductometria .minibutton {
+    min-width: 20px;
+    padding: 0px;
+}
+.conductometria_viewer_2 {
+    
+}
+.event_badge {
+    border: 1px solid #333;
+    border-radius: 2pt;
+    padding: 0px;
+    padding-right: 2px;
+    margin-right: 2px;
+    background-color: #CCCCCC;
+    color: #000;
+    cursor: pointer;
+}
+.event_badge:hover {
+    background-color: #FFFFFF;
+}
+
+.scrollable_text_area {
+    white-space: pre;
+    overflow: scroll;
+}
+
+
+
+
+
+/* WIDGET CLASSES */
+
+
+
+
+
+
+
+
+/* CSS-CLASSES */
+:root {
+    --padding_0: 0px;
+    --padding_1: 4px;
+    --padding_2: 8px;
+    --margin_0: 0px;
+    --margin_1: 4px;
+    --margin_2: 8px;
+}
+
+.pad_2 { padding: var(--padding_2); }
+.pad_1 { padding: var(--padding_1); }
+.pad_0 { padding: var(--padding_0); }
+
+.pad_vertical_2 { padding-top: var(--padding_2); padding-bottom: var(--padding_2); }
+.pad_horizontal_2 { padding-left: var(--padding_2); padding-right: var(--padding_2); }
+.pad_vertical_1 { padding-top: var(--padding_1); padding-bottom: var(--padding_1); }
+.pad_horizontal_1 { padding-left: var(--padding_1); padding-right: var(--padding_1); }
+.pad_vertical_0 { padding-top: var(--padding_0); padding-bottom: var(--padding_0); }
+.pad_horizontal_0 { padding-left: var(--padding_0); padding-right: var(--padding_0); }
+
+.pad_top_2 { padding-top: var(--padding_2); }
+.pad_bottom_2 { padding-bottom: var(--padding_2); }
+.pad_left_2 { padding-left: var(--padding_2); }
+.pad_right_2 { padding-right: var(--padding_2); }
+
+.pad_top_1 { padding-top: var(--padding_1); }
+.pad_bottom_1 { padding-bottom: var(--padding_1); }
+.pad_left_1 { padding-left: var(--padding_1); }
+.pad_right_1 { padding-right: var(--padding_1); }
+
+.pad_top_0 { padding-top: var(--padding_0); }
+.pad_bottom_0 { padding-bottom: var(--padding_0); }
+.pad_left_0 { padding-left: var(--padding_0); }
+.pad_right_0 { padding-right: var(--padding_0); }
+
+
+.margin_2 { margin: var(--margin_2); }
+.margin_1 { margin: var(--margin_1); }
+.margin_0 { margin: var(--margin_0); }
+
+.margin_vertical_2 { margin-top: var(--margin_2); margin-bottom: var(--margin_2); }
+.margin_horizontal_2 { margin-left: var(--margin_2); margin-right: var(--margin_2); }
+.margin_vertical_1 { margin-top: var(--margin_1); margin-bottom: var(--margin_1); }
+.margin_horizontal_1 { margin-left: var(--margin_1); margin-right: var(--margin_1); }
+.margin_vertical_0 { margin-top: var(--margin_0); margin-bottom: var(--margin_0); }
+.margin_horizontal_0 { margin-left: var(--margin_0); margin-right: var(--margin_0); }
+
+.margin_top_2 { margin-top: var(--margin_2); }
+.margin_bottom_2 { margin-bottom: var(--margin_2); }
+.margin_left_2 { margin-left: var(--margin_2); }
+.margin_right_2 { margin-right: var(--margin_2); }
+
+.margin_top_1 { margin-top: var(--margin_1); }
+.margin_bottom_1 { margin-bottom: var(--margin_1); }
+.margin_left_1 { margin-left: var(--margin_1); }
+.margin_right_1 { margin-right: var(--margin_1); }
+
+.margin_top_0 { margin-top: var(--margin_0); }
+.margin_bottom_0 { margin-bottom: var(--margin_0); }
+.margin_left_0 { margin-left: var(--margin_0); }
+.margin_right_0 { margin-right: var(--margin_0); }
+
+.flex_column {
+    display: flex;
+    flex-direction: column;
+}
+.flex_row {
+    display: flex;
+    flex-direction: row;
+}
+.flex_column.centered,
+.flex_row.centered {
+    align-items: center;
+}
+.flex_1,
+.flex_cell {
+    flex: 1;
+}
+.flex_100,
+.flex_cell.expanded {
+    flex: 100;
+}
+.nowrap {
+    white-space: nowrap;
+}
+.position_relative {
+    position: relative;
+}
+.position_absolute {
+    position: absolute;
+}
+.top_auto {
+    top: auto;
+}
+.top_0 {
+    top: 0;
+}
+
+.bottom_auto {
+    bottom: auto;
+}
+.bottom_0 {
+    bottom: 0;
+}
+
+.left_auto {
+    left: auto;
+}
+.left_0 {
+    left: 0;
+}
+
+.right_auto {
+    right: auto;
+}
+.right_0 {
+    right: 0;
+}
+.cursor_pointer {   
+    cursor: pointer;
+}
+
+.float_right {
+    float: right;
+}
+.float_left {
+    float: left;
+}
+
+.visibility_hidden {
+    visibility: hidden;
+}
+
+.font_weight_bold {
+    font-weight: bold;
+}
+
+.font_style_italic {
+    font-style: italic;
+}
+
+.overflow_hidden {
+    overflow: hidden;
+}
+
+.overflow_scroll {
+    overflow: scroll;
+}
+
+.overflow_scroll_x {
+    overflow: scroll-x;
+}
+
+.overflow_scroll_y {
+    overflow: scroll-y;
+}
+
+.HiddenMenu {
+    background-color: rgba(255,255,255,0.7);
+}
+
+.danger_button {
+    background-color: rgb(49, 9, 9);
+    border-color: red;
+}

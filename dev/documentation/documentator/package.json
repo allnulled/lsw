@@ -1,0 +1,15 @@
+{
+  "name": "documentator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/documentator.api.js",
+  "scripts": {
+    "build": "npx pegjs src/documentator.pegjs",
+    "autotranslate": "node src/translations/builder.js",
+    "test": "npx mocha test/test.js",
+    "serve": "npx http-server -c-1 ../../../docs/reference -o"
+  },
+  "keywords": [],
+  "author": "allnulled",
+  "license": "WTFPL"
+}

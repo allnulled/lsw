@@ -1,0 +1,13 @@
+{
+  "TODO": "ALLE",
+  "proporcionar conexión por patrón singleton": "bieden singleton patroon verbinding",
+  "Firstly, we create the object and the resolve function.": "Ten eerste creëren we het object en de resolve functie.",
+  "Luego cargamos la API de base de datos.": "Dan laden we de database API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "Uiteindelijk definiëren we de start- en sluitfuncties, en geven we het object van de API terug.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "De Loader API is de functie die verantwoordelijk is voor het monteren van de gehele API,\ndat uiteindelijk een object is dat normaal gesproken toegankelijk is;\nof als \"dit\" in de methoden van het kader zelf,\nof als parameter.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Er wordt gezegd dat de API altijd toegankelijk is omdat dit project over het algemeen patronen of ideeën van functionele programmering aanneemt. En probeer, hoewel niet strikt, dat alle variabelen die worden gebruikt in de functie worden verstrekt via deze of via parameters is een clausule in mijn programmeerstijl.",
+  "ATENCIÓN": "OPMERKINGEN",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "modules moeten in volgorde van lading zijn, anders moet je je eigen strategie implementeren of als 1 groep inpakken.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Er wordt gezegd dat de API altijd toegankelijk is omdat dit project over het algemeen patronen of ideeën van functionele programmering aanneemt. En probeer (niet strikt) dat alle variabelen die worden gebruikt in de functie worden verstrekt via deze of via parameters is een clausule in mijn programmeerstijl.",
+  "i18n.hello": "Hallo, iedereen!"
+}

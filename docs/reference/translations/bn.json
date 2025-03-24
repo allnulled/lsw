@@ -1,0 +1,13 @@
+{
+  "TODO": "সব",
+  "proporcionar conexión por patrón singleton": "acalton বিন্যাসের সংযোগ পরিচালনা করুন",
+  "Firstly, we create the object and the resolve function.": "প্রথমে, আমরা সেই অবজেক্ট তৈরি করি এবং সমাধান করি ।.",
+  "Luego cargamos la API de base de datos.": "তারপর আমরা ডাটাবেস API লোড.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "আর সবশেষে আমরা শুরু এবং শেষ পর্যন্ত সংজ্ঞায়িত করি, এবং API এর বস্তু ফিরিয়ে আনি।.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "লোডার API দ্বারা সম্পূর্ণ API পরিচালনার জন্য চিহ্নিত করা হয়েছে,\nশেষে যে কোনো অবজেক্ট ব্যবহৃত হয় তা হল, সাধারণত:\nঅথবা 'এই কাঠামোর পদ্ধতি' হিসাবে,\nঅথবা পরামিতি হিসেবে।\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "বলা হয়ে থাকে যে API সব সময় ব্যবহারযোগ্য, কারণ সাধারণত, এই প্রকল্প কার্যকরী প্রোগ্রামিং এর বিন্যাস বা ধারণা গ্রহণ করে। এবং চেষ্টা করে দেখুন, যদিও সঠিকভাবে না, এই ফাংশনে যে সমস্ত কোড ব্যবহার করা হয়েছে তা 'এইটিআইপি' বা পরামিতির মাধ্যমে দেয়া হয় আমার প্রোগ্রামিং স্টাইলে।.",
+  "ATENCIÓN": "অগ্রগতি",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "মডিউল লোড করার জন্য লোড করতে হবে, অন্যথা আপনার নিজের কৌশল প্রয়োগ করুন অথবা ১ দল রূপে এটি ভাগ করুন ।.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "বলা হয়ে থাকে যে API সব সময় ব্যবহারযোগ্য, কারণ সাধারণত, এই প্রকল্প কার্যকরী প্রোগ্রামিং এর বিন্যাস বা ধারণা গ্রহণ করে। এবং চেষ্টা করুন (বিশেষ করে) যে ফাংশনে ব্যবহার করা হয়েছে তা 'এইটিআইপি' বা পরামিতির মাধ্যমে আমার প্রোগ্রামিং স্টাইলে একটি ধারা।.",
+  "i18n.hello": "হ্যালো, সবাই!"
+}

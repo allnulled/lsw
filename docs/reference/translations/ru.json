@@ -1,0 +1,13 @@
+{
+  "TODO": "ALL",
+  "proporcionar conexión por patrón singleton": "соединение однотонного шаблона",
+  "Firstly, we create the object and the resolve function.": "Во-первых, мы создаем объект и функцию разрешения.",
+  "Luego cargamos la API de base de datos.": "Затем мы загружаем базу данных API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "И в итоге мы определяем стартовые и близкие функции, и возвращаем объект API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Загрузчик API - это функция, которая отвечает за монтаж всего API,\nчто в конце концов является объектом, который доступен, как правило,\nили как \"это\" в методах самой структуры,\nили как параметр.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Говорят, что API всегда доступен, потому что в целом этот проект принимает шаблоны или идеи функционального программирования. И попробуйте, хотя и не строго, чтобы все переменные, используемые в функции, предоставлялись через «это» или по параметрам - это пункт в моем стиле программирования.",
+  "ATENCIÓN": "ВНИМАНИЕ",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "модули должны быть в порядке загрузки, иначе реализовать свою собственную стратегию или обернуть ее как 1 группу.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Говорят, что API всегда доступен, потому что в целом этот проект принимает шаблоны или идеи функционального программирования. И попробуйте (не строго) чтобы все переменные, используемые в функции, предоставлялись через «это» или через параметры - это пункт в моем стиле программирования.",
+  "i18n.hello": "Всем привет!"
+}

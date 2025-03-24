@@ -1,0 +1,13 @@
+{
+  "TODO": "SITEMAP",
+  "proporcionar conexión por patrón singleton": "memberikan koneksi pola tunggal",
+  "Firstly, we create the object and the resolve function.": "Pertama, kami menciptakan objek dan fungsi penyelesaian.",
+  "Luego cargamos la API de base de datos.": "Kemudian kami memuat API database.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "Dan pada akhirnya kami mendefinisikan fungsi awal dan dekat, dan kami mengembalikan objek API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "The Loader API adalah fungsi yang bertanggung jawab untuk pemasangan seluruh API,\nyang di akhir adalah objek yang dapat diakses, biasanya,\natau sebagai `this` dalam metode kerangka itu sendiri, Meme it\natau sebagai parameter.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Dikatakan bahwa API selalu dapat diakses karena, secara umum, proyek ini mengadopsi pola atau ide pemrograman fungsional. Dan mencoba, meskipun tidak benar-benar, bahwa semua variabel yang digunakan dalam fungsi disediakan melalui `this` atau melalui parameter adalah klausul dalam gaya pemrograman saya.",
+  "ATENCIÓN": "LOGIN",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "modul harus dalam rangka beban, jika tidak menerapkan strategi anda sendiri atau membungkusnya sebagai 1 kelompok.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Dikatakan bahwa API selalu dapat diakses karena, secara umum, proyek ini mengadopsi pola atau ide pemrograman fungsional. Dan mencoba (tidak ketat) bahwa semua variabel yang digunakan dalam fungsi disediakan melalui `this` atau melalui parameter adalah klausul dalam gaya pemrograman saya.",
+  "i18n.hello": "Halo semua orang!"
+}

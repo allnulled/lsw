@@ -1,0 +1,13 @@
+{
+  "TODO": "ALL",
+  "proporcionar conexión por patrón singleton": "provide singleton pattern connection",
+  "Firstly, we create the object and the resolve function.": "Firstly, we create the object and the resolve function.",
+  "Luego cargamos la API de base de datos.": "Then we load the database API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "And in the end we define the start and close functions, and we return the object of the API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "The Loader API is the function that is responsible for mounting the entire API,\nthat in the end is an object that is accessible, normally,\nor as `this` in the methods of the framework itself,\nor as a parameter.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "It is said that the API is always accessible because, in general, this project adopts patterns or ideas of functional programming. And try, although not strictly, that all variables used in the function are provided via `this` or via parameters is a clause in my programming style.",
+  "ATENCIÓN": "ATTENTION",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "modules must be in order of load, otherwise implement your own strategy or wrap it up as 1 group.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "It is said that the API is always accessible because, in general, this project adopts patterns or ideas of functional programming. And try (not strictly) that all variables used in the function are provided via `this` or via parameters is a clause in my programming style.",
+  "i18n.hello": "Hello, everyone!"
+}

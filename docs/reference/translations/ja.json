@@ -1,0 +1,13 @@
+{
+  "TODO": "お問い合わせ",
+  "proporcionar conexión por patrón singleton": "シングルトンパターン接続を提供",
+  "Firstly, we create the object and the resolve function.": "まずオブジェクトと解決関数を作成します.",
+  "Luego cargamos la API de base de datos.": "データベース API を読み込みます.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "エンドでは、スタート関数とクローズ関数を定義し、API のオブジェクトを返します.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Loader API は API 全体を実装する責任のある機能です。\nエンドでは、通常、アクセス可能なオブジェクトです。\nまたはフレームワーク自体のメソッドで `this` として、\nパラメータとして\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "一般的に、このプロジェクトは機能的なプログラミングのパターンやアイデアを採用しているため、APIが常にアクセス可能であると言われています。 そして、厳密には機能で使用されるすべての変数が `this` またはパラメーターを介して提供されているのは、私のプログラミングスタイルの句です.",
+  "ATENCIÓN": "導入事例",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "モジュールは、負荷の順にある必要があります。そうしないと、独自の戦略を実行したり、1グループとしてそれをラップする必要があります.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "一般的に、このプロジェクトは機能的なプログラミングのパターンやアイデアを採用しているため、APIが常にアクセス可能であると言われています。 関数で使われるすべての変数が `this` またはパラメーターを介して提供されていることを(厳密には使用しない)試みることは、私のプログラミングスタイルの句です.",
+  "i18n.hello": "お問い合わせ!"
+}

@@ -1,23 +1,20 @@
-# lsw-table
+# lsw-data-explorer
 
-Table UI tool for LSW.
+General data explorer UI component for LSW.
 
 Based on [vue@2](#).
 
 ## Installation
 
 ```sh
-npm i -s @allnulled/lsw-table
+npm i -s @allnulled/lsw-data-explorer
 ```
 
 ## Importation
 
 ```html
-<script src="node_modules/@allnulled/lsw-table/lsw-table.bundled.js"></script>
-<link rel="stylesheet" type="text/css" href="node_modules/@allnulled/lsw-table/lsw-table.css" />
+not documented yet.
 ```
 
-The *compiled version* is because the template is injected to the JavaScript via a simple replace (but it is still needed).
 
-## Usage
-
+**DISCLAIMER:** this tool will be probably deleted in a near future.

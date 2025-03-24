@@ -1,0 +1,13 @@
+{
+  "TODO": "VŠETKO",
+  "proporcionar conexión por patrón singleton": "poskytnúť pripojenie k jednotu",
+  "Firstly, we create the object and the resolve function.": "Po prvé, vytvárame objekt a funkciu riešenia.",
+  "Luego cargamos la API de base de datos.": "Potom načítame databázu API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "A nakoniec definujeme štart a uzavreté funkcie a vrátime objekt API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Loader API je funkcia, ktorá je zodpovedná za montáž celého API,\nže na konci je objekt, ktorý je prístupný, normálne,\nalebo ako `to` v metódach samotného rámca,\nalebo ako parameter.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Hovorí sa, že API je vždy prístupný, pretože vo všeobecnosti tento projekt prijíma vzory alebo nápady na funkčné programovanie. A skúste, aj keď nie je prísne, že všetky premenné používané v funkcie sú poskytované prostredníctvom `this` alebo prostredníctvom parametrov je v mojom programovom štýle.",
+  "ATENCIÓN": "POZORNOSŤ",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "moduly musia byť v poriadku zaťaženia, inak implementovať svoju vlastnú stratégiu alebo zabaliť ju ako 1 skupinu.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Hovorí sa, že API je vždy prístupný, pretože vo všeobecnosti tento projekt prijíma vzory alebo nápady na funkčné programovanie. A skúste (nie je prísne), že všetky premenné používané v funkcie sú poskytované prostredníctvom `this` alebo prostredníctvom parametrov je v mojom programovom štýle.",
+  "i18n.hello": "Ahoj všetci!"
+}

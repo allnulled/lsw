@@ -1,0 +1,13 @@
+{
+  "TODO": "ĈIUJ ĈIUJ ĈIUJ ĈIUJ ĈIUJ",
+  "proporcionar conexión por patrón singleton": "disponigu unuton padronligon",
+  "Firstly, we create the object and the resolve function.": "Unue, ni kreas la objekton kaj la solvfunkcion.",
+  "Luego cargamos la API de base de datos.": "Tiam ni ŝarĝas la datumbazon API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "En la fino ni difinas la komencon kaj proksimajn funkciojn, kaj ni revenas la objekton de la API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "La Loader API estas la funkcio kiu respondecas pri muntado de la tuta API,\nTio en la fino estas objekto kiu estas alirebla, normale,\naŭ kiel \"tio\" en la metodoj de la kadro mem,\naŭ kiel parametro.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Estas dirite ke la API ĉiam estas alirebla ĉar, ĝenerale, tiu projekto adoptas padronojn aŭ ideojn de funkcia programado. Kaj provas, kvankam ne strikte, ke ĉiuj variabloj uzitaj en la funkcio estas disponigitaj per \"tio\" aŭ per parametroj estas paragrafo en mia programa stilo.",
+  "ATENCIÓN": "→ EVENTOJ:",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "moduloj devas esti en ordo de ŝarĝo, alie efektivigi vian propran strategion aŭ envolvi ĝin kiel 1 grupo.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Estas dirite ke la API ĉiam estas alirebla ĉar, ĝenerale, tiu projekto adoptas padronojn aŭ ideojn de funkcia programado. Kaj provas (ne strikte) ke ĉiuj variabloj uzitaj en la funkcio estas disponigitaj per \"tio\" aŭ per parametroj estas paragrafo en mia programa stilo.",
+  "i18n.hello": "Saluton, ĉiuj!"
+}

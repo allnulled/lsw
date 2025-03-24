@@ -1,0 +1,13 @@
+{
+  "TODO": "הכל",
+  "proporcionar conexión por patrón singleton": "חיבור תבנית singleton",
+  "Firstly, we create the object and the resolve function.": "ראשית, אנו יוצרים את האובייקט ואת הפונקציה לפתרון.",
+  "Luego cargamos la API de base de datos.": "לאחר מכן אנו לטעון את API מסד הנתונים.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "בסופו של דבר אנו מגדירים את ההתחלה והתפקודים הקרובים, ואנו מחזירים את האובייקט של ה- API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "ה- API המצורף הוא הפונקציה האחראית להרכבת כל ה- API,\nזה בסופו של דבר אובייקט נגיש, בדרך כלל,\nאו \"זה בשיטות המסגרת עצמה,\nאו כפרמטר.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "זה אומר כי ה- API הוא תמיד נגיש, כי באופן כללי הפרויקט הזה מאמץ דפוסים או רעיונות של תכנות פונקציונלי. ולנסות, למרות שלא בקפדנות, כי כל המשתנים המשמשים בתפקיד מסופקים באמצעות \"זה\" או באמצעות פרמטרים הוא סעיף בסגנון התכנות שלי.",
+  "ATENCIÓN": "המונחים",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "מודולים חייבים להיות על מנת לטעון, אחרת ליישם את האסטרטגיה שלך או לעטוף אותה כקבוצה אחת.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "זה אומר כי ה- API הוא תמיד נגיש, כי באופן כללי הפרויקט הזה מאמץ דפוסים או רעיונות של תכנות פונקציונלי. ולנסות (לא בקפדנות) כי כל המשתנים המשמשים בתפקיד מסופקים באמצעות \"זה\" או באמצעות פרמטרים הוא סעיף בסגנון התכנות שלי.",
+  "i18n.hello": "שלום, כולם!"
+}

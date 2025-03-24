@@ -1,0 +1,13 @@
+{
+  "TODO": " ALL",
+  "proporcionar conexión por patrón singleton": "tekton model bağlantısı",
+  "Firstly, we create the object and the resolve function.": "Birincisi, biz Objektiki və mühüm funksiyasını yaradırıb.",
+  "Luego cargamos la API de base de datos.": "Sonra biz baza API yükləyirik.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "Sonda biz start və yaxın funksiyaları təyin edirik, və biz API Objesini geri.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Lift API bütün API montaj üçün məsuliyyətdir,\nƏvvəl sonunda erişilebilir, normal olaraq,\nvə ya \"bu\" kimi qanun özü üsulları,\nvə ya parametr kimi.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Bu, API'nin hər zaman erişilebilir olduğunu deyir, ümumi, bu layihələri və ya funksional proqram fikirlərini qəbul edir. Və deyir, ciddi deyil ki, funksiyada istifadə olunan bütün aktivlər \"bu\" və ya parametrlər vasitəsilə təmin olunmuşdur ki, proqram üsulumda bir maddələrdir.",
+  "ATENCIÓN": "BAKI",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "modullar yük sifariş etmək lazımdır, aksiya öz strategiyanızı tətbiq etmək və ya 1 qrup ola bilər.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Bu, API'nin hər zaman erişilebilir olduğunu deyir, ümumi, bu layihələri və ya funksional proqram fikirlərini qəbul edir. Ve funksiyada istifadə olunan bütün növlərin \"bu\" və ya parametrlər vasitəsilə təminatı üsulumda bir maddədir.",
+  "i18n.hello": "Salam, hər şey!"
+}

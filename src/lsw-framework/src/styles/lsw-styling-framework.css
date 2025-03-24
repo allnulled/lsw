@@ -22,19 +22,20 @@ h3 {
 
 table.collapsed_table {
     border-collapse: collapse;
-    border: 0px solid white;
+    border: 1px solid #999;
 }
 table.collapsed_table > thead > tr > th {
     /*padding: 8px;*/
-    background-color: #AAA;
-    color: black;
-    border-right: 1px solid white;
+    background-color: black;
+    color: white;
+    border-right: 1px solid #999;
     vertical-align: middle;
     padding-left: 8px;
     padding-right: 8px;
+    border-bottom: 1px solid white;
 }
 table.collapsed_table > thead > tr > th:last-child {
-    border-right: none solid white;
+    border-right: none;
 }
 
 table.basic_table {
@@ -44,18 +45,15 @@ table.basic_table {
 table.basic_table > tbody > tr:nth-child(odd) {
     background-color: #FFF;
 }
+table.basic_table > tbody > tr > td {
+    vertical-align: top;
+}
 table.basic_table > thead > tr,
 table.basic_table > tbody > tr:nth-child(even) {
     background-color: #DDD;
 }
 table.basic_table > thead > tr > th {
-    /*padding: 8px;*/
-    background-color: #AAA;
-    color: black;
-    border-right: 1px solid white;
-    vertical-align: middle;
-    padding-left: 8px;
-    padding-right: 8px;
+    
 }
 table.basic_table > thead > tr > th:last-child {
     border-right: none solid white;

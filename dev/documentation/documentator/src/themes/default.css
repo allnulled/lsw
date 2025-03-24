@@ -1,0 +1,135 @@
+* {
+  box-sizing: border-box;
+}
+html {
+
+}
+body {
+  margin: 0px;
+  padding: 0px;
+  padding-bottom: 0px;
+  margin-right: 4px;
+  color: black;
+  font-family: "Ubuntu", "Courier 10 Pitch", "Arial";
+  font-size: 11px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.documentator_section {
+  background-color: white;
+  padding: 0px;
+  margin-bottom: 0px;
+  border: 0px solid #333;
+  border-top: 0px solid #333;
+}
+.documentator_code_snippet_block {
+  box-shadow: 2px 2px 4px black;
+}
+.documentator_code_snippet {
+  margin: 0px;
+  padding: 4px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: #C1C6E8;
+  color: white;
+  font-family: "Courier 10 Pitch";
+  font-size: 9px;
+  border: 0px solid #000;
+  overflow: scroll;
+}
+.documentator_code_snippet_label {
+  padding: 4px;
+  background-color: #D0D7FF;
+  color: black;
+  font-weight: bold;
+  font-size: 8px;
+  border: 0px solid #000;
+  border-bottom: 0px solid #222;
+  font-family: "Courier 10 Pitch";
+  margin-bottom: 0px;
+}
+.snippet_value {
+  background-color: white;
+  padding: 2px;
+  padding-left: 8px;
+  padding-right: 8px;
+  color: #333;
+}
+.snippet_attribute {
+  color: #2d2d2d;
+  font-weight: bold;
+  text-decoration: inherit;
+  font-family: "Arial";
+}
+.documentator_property_definition{
+  margin-top:0px;
+  margin-bottom:12px;
+}
+.documentator_property_name{
+  display: inline-block;
+  padding: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  background-color: transparent;
+  border-radius: 2pt;
+  color: blue;
+  text-decoration: default;
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.documentator_property_value{
+  padding: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  white-space: pre-wrap;
+  white-space: normal;
+}
+.documentator_section_title{
+  margin: 0px;
+  margin-top: 0px;
+  margin-bottom: 12px;
+  padding: 10px;
+  background-color: #000044;
+  color: #FFFFFF;
+  box-shadow: 0 0 4px black;
+}
+.documentator_comment{
+  padding: 10px;
+  padding-top: 0px;
+  border-top: 0px solid #333;
+}
+
+#language_selector_holder select {
+  border: 1px solid #BBB;
+  font-family: Arial;
+  font-size: 12px;
+  padding: 0px;
+  cursor: pointer;
+}
+#language_selector_holder select option {
+  font: -mox-pull-down-menu;
+  font-family: Arial;
+  font-size: 12px;
+}
+.quote {
+  display: inline-block;
+  padding: 12px;
+  margin: 12px;
+  margin-left: 0px;
+  margin-right: 0px;
+  background-color: #DDDDDD;
+  box-shadow: 2px 2px 4px black;
+}
+.documentator_property_name > span > p {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+.documentator_property_value > span > p:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+.documentator_property_value > span > p:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}

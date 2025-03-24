@@ -1,0 +1,13 @@
+{
+  "TODO": "KÕIK",
+  "proporcionar conexión por patrón singleton": "singletoni mustriühenduse loomine",
+  "Firstly, we create the object and the resolve function.": "Esiteks loome objekti ja otsusekindluse funktsiooni.",
+  "Luego cargamos la API de base de datos.": "Siis laadime andmebaasi API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "Ja lõpuks me määratleda algus ja tihe funktsioone, ja me tagastame objekti API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Laadija API on funktsioon, mis vastutab paigalduse kogu API,\nsee on tavaliselt kättesaadav objekt;\nvõi raamistiku meetodites,\nvõi parameetrina.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "On öeldud, et API on alati kättesaadav, sest üldiselt see projekt võtab mustrid või ideid funktsionaalne programmeerimine. Ja proovige, kuigi mitte rangelt, et kõik kasutatavad muutujad funktsiooni pakutakse kaudu ~this's või kaudu parameetrid on klausel minu programmeerimisstiilis.",
+  "ATENCIÓN": "TÄHELEPANU",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "moodulid peavad olema koormuse järjekorras, muidu rakendada oma strateegia või mähkida see üles 1 grupp.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "On öeldud, et API on alati kättesaadav, sest üldiselt see projekt võtab mustrid või ideid funktsionaalne programmeerimine. Ja proovige (mitte rangelt), et kõik funktsioonis kasutatavad muutujad on esitatud ~this'e või parameetrite kaudu on klausel minu programmeerimisstiilis.",
+  "i18n.hello": "Tere kõigile!"
+}

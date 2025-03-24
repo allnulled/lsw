@@ -1,0 +1,44 @@
+<div>
+
+
+    <lsw-agenda />
+    <!--lsw-console-hooker /-->
+    <lsw-windows-viewer />
+    <lsw-toasts />
+    <!--
+    <button v-on:click="uploadConductometria" v-if="!conductometria.registros">Abrir conductometría</button>
+    <button v-on:click="clearConductometria" v-else>Cerrar</button>
+    <button v-on:click="openDialog">Abrir diálogo</button>
+    <button v-on:click="openDialogSequence">Abrir secuencia de diálogos</button>
+    <div style="height: 4px;"></div>
+    <pre class="conductometria_viewer_1" style="display: none;">{{ conductometria }}</pre>
+    <hr/>
+    <lsw-schema-based-form :on-submit="(v) => console.log(v)" :model="{
+        databaseId: 'lsw_default_database',
+        tableId: 'Accion',
+        rowId: 1
+    }"/>
+    <hr/>
+    <div>
+        <div class="control_form" v-xform.form="{
+            onSubmit: v => console.log(v)
+        }" ref="form">
+            <button v-on:click="() => $refs.form.$xform.validate()">validate</button>
+            <div class="control_user" v-xform.control="{
+                name:'user',
+                debug:1,
+                onValidate: v => {
+                    if(v === '') {
+                        throw new Error('taloco');
+                    }
+                }
+            }">
+                <input class="control_user_name" v-xform.input="{
+                    name:'*'
+                }" type="text" />
+                <div v-xform.error="{}"></div>
+            </div>
+        </div>
+    </div>
+    -->
+</div>

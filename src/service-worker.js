@@ -2,12 +2,12 @@ const LAST_VERSION = 3;
 const BASE_URL = self.location.pathname.replace(/\/service-worker\.js$/, ''); // Obtiene el prefijo correcto
 const CACHE_NAME = `mi-app-cache-v${LAST_VERSION}`;
 const URLS_A_CACHEAR = [
-  `${BASE_URL}/`,
   `${BASE_URL}/index.html`,
-  `${BASE_URL}/distribution.css`,
-  `${BASE_URL}/distribution.js`,
+  `${BASE_URL}/assets/distribution.css`,
+  `${BASE_URL}/assets/distribution.js`,
   `${BASE_URL}/boot.js`,
   `${BASE_URL}/importer.js`
+  `${BASE_URL}/`,
 ];
 
 self.addEventListener('install', event => {

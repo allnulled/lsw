@@ -12,36 +12,36 @@
 })(function() {
 Vue.component("LswCalendario", {
   template: `<div class="Component LswCalendario">
-  <div style="max-width: 260px;">
-    <div class="like_table" style="border-collapse: collapse; border: none; border-bottom: 1px solid white;">
-      <div class="like_row">
-        <div class="like_cell">
-          <button class="boton_de_mover_mes"
-            v-on:click="ir_a_mes_anterior"> ◀ </button>
-        </div>
-        <div class="like_cell" style="width:100%;" :style="!soloFecha ? 'vertical-align: top;' : ''">
-          <div class="chivato_de_fecha">{{ obtener_fecha_formateada(fecha_seleccionada) }}</div>
-          <div class="chivato_de_fecha" v-if="!soloFecha">a las {{ espaciar_izquierda(hora_seleccionada, 2) }}:{{ espaciar_izquierda(minuto_seleccionado, 2)
-            }}:{{
-            espaciar_izquierda(segundo_seleccionado, 2) }}.{{ espaciar_izquierda(milisegundo_seleccionado, 3) }}
-          </div>
-        </div>
-        <div class="like_cell">
-          <button class="boton_de_mover_mes"
-            v-on:click="ir_a_mes_siguiente"> ▶ </button>
-        </div>
-      </div>
-    </div>
+  <div class="visor_de_calendario">
     <table class="tabla_de_calendario">
       <tbody>
+        <tr>
+          <td>
+            <button class="boton_de_mover_mes"
+              v-on:click="ir_a_mes_anterior"> ◀ </button>
+          </td>
+          <td colspan="5"
+            style="width:auto; vertical-align: top;">
+            <div class="chivato_de_fecha">{{ obtener_fecha_formateada(fecha_seleccionada) }}</div>
+            <div class="chivato_de_fecha"
+              v-if="(!es_solo_fecha) && fecha_seleccionada">a las {{ obtener_expresion_de_hora(fecha_seleccionada) }}
+            </div>
+          </td>
+          <td>
+            <button class="boton_de_mover_mes"
+              v-on:click="ir_a_mes_siguiente"> ▶ </button>
+          </td>
+        </tr>
+      </tbody>
+      <tbody>
         <tr class="fila_de_dias_de_semana">
-          <td>Lu</td>
-          <td>Ma</td>
-          <td>Mi</td>
-          <td>Ju</td>
-          <td>Vi</td>
-          <td>Sá</td>
-          <td>Do</td>
+          <td><div class="">Lu</div></td>
+          <td><div class="">Ma</div></td>
+          <td><div class="">Mi</div></td>
+          <td><div class="">Ju</div></td>
+          <td><div class="">Vi</div></td>
+          <td><div class="">Sá</div></td>
+          <td><div class="">Do</div></td>
         </tr>
       </tbody>
       <tbody class="dias_de_calendario">
@@ -49,17 +49,66 @@ Vue.component("LswCalendario", {
           v-bind:key="'semana-' + semana_index">
           <td v-for="dia, dia_index in semana"
             v-bind:key="'dia-' + dia_index">
-            <span v-if="dia">
-              <button class="boton_de_calendario boton_de_dia_de_calendario"
-                :class="{active: dia.getDate() === fecha_seleccionada.getDate()}"
-                v-on:click="() => seleccionar_dia(dia)">{{ dia.getDate() }}</button>
+            <span v-if="dia && (dia instanceof Date)">
+              <button class="boton_de_calendario boton_de_dia_de_calendario position_relative"
+                :class="{
+                  active: dia.getDate() === fecha_seleccionada.getDate(),
+                  current: (dia_actual === dia.getDate())
+                    && (mes_actual === dia.getMonth())
+                    && (anio_actual === dia.getFullYear())
+                }"
+                v-on:click="() => seleccionar_dia(dia)">
+                <div class="dia_de_calendario_texto">{{ dia.getDate() }}</div>
+                <div v-if="dia.getDate() in marcadores_del_mes"
+                  class="total_de_tareas_de_dia">
+                  <div>
+                    {{ marcadores_del_mes[dia.getDate()].length }}
+                  </div>
+                </div>
+              </button>
             </span>
           </td>
         </tr>
       </tbody>
     </table>
-    <table class="tabla_para_horas"
-      v-if="!soloFecha">
+    <table class="width_100 no_borders_table"
+      v-if="modo === 'datetime' || modo === 'time'">
+      <tbody>
+        <tr class="fila_de_digito">
+          <td v-on:click="agregar_digito_de_hora(1)"><button class="boton_de_ajuste_de_hora">▲</button></td>
+          <td v-on:click="agregar_digito_de_hora(2)"><button class="boton_de_ajuste_de_hora">▲</button></td>
+          <td></td>
+          <td v-on:click="agregar_digito_de_hora(3)"><button class="boton_de_ajuste_de_hora">▲</button></td>
+          <td v-on:click="agregar_digito_de_hora(4)"><button class="boton_de_ajuste_de_hora">▲</button></td>
+          <td></td>
+          <td v-on:click="\$noop"><button class="boton_de_ajuste_de_hora">▲</button></td>
+          <td v-on:click="\$noop"><button class="boton_de_ajuste_de_hora">▲</button></td>
+        </tr>
+        <tr class="fila_de_digito"
+          v-if="fecha_seleccionada">
+          <td>{{ obtener_digito_de_hora(1) }}</td>
+          <td>{{ obtener_digito_de_hora(2) }}</td>
+          <td>:</td>
+          <td>{{ obtener_digito_de_hora(3) }}</td>
+          <td>{{ obtener_digito_de_hora(4) }}</td>
+          <td>:</td>
+          <td>{{ obtener_digito_de_hora(5) }}</td>
+          <td>{{ obtener_digito_de_hora(6) }}</td>
+        </tr>
+        <tr class="fila_de_digito">
+          <td v-on:click="quitar_digito_de_hora(1)"><button class="boton_de_ajuste_de_hora">▼</button></td>
+          <td v-on:click="quitar_digito_de_hora(2)"><button class="boton_de_ajuste_de_hora">▼</button></td>
+          <td></td>
+          <td v-on:click="quitar_digito_de_hora(3)"><button class="boton_de_ajuste_de_hora">▼</button></td>
+          <td v-on:click="quitar_digito_de_hora(4)"><button class="boton_de_ajuste_de_hora">▼</button></td>
+          <td></td>
+          <td v-on:click="\$noop"><button class="boton_de_ajuste_de_hora">▼</button></td>
+          <td v-on:click="\$noop"><button class="boton_de_ajuste_de_hora">▼</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <!--table class="tabla_para_horas"
+      v-if="!es_solo_fecha">
       <tr>
         <td>
           <button style="display: table-cell;"
@@ -114,40 +163,151 @@ Vue.component("LswCalendario", {
             v-on:click="quitar_segundo"> ▼ </button>
         </td>
       </tr>
-    </table>
+    </table-->
   </div>
 </div>`,
   props: {
-    soloFecha: {
-      type: Boolean,
-      default: false
+    modo: {
+      type: String,
+      default: () => "datetime" // can be: date, time, datetime
+    },
+    valorInicial: {
+      type: [String, Date],
+      default: () => new Date()
     },
     alCambiarValor: {
       type: Function,
-      default: () => {}
-    }
+      default: () => { }
+    },
   },
   data() {
     try {
+      this.$trace("lsw-calendario.data");
+      const hoy = new Date();
       return {
+        es_carga_inicial: true,
+        valor_inicial_adaptado: this.adaptar_valor_inicial(this.valorInicial),
+        es_solo_fecha: this.modo === "date",
+        es_solo_hora: this.modo === "time",
+        es_fecha_y_hora: this.modo === "datetime",
         fecha_seleccionada: undefined,
         celdas_del_mes_actual: undefined,
+        marcadores_del_mes: {},
+        hoy: hoy,
+        dia_actual: hoy.getDate(),
+        mes_actual: hoy.getMonth(),
+        anio_actual: hoy.getFullYear(),
+        /*
         hora_seleccionada: "0",
         minuto_seleccionado: "0",
         segundo_seleccionado: "0",
-        milisegundo_seleccionado: "0"
+        milisegundo_seleccionado: "0",
+        //*/
       };
     } catch (error) {
       console.log(error);
       throw error;
     }
-
   },
   methods: {
     getValue() {
+      this.$trace("lsw-calendario.methods.getValue");
       return this.fecha_seleccionada;
     },
+    adaptar_valor_inicial(valor) {
+      this.$trace("lsw-calendario.methods.adaptar_valor_inicial");
+      if (typeof valor === "string") {
+        try {
+          const resultado = LswTimer.utils.getDateFromMomentoText(valor);
+          console.log("FECHA ENTRADA:", resultado);
+          return resultado;
+        } catch (error) {
+          console.error("Error parseando valor inicial de lsw-calendario:", error);
+        }
+      }
+      return valor;
+    },
+    agregar_digito_de_hora(indice) {
+      this.$trace("lsw-calendario.methods.agregar_digito_de_hora");
+      const value = this.obtener_digito_de_hora(indice);
+      const isInMaximum = ([3, 5].indexOf(indice) !== -1) ? value === 5 : ([1].indexOf(indice) !== -1) ? value === 2 : value === 9;
+      if (!isInMaximum) {
+        this.establecer_digito_de_hora(indice, value + 1);
+      }
+    },
+    quitar_digito_de_hora(indice) {
+      this.$trace("lsw-calendario.methods.quitar_digito_de_hora");
+      const value = this.obtener_digito_de_hora(indice);
+      const isInMinimum = value === 0;
+      if (!isInMinimum) {
+        this.establecer_digito_de_hora(indice, value - 1);
+      }
+    },
+    obtener_digito_de_hora(indice, fecha = this.fecha_seleccionada) {
+      this.$trace("lsw-calendario.methods.obtener_digito_de_hora");
+      if (indice === 1) {
+        return parseInt(this.espaciar_izquierda(fecha.getHours(), 2)[0]);
+      } else if (indice === 2) {
+        return parseInt(this.espaciar_izquierda(fecha.getHours(), 2)[1]);
+      } else if (indice === 3) {
+        return parseInt(this.espaciar_izquierda(fecha.getMinutes(), 2)[0]);
+      } else if (indice === 4) {
+        return parseInt(this.espaciar_izquierda(fecha.getMinutes(), 2)[1]);
+      } else if (indice === 5) {
+        return parseInt(this.espaciar_izquierda(fecha.getSeconds(), 2)[0]);
+      } else if (indice === 6) {
+        return parseInt(this.espaciar_izquierda(fecha.getSeconds(), 2)[1]);
+      } else {
+        throw new Error("No se reconoció el índice del dígito: " + indice);
+      }
+    },
+    cambiar_posicion_en_texto(texto, posicion, valor) {
+      this.$trace("lsw-calendario.methods.cambiar_posicion_en_texto");
+      const arr = ("" + texto).split("");
+      arr[posicion] = valor;
+      return arr.join("");
+    },
+    establecer_digito_de_hora(indice, valor) {
+      this.$trace("lsw-calendario.methods.establecer_digito_de_hora");
+      console.log(indice, valor);
+      const fecha_clonada = new Date(this.fecha_seleccionada);
+      if (indice === 1) {
+        let horas = this.espaciar_izquierda(this.fecha_seleccionada.getHours(), 2);
+        horas = this.cambiar_posicion_en_texto(horas, 0, valor);
+        const horasInt = parseInt(horas);
+        if(horasInt > 23) return;
+        fecha_clonada.setHours(horasInt);
+      } else if (indice === 2) {
+        let horas = this.espaciar_izquierda(this.fecha_seleccionada.getHours(), 2);
+        horas = this.cambiar_posicion_en_texto(horas, 1, valor);
+        const horasInt = parseInt(horas);
+        if(horasInt > 23) return;
+        fecha_clonada.setHours(horasInt);
+      } else if (indice === 3) {
+        let minutos = this.espaciar_izquierda(this.fecha_seleccionada.getMinutes(), 2);
+        minutos = this.cambiar_posicion_en_texto(minutos, 0, valor);
+        const minutosInt = parseInt(minutos);
+        if(minutosInt > 59) return;
+        fecha_clonada.setMinutes(minutosInt);
+      } else if (indice === 4) {
+        let minutos = this.espaciar_izquierda(this.fecha_seleccionada.getMinutes(), 2);
+        minutos = this.cambiar_posicion_en_texto(minutos, 1, valor);
+        const minutosInt = parseInt(minutos);
+        if(minutosInt > 59) return;
+        fecha_clonada.setMinutes(minutosInt);
+      } else if (indice === 5) {
+        // @OK
+      } else if (indice === 6) {
+        // @OK
+      } else {
+        throw new Error("No se reconoció el índice del dígito: " + indice);
+      }
+      console.log(fecha_clonada);
+      this.fecha_seleccionada = fecha_clonada;
+      this.actualizar_fecha_seleccionada(true);
+    },
     ir_a_mes_anterior() {
+      this.$trace("lsw-calendario.methods.ir_a_mes_anterior");
       try {
         const nueva_fecha = new Date(this.fecha_seleccionada);
         nueva_fecha.setMonth(nueva_fecha.getMonth() - 1);
@@ -159,6 +319,7 @@ Vue.component("LswCalendario", {
 
     },
     ir_a_mes_siguiente() {
+      this.$trace("lsw-calendario.methods.ir_a_mes_siguiente");
       try {
         const nueva_fecha = new Date(this.fecha_seleccionada);
         nueva_fecha.setMonth(nueva_fecha.getMonth() + 1);
@@ -169,75 +330,11 @@ Vue.component("LswCalendario", {
       }
 
     },
-    agregar_hora() {
-      try {
-        let hora = parseInt(this.hora_seleccionada);
-        hora += 1;
-        this.hora_seleccionada = hora;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-
-    },
-    agregar_minuto() {
-      try {
-        let minuto = parseInt(this.minuto_seleccionado);
-        minuto += 1;
-        this.minuto_seleccionado = minuto;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-
-    },
-    agregar_segundo() {
-      try {
-        let segundo = parseInt(this.segundo_seleccionado);
-        segundo += 1;
-        this.segundo_seleccionado = segundo;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-
-    },
-    quitar_hora() {
-      try {
-        let hora = parseInt(this.hora_seleccionada);
-        hora -= 1;
-        this.hora_seleccionada = hora;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-
-    },
-    quitar_minuto() {
-      try {
-        let minuto = parseInt(this.minuto_seleccionado);
-        minuto -= 1;
-        this.minuto_seleccionado = minuto;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-
-    },
-    quitar_segundo() {
-      try {
-        let segundo = parseInt(this.segundo_seleccionado);
-        segundo -= 1;
-        this.segundo_seleccionado = segundo;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-
-    },
     seleccionar_dia(dia) {
+      this.$trace("lsw-calendario.methods.seleccionar_dia");
       try {
         this.fecha_seleccionada = dia;
+        this.actualizar_fecha_seleccionada(true);
       } catch (error) {
         console.log(error);
         throw error;
@@ -247,6 +344,7 @@ Vue.component("LswCalendario", {
     espaciar_izquierda(texto,
       longitud,
       relleno = "0") {
+      this.$trace("lsw-calendario.methods.espaciar_izquierda");
       try {
         let salida = "" + texto;
         while (salida.length < longitud) {
@@ -260,6 +358,7 @@ Vue.component("LswCalendario", {
 
     },
     obtener_fecha_formateada(fecha) {
+      this.$trace("lsw-calendario.methods.obtener_fecha_formateada");
       try {
         if (typeof fecha === 'undefined') {
           return;
@@ -347,10 +446,9 @@ Vue.component("LswCalendario", {
         throw error;
       }
 
-    }
-  },
-  watch: {
-    fecha_seleccionada(nuevo_valor) {
+    },
+    actualizar_calendario(nuevo_valor = this.fecha_seleccionada) {
+      this.$trace("lsw-calendario.methods.actualizar_calendario");
       try {
         const dias = [];
         const dia_1_del_mes = new Date(nuevo_valor);
@@ -408,19 +506,50 @@ Vue.component("LswCalendario", {
           dias.push(fila_actual);
         }
         this.celdas_del_mes_actual = dias;
-        if(typeof this.alCambiarValor === "function") {
-          this.alCambiarValor(nuevo_valor, this);
-        }
+        this.propagar_cambio();
+        this.actualizar_fecha_seleccionada(false);
       } catch (error) {
         console.log(error);
         throw error;
       }
-
+    },
+    actualizar_fecha_seleccionada(con_propagacion = true, fecha_seleccionada = this.fecha_seleccionada) {
+      this.$trace("lsw-calendario.methods.actualizar_fecha_seleccionada");
+      if (con_propagacion) {
+        const clon_fecha = new Date(fecha_seleccionada);
+        this.fecha_seleccionada = clon_fecha;
+      }
+    },
+    propagar_cambio() {
+      this.$trace("lsw-calendario.methods.propagar_cambio");
+      if (typeof this.alCambiarValor === "function") {
+        this.alCambiarValor(this.fecha_seleccionada, this);
+      }
+    },
+    obtener_expresion_de_hora(fecha = this.fecha_seleccionada) {
+      let hours = fecha.getHours();
+      let minutes = fecha.getMinutes();
+      let seconds = fecha.getSeconds();
+      hours = this.espaciar_izquierda(hours, 2, "0");
+      minutes = this.espaciar_izquierda(minutes, 2, "0");
+      seconds = this.espaciar_izquierda(seconds, 2, "0");
+      return `${hours}:${minutes}:${seconds}`;
+    },
+    establecer_marcadores_del_mes(marcadores_del_mes) {
+      this.marcadores_del_mes = marcadores_del_mes;
     }
   },
+  watch: {
+    fecha_seleccionada(nuevo_valor) {
+      this.$trace("lsw-calendario.watch.fecha_seleccionada");
+      this.actualizar_calendario(nuevo_valor);
+    },
+  },
   mounted() {
+    this.$trace("lsw-calendario.mounted");
     try {
-      this.fecha_seleccionada = new Date();
+      this.fecha_seleccionada = this.valor_inicial_adaptado;
+      this.es_carga_inicial = false;
     } catch (error) {
       console.log(error);
       throw error;
@@ -430,45 +559,38 @@ Vue.component("LswCalendario", {
 Vue.component("LswTable", {
   template: `<div class="lsw_table"
     style="padding-top: 4px;">
-    <div class="position_relative">
-        <div class="position_absolute top_0 right_0"
-            style="font-size: 16px; padding: 3px;">
-            <span class="bordered_1 cursor_pointer"
-                v-on:click="digestOutput">🛜</span>
-        </div>
-    </div>
-    <table class="collapsed_table lsw_table_itself">
-        <thead>
-            <tr>
-                <th style="width: 1%; padding: 0px;">
+    <div>
+        <div class="lsw_table_top_panel">
+            <div class="flex_row centered">
+                <div class="flex_1">
+                    <button class="bordered_1 cursor_pointer"
+                        v-on:click="digestOutput">🛜</button>
+                </div>
+                <div class="flex_100 title_box">{{ title }}</div>
+                <div class="flex_1 lsw_table_top_button" v-for="topButton, topButtonIndex in attachedTopButtons" v-bind:key="'table-button-' + topButtonIndex">
+                    <button class="" v-on:click="topButton.event">
+                        {{ topButton.text }}
+                    </button>
+                </div>
+                <div class="flex_1">
                     <button class="table_menu_div width_100"
                         v-on:click="toggleMenu"
                         :class="{activated: isShowingMenu === true}">
-                        <span v-if="hasFiltersApplying">🟡</span>
-                        <span v-else>⚪️</span>
+                        <span v-if="hasFiltersApplying">🟠</span>
+                        <span v-else>▫️</span>
                     </button>
-                </th>
-                <th class="table_header"
-                    v-for="header, headerIndex in headers"
-                    v-bind:key="'header-' + headerIndex">
-                    <div>{{ header }}</div>
-                </th>
-                <th style="width: 100%; padding-right: 0px;">
-                    <div class="flex_row centered">
-                        <div class="flex_100">size of row</div>
-                    </div>
-                </th>
-            </tr>
-        </thead>
-        <tbody v-if="isShowingMenu">
-            <tr>
-                <td class="table_navigation_menu_cell"
+                </div>
+            </div>
+        </div>
+        <div v-if="isShowingMenu">
+            <div class="">
+                <div class="table_navigation_menu_cell"
                     colspan="1000">
                     <div class="table_navigation_menu">
                         <div class="flex_row centered">
                             <div class="flex_1 nowrap">Estás en: </div>
                             <div class="flex_100 left_padded_1">
-                                <select class="width_100 text_align_center"
+                                <select class="width_100 text_align_left"
                                     v-model="isShowingSubpanel">
                                     <option value="Extensor">Extensor ({{ extender.length }})</option>
                                     <option value="Filtro">Filtro ({{ filter.length }})</option>
@@ -478,115 +600,210 @@ Vue.component("LswTable", {
                         </div>
                         <div v-if="isShowingSubpanel === 'Extensor'">
                             <textarea spellcheck="false"
-                                v-model="extender"></textarea>
+                                v-model="extender"
+                                :placeholder="placeholderForExtensor"></textarea>
                         </div>
                         <div v-if="isShowingSubpanel === 'Filtro'">
                             <textarea spellcheck="false"
-                                v-model="filter"></textarea>
+                                v-model="filter"
+                                :placeholder="placeholderForFiltro"></textarea>
                         </div>
                         <div v-if="isShowingSubpanel === 'Ordenador'">
                             <textarea spellcheck="false"
-                                v-model="sorter"></textarea>
+                                v-model="sorter"
+                                :placeholder="placeholderForOrdenador"></textarea>
                         </div>
                     </div>
-                </td>
-            </tr>
-        </tbody>
-        <template v-if="paginatedOutput && headers">
-            <tbody class="this_code_is_duplicated_always">
-                <tr>
-                    <td colspan="1000">
-                        <div class="flex_row centered">
-                            <div class="flex_1 pagination_button_box first_box">
-                                <div class="pagination_button first_button"
-                                    v-on:click="goToFirstPage">⏪</div>
-                            </div>
-                            <div class="flex_1 pagination_button_box">
-                                <div class="pagination_button"
-                                    v-on:click="decreasePage">◀️</div>
-                            </div>
-                            <div class="flex_100 text_align_center">Page {{ currentPage+1 }} out of {{ Math.ceil(output.length /
-                                itemsPerPage) }}</div>
-                            <div class="flex_1 pagination_button_box">
-                                <div class="pagination_button"
-                                    v-on:click="increasePage">▶️</div>
-                            </div>
-                            <div class="flex_1 pagination_button_box last_box">
-                                <div class="pagination_button last_button"
-                                    v-on:click="goToLastPage">⏩</div>
-                            </div>
-                        </div>
-                    </td>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="paginator_widget this_code_is_duplicated_always">
+        <div>
+            <div>
+                <div class="flex_row centered">
+                    <div class="flex_1 pagination_button_box first_box">
+                        <div class="pagination_button first_button"
+                            v-on:click="goToFirstPage">⏪</div>
+                    </div>
+                    <div class="flex_1 pagination_button_box">
+                        <div class="pagination_button"
+                            v-on:click="decreasePage">◀️</div>
+                    </div>
+                    <div class="flex_100 text_align_center">{{ currentPage+1 }}</div>
+                    <div class="flex_1 pagination_button_box">
+                        <div class="pagination_button"
+                            v-on:click="increasePage">▶️</div>
+                    </div>
+                    <div class="flex_1 pagination_button_box last_box">
+                        <div class="pagination_button last_button"
+                            v-on:click="goToLastPage">⏩</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="lsw_table_viewer">
+        <table class="collapsed_table lsw_table_itself">
+            <thead v-if="paginatedOutput && headers">
+                <tr class="">
+                    <!--Id cell:-->
+                    <th>nº</th>
+                    <!--Selectable buttons headers:-->
+                    <th v-if="selectable === 'one'"></th>
+                    <th v-else-if="selectable === 'many'"></th>
+                    <!--Row buttons headers:-->
+                    <th class="button_header"
+                        v-for="attachedHeader, attachedHeaderIndex in attachedHeaders"
+                        v-bind:key="'attached-header-' + attachedHeaderIndex">{{ attachedHeader.text }}</th>
+                    <!--Object properties headers:-->
+                    <th v-for="header, headerIndex in headers"
+                        v-bind:key="'header-' + headerIndex">{{ header }}</th>
+                    <th>*size</th>
                 </tr>
-            </tbody>
-            <tbody>
-                <template v-for="row, rowIndex in paginatedOutput">
-                    <tr class="row_for_table"
-                        :class="{ odd: rowIndex === 0 ? true : (rowIndex % 2 === 0) ? true : false }"
-                        v-bind:key="'row-for-table-' + rowIndex">
-                        <td class="index_cell">
-                            <button v-on:click="() => toggleRow(rowIndex)"
-                                :class="{activated: selectedRows.indexOf(rowIndex) !== -1}">
-                                {{ rowIndex + (currentPage * itemsPerPage) }}
-                            </button>
-                        </td>
-                        <td v-for="columnKey, columnIndex in headers"
-                            v-bind:key="'column-' + columnIndex">
-                            {{ row[columnKey] ?? "-" }}
-                        </td>
-                        <td>
-                            {{ JSON.stringify(row).length }} bytes
+            </thead>
+            <template v-if="paginatedOutput && headers">
+                <tbody v-if="!paginatedOutput.length">
+                    <tr>
+                        <td colspan="1000"
+                            v-descriptor="'lsw_table.no_data_provided_message'">
+                            No data provided.
                         </td>
                     </tr>
-                    <tr class="row_for_details"
-                        v-show="selectedRows.indexOf(rowIndex) !== -1"
-                        v-bind:key="'row-for-cell-' + rowIndex">
-                        <td class="data_cell"
-                            colspan="1000">
-                            <pre class="">{{ JSON.stringify(row, null, 2) }}</pre>
-                        </td>
-                    </tr>
+                </tbody>
+                <template v-else>
+                    <tbody>
+                        <template v-for="row, rowIndex in paginatedOutput">
+                            <tr class="row_for_table"
+                                :class="{ odd: rowIndex === 0 ? true : (rowIndex % 2 === 0) ? true : false }"
+                                v-bind:key="'row-for-table-' + rowIndex">
+                                <!--Id cell:-->
+                                <td class="index_cell">
+                                    <button v-on:click="() => toggleRow(row.id)"
+                                        :class="{activated: selectedRows.indexOf(row.id) !== -1}">
+                                        {{ rowIndex + (currentPage * itemsPerPage) }}
+                                    </button>
+                                </td>
+                                <!--Selectable cell:-->
+                                <td class="index_cell" v-if="selectable === 'one'">
+                                    <span v-on:click="() => toggleChoosenRow(row[choosableId])">
+                                        <button class="activated" v-if="choosenRows === row[choosableId]">
+                                            <!--input type="radio" :checked="true" /-->
+                                            ☑️
+                                        </button>
+                                        <button v-else>
+                                            🔘
+                                            <!--input type="radio" :checked="false" /-->
+                                        </button>
+                                    </span>
+                                </td>
+                                <td class="index_cell" v-else-if="selectable === 'many'">
+                                    <label>
+                                        <input type="checkbox" v-model="choosenRows" :value="row[choosableId]" />
+                                    </label>
+                                </td>
+                                <!--Row buttons cells:-->
+                                <td class="button_cell" v-for="attachedColumn, attachedColumnIndex in attachedColumns"
+                                    v-bind:key="'attached-column-' + attachedColumnIndex">
+                                    <button v-on:click="() => rowButtons[attachedColumnIndex].event(row, rowIndex, attachedColumn)">{{ attachedColumn.text }}</button>
+                                </td>
+                                <!--Object properties cells:-->
+                                <td class="data_cell" v-for="columnKey, columnIndex in headers"
+                                    v-bind:key="'column-' + columnIndex"
+                                    :title="JSON.stringify(row[columnKey])">
+                                    <template v-if="columnsAsList.indexOf(columnKey) !== -1 && Array.isArray(row[columnKey])">
+                                        <ul>
+                                            <li v-for="item, itemIndex in row[columnKey]" v-bind:key="'column-' + columnIndex + '-item-' + itemIndex">
+                                                {{ itemIndex + 1 }}. {{ item }}
+                                            </li>
+                                        </ul>
+                                    </template>
+                                    <template v-else>
+                                        {{ row[columnKey] ?? "-" }}
+                                    </template>
+                                </td>
+                                <td class="data_cell metadata_cell">
+                                    {{ JSON.stringify(row).length }} bytes
+                                </td>
+                            </tr>
+                            <tr class="row_for_details"
+                                v-show="selectedRows.indexOf(row.id) !== -1"
+                                v-bind:key="'row-for-cell-' + rowIndex">
+                                <td class="data_cell details_cell"
+                                    colspan="1000">
+                                    <pre class="">{{ JSON.stringify(row, null, 2) }}</pre>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
                 </template>
-            </tbody>
-            <tbody class="this_code_is_duplicated_always">
+            </template>
+            <tbody v-else>
                 <tr>
                     <td colspan="1000">
-                        <div class="flex_row centered">
-                            <div class="flex_1 pagination_button_box first_box">
-                                <div class="pagination_button first_button"
-                                    v-on:click="goToFirstPage">⏪</div>
-                            </div>
-                            <div class="flex_1 pagination_button_box">
-                                <div class="pagination_button"
-                                    v-on:click="decreasePage">◀️</div>
-                            </div>
-                            <div class="flex_100 text_align_center">Page {{ currentPage+1 }} out of {{ Math.ceil(output.length /
-                                itemsPerPage) }}</div>
-                            <div class="flex_1 pagination_button_box">
-                                <div class="pagination_button"
-                                    v-on:click="increasePage">▶️</div>
-                            </div>
-                            <div class="flex_1 pagination_button_box last_box">
-                                <div class="pagination_button last_button"
-                                    v-on:click="goToLastPage">⏩</div>
-                            </div>
-                        </div>
+                        Un momento, por favor, la tabla está cargando...
                     </td>
                 </tr>
             </tbody>
-        </template>
-        <tbody v-else>
-            <tr>
-                <td colspan="1000">
-                    Aguarde: la tabla está cargando...
-                </td>
-            </tr>
-        </tbody>
-    </table>
+        </table>
+    </div>
+    <div class="paginator_widget this_code_is_duplicated_always">
+        <div>
+            <div>
+                <div class="flex_row centered">
+                    <div class="flex_1 pagination_button_box first_box">
+                        <div class="pagination_button first_button"
+                            v-on:click="goToFirstPage">⏪</div>
+                    </div>
+                    <div class="flex_1 pagination_button_box">
+                        <div class="pagination_button"
+                            v-on:click="decreasePage">◀️</div>
+                    </div>
+                    <div class="flex_100 text_align_center">{{ currentPage+1 }}</div>
+                    <div class="flex_1 pagination_button_box">
+                        <div class="pagination_button"
+                            v-on:click="increasePage">▶️</div>
+                    </div>
+                    <div class="flex_1 pagination_button_box last_box">
+                        <div class="pagination_button last_button"
+                            v-on:click="goToLastPage">⏩</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>`,
   props: {
     initialInput: {
       type: Array,
+      default: () => []
+    },
+    initialSettings: {
+      type: Object,
+      default: () => ({})
+    },
+    rowButtons: {
+      type: Array,
+      default: () => []
+    },
+    tableButtons: {
+      type: Array,
+      default: () => []
+    },
+    selectable: {
+      type: String,
+      default: () => "none"
+    },
+    onChooseRow: {
+      type: Function,
+      default: () => {}
+    },
+    choosableId: {
+      type: String,
+      default: () => "id"
+    },
+    initialChoosenValue: {
+      type: [],
       default: () => []
     }
   },
@@ -595,17 +812,27 @@ Vue.component("LswTable", {
     const input = [].concat(this.initialInput);
     return {
       input,
-      isShowingMenu: false,
-      isShowingSubpanel: "none",
+      title: this.initialSettings?.title || "",
+      isShowingMenu: this.initialSettings?.isShowingMenu || false,
+      isShowingSubpanel: this.initialSettings?.isShowingSubpanel || "Extensor",
       selectedRows: [],
-      extender: "",
-      filter: "",
-      sorter: "",
-      itemsPerPage: 10,
-      currentPage: 0,
+      choosenRows: this.initialChoosenValue || [],
+      extender: this.initialSettings?.extender || "",
+      filter: this.initialSettings?.filter || "",
+      sorter: this.initialSettings?.sorter || "",
+      itemsPerPage: this.initialSettings?.itemsPerPage || 10,
+      currentPage: this.initialSettings?.currentPage || 0,
+      columnsAsList: this.initialSettings?.columnsAsList || [],
+      columnsOrder: this.initialSettings?.columnsOrder || [],
       output: [],
       paginatedOutput: [],
       headers: [],
+      attachedHeaders: this._adaptRowButtonsToHeaders(this.rowButtons),
+      attachedColumns: this._adaptRowButtonsToColumns(this.rowButtons),
+      attachedTopButtons: this._adaptRowButtonsToColumns(this.tableButtons),
+      placeholderForExtensor: "data.map(function(it, i) {\n  return /* you start here */ || {};\n});",
+      placeholderForOrdenador: "data.sort(function(a, b) {\n  return /* you start here */;\n});",
+      placeholderForFiltro: "data.filter(function(it, i) {\n  return /* you start here */;\n});",
     };
   },
   methods: {
@@ -631,6 +858,24 @@ Vue.component("LswTable", {
       const lastPage = Math.floor(this.output.length / this.itemsPerPage);
       if (this.currentPage !== lastPage) {
         this.currentPage = lastPage;
+      }
+    },
+    toggleChoosenRow(rowId) {
+      this.$trace("lsw-table.methods.toggleChoosenRow");
+      if(this.selectable === 'many') {
+        const pos = this.choosenRows.indexOf(rowId);
+        if (pos === -1) {
+          this.choosenRows.push(rowId);
+        } else {
+          this.choosenRows.splice(pos, 1);
+        }
+      } else if(this.selectable === 'one') {
+        const isSame = this.choosenRows === rowId;
+        if(isSame) {
+          this.choosenRows = undefined;
+        } else {
+          this.choosenRows = rowId;
+        }
       }
     },
     toggleRow(rowIndex) {
@@ -694,6 +939,24 @@ Vue.component("LswTable", {
         } catch (error) {
           // @OK.
         }
+        Also_to_headers: {
+          if(Array.isArray(this.columnsOrder) && this.columnsOrder.length) {
+            tempHeaders = [...tempHeaders].sort((h1, h2) => {
+              const pos1 = this.columnsOrder.indexOf(h1);
+              const pos2 = this.columnsOrder.indexOf(h2);
+              if(pos1 === -1 && pos2 === -1) {
+                return -1;
+              } else if(pos1 === -1) {
+                return 1;
+              } else if(pos2 === -1) {
+                return -1;
+              } else if(pos1 > pos2) {
+                return 1;
+              }
+              return -1;
+            });
+          }
+        }
       }
       this.headers = tempHeaders;
       this.output = temp;
@@ -701,14 +964,40 @@ Vue.component("LswTable", {
     },
     digestPagination() {
       this.$trace("lsw-table.methods.digestPagination");
+      console.log(1);
       const page = this.currentPage;
+      console.log(2);
       const items = this.itemsPerPage;
+      console.log(3);
       const firstPosition = items * (page);
       this.selectedRows = [];
+      console.log(4);
       this.paginatedOutput = [].concat(this.output).splice(firstPosition, items);
+      console.log(5);
     },
     saveCurrentTransformer() {
       this.$trace("lsw-table.methods.saveCurrentTransformer");
+    },
+    _adaptRowButtonsToHeaders(rowButtons) {
+      const attachedHeaders = [];
+      for(let index=0; index<rowButtons.length; index++) {
+        const attachedButton = rowButtons[index];
+        attachedHeaders.push({
+          text: attachedButton.header || ""
+        });
+      }
+      return attachedHeaders;
+    },
+    _adaptRowButtonsToColumns(rowButtons) {
+      const attachedColumns = [];
+      for(let index=0; index<rowButtons.length; index++) {
+        const attachedButton = rowButtons[index];
+        attachedColumns.push({
+          text: attachedButton.text || "",
+          event: attachedButton.event || this.$noop,
+        });
+      }
+      return attachedColumns;
     }
   },
   watch: {
@@ -719,6 +1008,10 @@ Vue.component("LswTable", {
     currentPage(value) {
       this.$trace("lsw-table.watch.currentPage");
       this.digestPagination();
+    },
+    choosenRows(v) {
+      this.$trace("lsw-table.watch.value");
+      this.onChooseRow(v, this);
     }
   },
   computed: {
@@ -1177,11 +1470,11 @@ Vue.component('LswDataImplorer', {
                         <div class="dialog_footer">
                             <button v-if="dialog && dialog.acceptButton"
                                 class=""
-                                v-on:click="() => dialog.acceptButton.callback ? dialog.acceptButton.callback($refs['currentDialogComponent_' + dialog_index][0], dialog, dialog.id, this) : resolve(dialog.id).close()">{{
+                                v-on:click="() => dialog.acceptButton.callback ? dialog.acceptButton.callback(\$refs['currentDialogComponent_' + dialog_index][0], dialog, dialog.id, this) : resolve(dialog.id).close()">{{
                                 dialog.acceptButton.text || "Accept" }}</button>
                             <button v-if="dialog && dialog.cancelButton"
                                 class=""
-                                v-on:click="() => dialog.cancelButton.callback ? dialog.cancelButton.callback($refs['currentDialogComponent_' + dialog_index][0], dialog, dialog.id, this) : close(dialog.id)">{{
+                                v-on:click="() => dialog.cancelButton.callback ? dialog.cancelButton.callback(\$refs['currentDialogComponent_' + dialog_index][0], dialog, dialog.id, this) : close(dialog.id)">{{
                                 dialog.cancelButton.text || "Cancel" }}</button>
                             <button v-else
                                 class=""
@@ -1200,7 +1493,7 @@ Vue.component('LswDataImplorer', {
       }
     },
     data() {
-      this.$trace("lsw-dialogs.data", arguments);
+      this.$trace("lsw-dialogs.data", []);
       return {
         enabledWindowsSystem: this.asWindows,
         opened: {},
@@ -1237,7 +1530,8 @@ Vue.component('LswDataImplorer', {
           throw new Error(`Required parameter «id» to be a string on «LswDialogs.methods.open»`);
         }
         if (id in this.opened) {
-          throw new Error(`Cannot open dialog «${id}» because it is already opened on «LswDialogs.methods.open»`);
+          return this.maximize(id);
+          // throw new Error(`Cannot open dialog «${id}» because it is already opened on «LswDialogs.methods.open»`);
         }
         if (typeof template !== "string") {
           throw new Error(`Required parameter «template» to be a string on «LswDialogs.methods.open»`);
@@ -1285,7 +1579,7 @@ Vue.component('LswDataImplorer', {
             if (typeof preData.value === "undefined") {
               preData.value = "";
             };
-            console.log("El data del nuevo componente dialog:", preData);
+            // console.log("El data del nuevo componente dialog:", preData);
             dialogComponentInput.watch = scopifyMethods(dialogComponentInput.watch || {}, component);
             dialogComponentInput.computed = scopifyMethods(dialogComponentInput.computed || {}, component);
             dialogComponentInput.methods = scopifyMethods(dialogComponentInput.methods || {}, component);
@@ -1340,7 +1634,7 @@ Vue.component('LswDataImplorer', {
           promiser: Promise.withResolvers(),
         });
         const dialogInstance = new Dialog(dialogDefinition);
-        console.log("Definición final del dialogo", dialogInstance);
+        // console.log("Definición final del dialogo", dialogInstance);
         Define_dialog: {
           this.opened = Object.assign({}, this.opened, {
             [id]: dialogInstance
@@ -1484,7 +1778,7 @@ Vue.component("LswWindowsMainTab", {
                     <div>Process manager</div>
                 </div>
                 <div class="dialog_topbar_buttons">
-                    <button v-if="$consoleHooker?.is_shown === false" class="mini" style="white-space: nowrap;flex: 1; margin-right: 4px;" v-on:click="() => $consoleHooker.show()">💻</button><button class="mini" v-on:click="viewer.toggleState">-</button>
+                    <button v-if="\$consoleHooker?.is_shown === false" class="mini" style="white-space: nowrap;flex: 1; margin-right: 4px;" v-on:click="() => \$consoleHooker?.show()">💻</button><button class="mini" v-on:click="viewer.toggleState">-</button>
                 </div>
             </div>
             <div class="dialog_body">
@@ -1494,11 +1788,11 @@ Vue.component("LswWindowsMainTab", {
                     <button class="main_tab_topbar_button" v-on:click="openRest">Data</button>
                     <button class="main_tab_topbar_button" v-on:click="openFilesystem">Files</button>
                 </div>
-                <div class="pad_normal" v-if="!Object.keys($lsw.dialogs.opened).length">
+                <div class="pad_normal" v-if="!Object.keys(\$lsw.dialogs.opened).length">
                     <span>No processes found right now.</span>
                 </div>
                 <div class="pad_normal" v-else>
-                    <div v-for="dialog, dialogIndex, dialogCounter in $lsw.dialogs.opened" v-bind:key="'dialog-' + dialogIndex">
+                    <div v-for="dialog, dialogIndex, dialogCounter in \$lsw.dialogs.opened" v-bind:key="'dialog-' + dialogIndex">
                         <a href="javascript:void(0)" v-on:click="() => viewer.selectDialog(dialogIndex)">{{ dialogCounter + 1 }}. {{ dialog.title }} [{{ dialog.id }}]</a>
                     </div>
                 </div>
@@ -1744,6 +2038,10 @@ Vue.component("LswConsoleHooker", {
   },
   mounted() {
     this.instance = new ConsoleHooker("lsw-console-hooker-output");
+    if(process.env.NODE_ENV !== "development") {
+      // !@DESCOMENTAR: para restaurar consola (OFUSCA LOGS EN desarrollo)
+      this.instance.restoreConsole();
+    }
     this.$vue.prototype.$consoleHooker = this;
     this.$window.LswConsoleHooker = this;
   },
@@ -1751,197 +2049,33 @@ Vue.component("LswConsoleHooker", {
 
   }
 });
-// Change this component at your convenience:
-Vue.component("App", {
-  template: `<div>
-    <button v-on:click="uploadConductometria" v-if="!conductometria.registros">Abrir conductometría</button>
-    <button v-on:click="clearConductometria" v-else>Cerrar</button>
-    <button v-on:click="openDialog">Abrir diálogo</button>
-    <button v-on:click="openDialogSequence">Abrir secuencia de diálogos</button>
-    <div style="height: 4px;"></div>
-    <pre class="conductometria_viewer_1" style="display: none;">{{ conductometria }}</pre>
-    <table class="tabla_de_conductometria">
-        <template v-for="dia, dia_index in conductometria.registros">
-            <tbody v-bind:key="'conductometria_registro_dia_' + dia.day ">
-                <tr v-on:click="() => toggleDay(dia.day)">
-                    <td colspan="1000" class="celda_fecha" :class="{ activated: conductometria_minified_days.indexOf(dia.day) === -1 }">
-                        {{ dia.day }}
-                    </td>
-                </tr>
-                <template v-if="conductometria_minified_days.indexOf(dia.day) === -1">
-                    <template v-for="hora, hora_index in dia.hours">
-                        <tr v-bind:key="'conductometria_registro_dia_' + dia.day + '_celda_hora'" :class="{ passed: hora.passed, current: hora.current }">
-                            <td class="celda_hora">
-                                {{ hora.hour }}
-                            </td>
-                            <td class="celda_contenido">
-                                <button class="minibutton">+</button>
-                                <span class="pill_group" v-for="event, event_index in hora.events" v-bind:key="'conductometria_registro_dia_' + dia.day + '_celda_hora_event_' + event_index" style="margin-right: 2px;">
-                                    <span style="padding-left: 2px; padding-right: 2px; border: 1px solid #000; border-right: 0px solid #000; background-color: #FFFFFF;">
-                                        <template v-if="event.details">
-                                            <span>{{ event.name }} <span>({{ event.details }})</span></span>
-                                        </template>
-                                        <template v-else>
-                                            <span>{{ event.name }}</span>
-                                        </template>
-                                    </span><span class="like_button minibutton display_inline_block text_align_center" style="border: 1px solid #000; border-left: 0px solid #000; min-width:15px;"> - </span>
-                                </span>
-                            </td>
-                        </tr>
-                    </template>
-                </template>
-            </tbody>
-        </template>
-    </table>
-
-
-
-
-    <lsw-console-hooker />
-    <lsw-windows-viewer />
-    <lsw-toasts />
-</div>`,
-  props: {},
-  data() {
-    return {
-      conductometria: [],
-      conductometria_minified_days: [],
-    };
-  },
-  methods: {
-
-    async uploadConductometria() {
-      try {
-        if (localStorage.__conductometria_file_1__) {
-          this.conductometria = JSON.parse(localStorage.__conductometria_file_1__);
-          return 1;
-        }
-        const excelData2 = await this.$lsw.utils.loadConductometriaByExcelFile();
-        if (excelData2) {
-          this.conductometria = excelData2;
-          localStorage.__conductometria_file_1__ = JSON.stringify(excelData2);
-          return 2;
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        this.$forceUpdate(true);
-      }
-    },
-
-    clearConductometria() {
-      try {
-        this.conductometria = [];
-        this.conductometria_minified_days = [];
-        delete localStorage.__conductometria_file_1__;
-      } catch (error) {
-        console.log(error);
-      } finally {
-        this.$forceUpdate(true);
-      }
-    },
-
-    toggleDay(dia_index) {
-      const pos = this.conductometria_minified_days.indexOf(dia_index);
-      if (pos === -1) {
-        this.conductometria_minified_days.push(dia_index);
-      } else {
-        this.conductometria_minified_days.splice(pos, 1);
-      }
-      this.$forceUpdate(true);
-    },
-
-    async openDialog() {
-      const name = await this.$dialogs.open({
-        template: `
-          <div>
-            <div style="display: flex; flex-direction: row; align-items: center;">
-              <div style="flex:100; padding-right: 4px;">
-                <input type="text" v-model="value" style="width:100%;" placeholder="Pon tu nombre aquí" v-focus v-on:keydown.enter="accept" />
-              </div>
-              <div style="flex:1;">
-                <button v-on:click="accept">Aceptar</button>
-              </div>
-            </div>
-          </div>
-        `
-      });
-      console.log("Name:", name);
-    },
-
-    async openDialogSequence() {
-      const userData = await this.$dialogs.open({
-        id: "dialog-step-1",
-        title: "Paso 1",
-        template: `
-          <div>
-              <div>
-                <div>Nombre:</div>
-                <input type="text" ref="nameInput" v-model="value.name" style="width:100%;" placeholder="Pon tu nombre aquí" v-focus v-on:keydown.enter="() => $refs.ageInput.focus()" />
-                <div>Edad:</div>
-                <input type="number" ref="ageInput" v-model="value.age" style="width:100%;" placeholder="Pon tu edad aquí" v-on:keydown.enter="() => $refs.cityInput.focus()" />
-                <div>Ciudad:</div>
-                <input type="text" ref="cityInput" v-model="value.city" style="width:100%;" placeholder="Pon tu ciudad aquí" v-on:keydown.enter="accept" />
-              </div>
-              <div>
-                <button v-on:click="accept">Aceptar</button>
-              </div>
-          </div>
-        `,
-        factory: {
-          data: {
-            value: {
-              tpl1: [["name, nombre"], ["age", "edad"], ["city", "ciudad"]],
-              name: "Guybrush Threepwood",
-              age: 0,
-              city: "Los Angeles"
-            }
-          }
-        }
-      });
-      console.log("UserData:", userData);
-      const response = await this.$dialogs.open({
-        id: "dialog-step-2",
-        title: "Paso 2",
-        template: `
-          <div>
-              <div>
-                <div>¿Cómo estás, ${userData.name}?</div>
-                <div>Cuéntame, ¿qué tal todo por ${userData.city}?</div>
-                <div>¿Cómo van esos ${userData.age} años?</div>
-                <input type="text" v-model="value" style="width:100%;" placeholder="Cuéntame aquí, que quiero saber" v-on:keydown.enter="accept" />
-              </div>
-              <div>
-                <button v-on:click="accept">Aceptar</button>
-              </div>
-          </div>
-        `
-      });
-      console.log("Response:", response);
-    }
-
-  },
-  mounted() {
-    console.log("[*] Application mounted.");
-    window.on_application_mounted.resolve(true);
-  }
-});
 Vue.component("LswDatabaseExplorer", {
-  template: `<div>
-    <component :is="selectedPage" :args="selectedArgs" :database-explorer="this" />
+  template: `<div class="lsw_database_ui database_explorer">
+    <template v-if="!isLoading">
+        <component :is="selectedPage" :args="selectedArgs" :database-explorer="this" />
+    </template>
 </div>`,
   props: {},
   data() {
+    this.$trace("lsw-database-explorer.data", arguments);
     return {
-      selectedPage: "lsw-page-databases",
-      selectedArgs: [],
+      isLoading: false,
+      selectedPage: "lsw-page-tables",
+      selectedArgs: { database: "lsw_default_database" },
     }
   },
   methods: {
-    selectPage(page, args = []) {
+    selectPage(page, args = {}) {
       try {
-        this.selectedArgs = args;
-        this.selectedPage = page;
+        this.$trace("lsw-database-explorer.methods.selectPage", arguments);
+        $ensure({page}, 1).type("string");
+        $ensure({args}, 1).type("object");
+        this.isLoading = true;
+        this.$nextTick(() => {
+          this.selectedArgs = args;
+          this.selectedPage = page;
+          this.isLoading = false;
+        });
       } catch (error) {
         console.log(error);
         throw error;
@@ -1949,15 +2083,15 @@ Vue.component("LswDatabaseExplorer", {
     }
   },
   async mounted() {
-    
+    this.$trace("lsw-database-explorer.methods.mounted", arguments);
   },
   unmounted() {
-
+    this.$trace("lsw-database-explorer.methods.unmounted", arguments);
   }
 });
 Vue.component("LswDatabaseBreadcrumb", {
   template: `<div class="database_breadcrumb">
-    <span>Return to:</span>
+    <span>Estás en: </span>
     <template v-for="item, itemIndex in breadcrumb">
         <span v-bind:key="'breadcrumb_item_' + itemIndex">
             <span v-if="itemIndex !== 0"> » </span>
@@ -1997,30 +2131,13 @@ Vue.component("LswDatabaseBreadcrumb", {
 });
 Vue.component("LswPageDatabases", {
   template: `<div>
-    <h3>All databases</h3>
-    <lsw-table :initial-input="databases" v-if="databases"></lsw-table>
-    <table class="basic_table top_aligned">
-        <thead>
-            <tr>
-                <th>Nº</th>
-                <th>Database</th>
-                <th class="width_100">Version</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="database, databaseIndex in databases" v-bind:key="'database_id_' + database.name">
-                <td>
-                    {{ databaseIndex + 1 }}
-                </td>
-                <td>
-                    <a href="javascript:void(0)" v-on:click="() => openDatabase(database.name)">{{ database.name }}</a>
-                </td>
-                <td>
-                    {{ database.version }}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <h3>Todas las bases de datos</h3>
+    <lsw-database-breadcrumb :breadcrumb="breadcrumb"
+        :database-explorer="databaseExplorer" />
+    <lsw-table v-if="databases && databases.length"
+        :initial-input="databases"
+        :initial-settings="{title: 'Lista de todas las bases de datos:', itemsPerPage: 50 }"
+        :row-buttons="[{ header: '', text: '↗️', event: (row) => openDatabase(row.name) }]"></lsw-table>
 </div>`,
   props: {
     databaseExplorer: {
@@ -2035,6 +2152,7 @@ Vue.component("LswPageDatabases", {
   data() {
     return {
       databases: [],
+      databasesForTable: false,
       breadcrumb: [{
         page: "LswPageDatabases",
         name: "Databases",
@@ -2048,8 +2166,27 @@ Vue.component("LswPageDatabases", {
       this.databaseExplorer.selectPage("LswPageTables", { database: name });
     }
   },
+  watch: {
+    databases(value) {
+      AdaptingForTable: {
+        const databasesForTable = [];
+        if (typeof value !== "object") {
+          break AdaptingForTable;
+        }
+        const databaseIds = Object.keys(value);
+        for(let indexDatabase=0; indexDatabase<databaseIds.length; indexDatabase++) {
+          const databaseId = databaseIds[indexDatabase];
+          const databaseObject = value[databaseId];
+        }
+        this.databasesForTable = databasesForTable;
+      }
+    }
+  },
   async mounted() {
     this.databases = await LswDatabaseAdapter.listDatabases();
+    Filter_by_entity_schema_matched_db_names: {
+      $lswSchema
+    }
   },
   unmounted() {
 
@@ -2057,10 +2194,17 @@ Vue.component("LswPageDatabases", {
 });
 Vue.component("LswPageRows", {
   template: `<div>
-    <h3>Rows of {{ args.database }}.{{ args.table }}</h3>
+    <h3>Registros de {{ args.table }} [{{ args.database }}]</h3>
     <lsw-database-breadcrumb :breadcrumb="breadcrumb" :database-explorer="databaseExplorer" />
-    <lsw-table :initial-input="rows" v-if="rows"></lsw-table>
-    <table class="basic_table top_aligned">
+    <lsw-table
+        :initial-input="rows" v-if="rows"
+        :initial-settings="{
+            title: 'Registros de ' + args.table,
+            columnsOrder: ['id'],
+        }"
+        :row-buttons="[{ header: '', text: '↗️', event: (row) => openRow(row.id) }]"
+        :table-buttons="[{ text: '#️⃣', event() { openRow(-1) }}]"></lsw-table>
+    <!--table class="basic_table top_aligned">
         <thead>
             <tr>
                 <th>Nº</th>
@@ -2083,7 +2227,7 @@ Vue.component("LswPageRows", {
                 </td>
             </tr>
         </tbody>
-    </table>
+    </table-->
 </div>`,
   props: {
     databaseExplorer: {
@@ -2096,18 +2240,12 @@ Vue.component("LswPageRows", {
     },
   },
   data() {
-    if(typeof this.args.database !== "string") {
-      throw new Error("Required parameter «args.database» to be a string on «LswPageRows.data»");
-    }
-    if(typeof this.args.table !== "string") {
-      throw new Error("Required parameter «args.table» to be a string on «LswPageRows.data»");
-    }
+    this.$trace("lsw-page-rows.data", arguments);
+    $ensure(this.args).type("object");
+    $ensure(this.args.database).type("string");
+    $ensure(this.args.table).type("string");
     return {
       breadcrumb: [{
-        page: "LswPageDatabases",
-        name: "Databases",
-        args: {}
-      }, {
         page: "LswPageTables",
         name: this.args.database,
         args: {
@@ -2130,49 +2268,64 @@ Vue.component("LswPageRows", {
   },
   methods: {
     async loadRows() {
-      this.connection = new LswDatabaseAdapter(this.database);
+      this.$trace("lsw-page-rows.methods.loadRows", arguments);
+      this.connection = this.connection ?? new LswDatabaseAdapter(this.database);
       await this.connection.open();
-      this.rows = await this.connection.select(this.table, it => true);
+      const selection = await this.connection.select(this.table, it => true);
+      this.rows = selection;
+      return selection;
     },
-    openRow(rowid) {
+    openRow(rowId) {
+      this.$trace("lsw-page-rows.methods.openRow", arguments);
       return this.databaseExplorer.selectPage("LswPageRow", {
         database: this.database,
         table: this.table,
-        rowid: rowid
+        rowId: rowId
       });
     }
   },
   mounted() {
+    this.$trace("lsw-page-rows.mounted", arguments);
     this.loadRows();
   },
   unmounted() {
+    this.$trace("lsw-page-rows.unmounted", arguments);
     this.connection.close();
   }
 });
 Vue.component("LswPageRow", {
   template: `<div>
-    <h3>Row on {{ args.database }}.{{ args.table }}#{{ args.rowid }}</h3>
-    <lsw-database-breadcrumb :breadcrumb="breadcrumb" :database-explorer="databaseExplorer" />
-    <table class="basic_table top_aligned" v-if="row">
-        <thead>
-            <tr>
-                <th>Nº</th>
-                <th>Property</th>
-                <th class="width_100">Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="prop, propName, propCounter in row" v-bind:key="'prop_index_' + propName">
-                <td>{{ propCounter + 1 }}</td>
-                <td>
-                    {{ propName }}
-                </td>
-                <td>
-                    {{ prop }}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <h3>
+        <span>
+            Registro de {{ args.table }}
+        </span>
+        <span v-if="(args.rowId && args.rowId !== -1)">
+            [#{{ args.rowId }}]
+        </span>
+        <span v-else-if="args.row && args.row.id">
+            [#{{ args.row.id }}]
+        </span>
+        <span v-else>
+            [new]
+        </span>
+        <span>
+            [{{ args.database }}]
+        </span>
+    </h3>
+    <lsw-database-breadcrumb :breadcrumb="breadcrumb"
+        :database-explorer="databaseExplorer" />
+    <div v-if="!isLoaded">Un momento, por favor, está cargando...</div>
+    <lsw-schema-based-form v-else
+        :on-submit="upsertRow"
+        :model="{
+            connection: \$lsw.database,
+            databaseId: args.database,
+            tableId: args.table,
+            rowId: args.rowId,
+            row: row,
+            databaseExplorer,
+        }"
+        />
 </div>`,
   props: {
     databaseExplorer: {
@@ -2185,21 +2338,13 @@ Vue.component("LswPageRow", {
     },
   },
   data() {
-    if(typeof this.args.database !== "string") {
-      throw new Error("Required parameter «args.database» to be a string on «LswPageRow.data»");
-    }
-    if(typeof this.args.table !== "string") {
-      throw new Error("Required parameter «args.table» to be a string on «LswPageRow.data»");
-    }
-    if(typeof this.args.rowid === "undefined") {
-      throw new Error("Required parameter «args.rowid» to be a string or a number on «LswPageRow.data»");
-    }
+    this.$trace("lsw-page-row.data", arguments);
+    $ensure(this.args.database).type("string");
+    $ensure(this.args.table).type("string");
+    $ensure(this.args.rowId).type("number");
     return {
+      isLoaded: false,
       breadcrumb: [{
-        page: "LswPageDatabases",
-        name: "Databases",
-        args: {}
-      }, {
         page: "LswPageTables",
         name: this.args.database,
         args: {
@@ -2214,33 +2359,77 @@ Vue.component("LswPageRow", {
         },
       }, {
         page: "LswPageRow",
-        name: "#" + this.args.rowid,
+        name: (this.args.rowId === -1) ? '#new' : ("#" + this.args.rowId),
         args: {
           database: this.args.database,
           table: this.args.table,
-          rowid: this.args.rowid
+          rowId: this.args.rowId
         },
         current: true
       }],
       database: this.args.database,
       table: this.args.table,
-      rowid: this.args.rowid,
+      rowId: this.args.rowId,
       connection: undefined,
       row: false,
     }
   },
   methods: {
     async loadRow() {
-      this.connection = new LswDatabaseAdapter(this.database);
-      await this.connection.open();
-      const matches = await this.connection.select(this.table, it => it.id === this.rowid);
-      this.row = matches[0];
+      this.$trace("lsw-page-row.methods.loadRow", arguments);
+      try {
+        if(this.rowId === -1) {
+          return false;
+        }
+        this.connection = this.connection ?? new LswDatabaseAdapter(this.database);
+        await this.connection.open();
+        const matches = await this.connection.select(this.table, it => it.id === this.rowId);
+        this.row = matches[0];
+      } catch (error) {
+        console.log("Error loading row:", error);
+        throw error;
+      } finally {
+        this.row = false;
+      }
+    },
+    async upsertRow(v) {
+      this.$trace("lsw-page-row.methods.upsertRow", arguments);
+      const existsRow = this.rowId || ((typeof (this.row) === "object") && (typeof (this.row.id) === "number") && (this.row.id !== -1));
+      let id = this.rowId || this.row.id;
+      const operation = (existsRow && (id !== -1)) ? "update" : "insert";
+      if (operation === "insert") {
+        id = await this.$lsw.database.insert(this.table, v);
+      } else {
+        await this.$lsw.database.update(this.table, id, v);
+      }
+      lsw.toasts.send({
+        title: `Nueva ${operation === 'insert' ? 'inserción' : 'actualización'}`,
+        text: `El registro #${id} de «${this.table}» fue ${operation === 'insert' ? 'insertado' : 'actualizado'} correctamente.`
+      });
+      if(operation === "insert") {
+        this.databaseExplorer.selectPage("LswPageRow", {
+          database: this.database,
+          table: this.table,
+          rowId: id
+        });
+      } else {
+        // @OK.
+      }
     }
   },
-  mounted() {
-    this.loadRow();
+  async mounted() {
+    this.$trace("lsw-page-row.mounted", arguments);
+    try {
+      await this.loadRow();
+    } catch (error) {
+      console.log("Error loading row:", error);
+      throw error;
+    } finally {
+      this.isLoaded = true;
+    }
   },
   unmounted() {
+    this.$trace("lsw-page-row.unmounted", arguments);
     this.connection.close();
   }
 });
@@ -2264,47 +2453,22 @@ Vue.component("LswPageSchema", {
 });
 Vue.component("LswPageTables", {
   template: `<div>
-    <h3>Tables of {{ args.database }}</h3>
+    <h3>Tablas de {{ args.database }}</h3>
     <lsw-database-breadcrumb :breadcrumb="breadcrumb"
         :database-explorer="databaseExplorer" />
-    <lsw-table :initial-input="tables" v-if="tables"></lsw-table>
-    <div style="padding: 4px;">
-        <table class="basic_table top_aligned">
-            <thead>
-                <tr>
-                    <th>Nº</th>
-                    <th>Table</th>
-                    <th class="width_100">Columns</th>
-                </tr>
-            </thead>
-            <tbody v-if="tables">
-                <tr v-for="table, tableIndex, tableCounter in tables"
-                    v-bind:key="'table_id_' + table.name">
-                    <td>
-                        {{ tableCounter + 1 }}
-                    </td>
-                    <td>
-                        <a href="javascript:void(0)"
-                            v-on:click="() => openTable(tableIndex)">{{ tableIndex }}</a>
-                    </td>
-                    <td>
-                        <!--div>- keyPath: {{ table.keyPath }}</div-->
-                        <div v-if="table.autoIncrement">Is autoincrement</div>
-                        <div v-for="subprop, subpropIndex in table.indexes"
-                            v-bind:key="'table_' + table.name + '_index_' + subpropIndex">
-                            <div>
-                                {{ subpropIndex + 1 }}. {{ subprop.name }} 
-                                <span v-if="subprop.unique || subprop.multientry">
-                                    [{{ [subprop.unique ? "unique" : false, subprop.multiEntry ?
-                                "multientry" : false].filter(it => !!it).join(", ") }}]
-                                </span>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <lsw-table v-if="tablesAsList && tablesAsList.length"
+        :initial-input="tablesAsList"
+        :initial-settings="{
+            title: 'Tablas de ' + args.database,
+            itemsPerPage: 50,
+            columnsAsList: ['indexes'],
+            columnsOrder: ['name', 'indexes', 'keyPath']
+        }"
+        :row-buttons="[{
+            header: '',
+            text: '↗️',
+            event: (row, i) => openTable(row.name)
+        }]"></lsw-table>
 </div>`,
   props: {
     databaseExplorer: {
@@ -2317,18 +2481,10 @@ Vue.component("LswPageTables", {
     },
   },
   data() {
-    if(!("database" in this.args)) {
-      throw new Error("Required parameter «args.database» on «LswPageTables.data»");
-    }
-    if(typeof this.args.database !== "string") {
-      throw new Error("Required parameter «args.database» to be a string on «LswPageTables.data»");
-    }
+    const ensureArgs = $ensure(this.args).type("object");
+    ensureArgs.to.have.key("database").its("database").type("string");
     return {
       breadcrumb: [{
-        page: "LswPageDatabases",
-        name: "Databases",
-        args: {}
-      }, {
         page: "LswPageTables",
         name: this.args.database,
         args: {
@@ -2337,20 +2493,38 @@ Vue.component("LswPageTables", {
         current: true
       }],
       database: this.args.database,
-      tables: false
+      tables: false,
+      tablesAsList: false,
     }
   },
   methods: {
     async loadDatabase() {
       const db = await LswDatabaseAdapter.getSchema(this.database);
       this.tables = db;
-      console.log(db);
+      console.log(`[*] Tables of database ${this.args.database}:`, db);
     },
     openTable(table) {
+      $ensure({ table }, 1).type("string");
       return this.databaseExplorer.selectPage("LswPageRows", {
         database: this.database,
         table: table
       });
+    }
+  },
+  watch: {
+    tables(value) {
+      const tablesAsList = [];
+      const tableIds = Object.keys(value);
+      for(let index=0; index<tableIds.length; index++) {
+        const tableId = tableIds[index];
+        const tableData = value[tableId];
+        tablesAsList.push({
+          name: tableId,
+          ...tableData,
+          indexes: tableData.indexes ? tableData.indexes.map(ind => ind.name) : []
+        });
+      }
+      this.tablesAsList = tablesAsList;
     }
   },
   mounted() {
@@ -2699,36 +2873,36 @@ Vue.component("LswWiki", {
 });
 Vue.component("LswCalendario", {
   template: `<div class="Component LswCalendario">
-  <div style="max-width: 260px;">
-    <div class="like_table" style="border-collapse: collapse; border: none; border-bottom: 1px solid white;">
-      <div class="like_row">
-        <div class="like_cell">
-          <button class="boton_de_mover_mes"
-            v-on:click="ir_a_mes_anterior"> ◀ </button>
-        </div>
-        <div class="like_cell" style="width:100%;" :style="!soloFecha ? 'vertical-align: top;' : ''">
-          <div class="chivato_de_fecha">{{ obtener_fecha_formateada(fecha_seleccionada) }}</div>
-          <div class="chivato_de_fecha" v-if="!soloFecha">a las {{ espaciar_izquierda(hora_seleccionada, 2) }}:{{ espaciar_izquierda(minuto_seleccionado, 2)
-            }}:{{
-            espaciar_izquierda(segundo_seleccionado, 2) }}.{{ espaciar_izquierda(milisegundo_seleccionado, 3) }}
-          </div>
-        </div>
-        <div class="like_cell">
-          <button class="boton_de_mover_mes"
-            v-on:click="ir_a_mes_siguiente"> ▶ </button>
-        </div>
-      </div>
-    </div>
+  <div class="visor_de_calendario">
     <table class="tabla_de_calendario">
       <tbody>
+        <tr>
+          <td>
+            <button class="boton_de_mover_mes"
+              v-on:click="ir_a_mes_anterior"> ◀ </button>
+          </td>
+          <td colspan="5"
+            style="width:auto; vertical-align: top;">
+            <div class="chivato_de_fecha">{{ obtener_fecha_formateada(fecha_seleccionada) }}</div>
+            <div class="chivato_de_fecha"
+              v-if="(!es_solo_fecha) && fecha_seleccionada">a las {{ obtener_expresion_de_hora(fecha_seleccionada) }}
+            </div>
+          </td>
+          <td>
+            <button class="boton_de_mover_mes"
+              v-on:click="ir_a_mes_siguiente"> ▶ </button>
+          </td>
+        </tr>
+      </tbody>
+      <tbody>
         <tr class="fila_de_dias_de_semana">
-          <td>Lu</td>
-          <td>Ma</td>
-          <td>Mi</td>
-          <td>Ju</td>
-          <td>Vi</td>
-          <td>Sá</td>
-          <td>Do</td>
+          <td><div class="">Lu</div></td>
+          <td><div class="">Ma</div></td>
+          <td><div class="">Mi</div></td>
+          <td><div class="">Ju</div></td>
+          <td><div class="">Vi</div></td>
+          <td><div class="">Sá</div></td>
+          <td><div class="">Do</div></td>
         </tr>
       </tbody>
       <tbody class="dias_de_calendario">
@@ -2736,17 +2910,66 @@ Vue.component("LswCalendario", {
           v-bind:key="'semana-' + semana_index">
           <td v-for="dia, dia_index in semana"
             v-bind:key="'dia-' + dia_index">
-            <span v-if="dia">
-              <button class="boton_de_calendario boton_de_dia_de_calendario"
-                :class="{active: dia.getDate() === fecha_seleccionada.getDate()}"
-                v-on:click="() => seleccionar_dia(dia)">{{ dia.getDate() }}</button>
+            <span v-if="dia && (dia instanceof Date)">
+              <button class="boton_de_calendario boton_de_dia_de_calendario position_relative"
+                :class="{
+                  active: dia.getDate() === fecha_seleccionada.getDate(),
+                  current: (dia_actual === dia.getDate())
+                    && (mes_actual === dia.getMonth())
+                    && (anio_actual === dia.getFullYear())
+                }"
+                v-on:click="() => seleccionar_dia(dia)">
+                <div class="dia_de_calendario_texto">{{ dia.getDate() }}</div>
+                <div v-if="dia.getDate() in marcadores_del_mes"
+                  class="total_de_tareas_de_dia">
+                  <div>
+                    {{ marcadores_del_mes[dia.getDate()].length }}
+                  </div>
+                </div>
+              </button>
             </span>
           </td>
         </tr>
       </tbody>
     </table>
-    <table class="tabla_para_horas"
-      v-if="!soloFecha">
+    <table class="width_100 no_borders_table"
+      v-if="modo === 'datetime' || modo === 'time'">
+      <tbody>
+        <tr class="fila_de_digito">
+          <td v-on:click="agregar_digito_de_hora(1)"><button class="boton_de_ajuste_de_hora">▲</button></td>
+          <td v-on:click="agregar_digito_de_hora(2)"><button class="boton_de_ajuste_de_hora">▲</button></td>
+          <td></td>
+          <td v-on:click="agregar_digito_de_hora(3)"><button class="boton_de_ajuste_de_hora">▲</button></td>
+          <td v-on:click="agregar_digito_de_hora(4)"><button class="boton_de_ajuste_de_hora">▲</button></td>
+          <td></td>
+          <td v-on:click="\$noop"><button class="boton_de_ajuste_de_hora">▲</button></td>
+          <td v-on:click="\$noop"><button class="boton_de_ajuste_de_hora">▲</button></td>
+        </tr>
+        <tr class="fila_de_digito"
+          v-if="fecha_seleccionada">
+          <td>{{ obtener_digito_de_hora(1) }}</td>
+          <td>{{ obtener_digito_de_hora(2) }}</td>
+          <td>:</td>
+          <td>{{ obtener_digito_de_hora(3) }}</td>
+          <td>{{ obtener_digito_de_hora(4) }}</td>
+          <td>:</td>
+          <td>{{ obtener_digito_de_hora(5) }}</td>
+          <td>{{ obtener_digito_de_hora(6) }}</td>
+        </tr>
+        <tr class="fila_de_digito">
+          <td v-on:click="quitar_digito_de_hora(1)"><button class="boton_de_ajuste_de_hora">▼</button></td>
+          <td v-on:click="quitar_digito_de_hora(2)"><button class="boton_de_ajuste_de_hora">▼</button></td>
+          <td></td>
+          <td v-on:click="quitar_digito_de_hora(3)"><button class="boton_de_ajuste_de_hora">▼</button></td>
+          <td v-on:click="quitar_digito_de_hora(4)"><button class="boton_de_ajuste_de_hora">▼</button></td>
+          <td></td>
+          <td v-on:click="\$noop"><button class="boton_de_ajuste_de_hora">▼</button></td>
+          <td v-on:click="\$noop"><button class="boton_de_ajuste_de_hora">▼</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <!--table class="tabla_para_horas"
+      v-if="!es_solo_fecha">
       <tr>
         <td>
           <button style="display: table-cell;"
@@ -2801,40 +3024,151 @@ Vue.component("LswCalendario", {
             v-on:click="quitar_segundo"> ▼ </button>
         </td>
       </tr>
-    </table>
+    </table-->
   </div>
 </div>`,
   props: {
-    soloFecha: {
-      type: Boolean,
-      default: false
+    modo: {
+      type: String,
+      default: () => "datetime" // can be: date, time, datetime
+    },
+    valorInicial: {
+      type: [String, Date],
+      default: () => new Date()
     },
     alCambiarValor: {
       type: Function,
-      default: () => {}
-    }
+      default: () => { }
+    },
   },
   data() {
     try {
+      this.$trace("lsw-calendario.data");
+      const hoy = new Date();
       return {
+        es_carga_inicial: true,
+        valor_inicial_adaptado: this.adaptar_valor_inicial(this.valorInicial),
+        es_solo_fecha: this.modo === "date",
+        es_solo_hora: this.modo === "time",
+        es_fecha_y_hora: this.modo === "datetime",
         fecha_seleccionada: undefined,
         celdas_del_mes_actual: undefined,
+        marcadores_del_mes: {},
+        hoy: hoy,
+        dia_actual: hoy.getDate(),
+        mes_actual: hoy.getMonth(),
+        anio_actual: hoy.getFullYear(),
+        /*
         hora_seleccionada: "0",
         minuto_seleccionado: "0",
         segundo_seleccionado: "0",
-        milisegundo_seleccionado: "0"
+        milisegundo_seleccionado: "0",
+        //*/
       };
     } catch (error) {
       console.log(error);
       throw error;
     }
-
   },
   methods: {
     getValue() {
+      this.$trace("lsw-calendario.methods.getValue");
       return this.fecha_seleccionada;
     },
+    adaptar_valor_inicial(valor) {
+      this.$trace("lsw-calendario.methods.adaptar_valor_inicial");
+      if (typeof valor === "string") {
+        try {
+          const resultado = LswTimer.utils.getDateFromMomentoText(valor);
+          console.log("FECHA ENTRADA:", resultado);
+          return resultado;
+        } catch (error) {
+          console.error("Error parseando valor inicial de lsw-calendario:", error);
+        }
+      }
+      return valor;
+    },
+    agregar_digito_de_hora(indice) {
+      this.$trace("lsw-calendario.methods.agregar_digito_de_hora");
+      const value = this.obtener_digito_de_hora(indice);
+      const isInMaximum = ([3, 5].indexOf(indice) !== -1) ? value === 5 : ([1].indexOf(indice) !== -1) ? value === 2 : value === 9;
+      if (!isInMaximum) {
+        this.establecer_digito_de_hora(indice, value + 1);
+      }
+    },
+    quitar_digito_de_hora(indice) {
+      this.$trace("lsw-calendario.methods.quitar_digito_de_hora");
+      const value = this.obtener_digito_de_hora(indice);
+      const isInMinimum = value === 0;
+      if (!isInMinimum) {
+        this.establecer_digito_de_hora(indice, value - 1);
+      }
+    },
+    obtener_digito_de_hora(indice, fecha = this.fecha_seleccionada) {
+      this.$trace("lsw-calendario.methods.obtener_digito_de_hora");
+      if (indice === 1) {
+        return parseInt(this.espaciar_izquierda(fecha.getHours(), 2)[0]);
+      } else if (indice === 2) {
+        return parseInt(this.espaciar_izquierda(fecha.getHours(), 2)[1]);
+      } else if (indice === 3) {
+        return parseInt(this.espaciar_izquierda(fecha.getMinutes(), 2)[0]);
+      } else if (indice === 4) {
+        return parseInt(this.espaciar_izquierda(fecha.getMinutes(), 2)[1]);
+      } else if (indice === 5) {
+        return parseInt(this.espaciar_izquierda(fecha.getSeconds(), 2)[0]);
+      } else if (indice === 6) {
+        return parseInt(this.espaciar_izquierda(fecha.getSeconds(), 2)[1]);
+      } else {
+        throw new Error("No se reconoció el índice del dígito: " + indice);
+      }
+    },
+    cambiar_posicion_en_texto(texto, posicion, valor) {
+      this.$trace("lsw-calendario.methods.cambiar_posicion_en_texto");
+      const arr = ("" + texto).split("");
+      arr[posicion] = valor;
+      return arr.join("");
+    },
+    establecer_digito_de_hora(indice, valor) {
+      this.$trace("lsw-calendario.methods.establecer_digito_de_hora");
+      console.log(indice, valor);
+      const fecha_clonada = new Date(this.fecha_seleccionada);
+      if (indice === 1) {
+        let horas = this.espaciar_izquierda(this.fecha_seleccionada.getHours(), 2);
+        horas = this.cambiar_posicion_en_texto(horas, 0, valor);
+        const horasInt = parseInt(horas);
+        if(horasInt > 23) return;
+        fecha_clonada.setHours(horasInt);
+      } else if (indice === 2) {
+        let horas = this.espaciar_izquierda(this.fecha_seleccionada.getHours(), 2);
+        horas = this.cambiar_posicion_en_texto(horas, 1, valor);
+        const horasInt = parseInt(horas);
+        if(horasInt > 23) return;
+        fecha_clonada.setHours(horasInt);
+      } else if (indice === 3) {
+        let minutos = this.espaciar_izquierda(this.fecha_seleccionada.getMinutes(), 2);
+        minutos = this.cambiar_posicion_en_texto(minutos, 0, valor);
+        const minutosInt = parseInt(minutos);
+        if(minutosInt > 59) return;
+        fecha_clonada.setMinutes(minutosInt);
+      } else if (indice === 4) {
+        let minutos = this.espaciar_izquierda(this.fecha_seleccionada.getMinutes(), 2);
+        minutos = this.cambiar_posicion_en_texto(minutos, 1, valor);
+        const minutosInt = parseInt(minutos);
+        if(minutosInt > 59) return;
+        fecha_clonada.setMinutes(minutosInt);
+      } else if (indice === 5) {
+        // @OK
+      } else if (indice === 6) {
+        // @OK
+      } else {
+        throw new Error("No se reconoció el índice del dígito: " + indice);
+      }
+      console.log(fecha_clonada);
+      this.fecha_seleccionada = fecha_clonada;
+      this.actualizar_fecha_seleccionada(true);
+    },
     ir_a_mes_anterior() {
+      this.$trace("lsw-calendario.methods.ir_a_mes_anterior");
       try {
         const nueva_fecha = new Date(this.fecha_seleccionada);
         nueva_fecha.setMonth(nueva_fecha.getMonth() - 1);
@@ -2846,6 +3180,7 @@ Vue.component("LswCalendario", {
 
     },
     ir_a_mes_siguiente() {
+      this.$trace("lsw-calendario.methods.ir_a_mes_siguiente");
       try {
         const nueva_fecha = new Date(this.fecha_seleccionada);
         nueva_fecha.setMonth(nueva_fecha.getMonth() + 1);
@@ -2856,75 +3191,11 @@ Vue.component("LswCalendario", {
       }
 
     },
-    agregar_hora() {
-      try {
-        let hora = parseInt(this.hora_seleccionada);
-        hora += 1;
-        this.hora_seleccionada = hora;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-
-    },
-    agregar_minuto() {
-      try {
-        let minuto = parseInt(this.minuto_seleccionado);
-        minuto += 1;
-        this.minuto_seleccionado = minuto;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-
-    },
-    agregar_segundo() {
-      try {
-        let segundo = parseInt(this.segundo_seleccionado);
-        segundo += 1;
-        this.segundo_seleccionado = segundo;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-
-    },
-    quitar_hora() {
-      try {
-        let hora = parseInt(this.hora_seleccionada);
-        hora -= 1;
-        this.hora_seleccionada = hora;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-
-    },
-    quitar_minuto() {
-      try {
-        let minuto = parseInt(this.minuto_seleccionado);
-        minuto -= 1;
-        this.minuto_seleccionado = minuto;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-
-    },
-    quitar_segundo() {
-      try {
-        let segundo = parseInt(this.segundo_seleccionado);
-        segundo -= 1;
-        this.segundo_seleccionado = segundo;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-
-    },
     seleccionar_dia(dia) {
+      this.$trace("lsw-calendario.methods.seleccionar_dia");
       try {
         this.fecha_seleccionada = dia;
+        this.actualizar_fecha_seleccionada(true);
       } catch (error) {
         console.log(error);
         throw error;
@@ -2934,6 +3205,7 @@ Vue.component("LswCalendario", {
     espaciar_izquierda(texto,
       longitud,
       relleno = "0") {
+      this.$trace("lsw-calendario.methods.espaciar_izquierda");
       try {
         let salida = "" + texto;
         while (salida.length < longitud) {
@@ -2947,6 +3219,7 @@ Vue.component("LswCalendario", {
 
     },
     obtener_fecha_formateada(fecha) {
+      this.$trace("lsw-calendario.methods.obtener_fecha_formateada");
       try {
         if (typeof fecha === 'undefined') {
           return;
@@ -3034,10 +3307,9 @@ Vue.component("LswCalendario", {
         throw error;
       }
 
-    }
-  },
-  watch: {
-    fecha_seleccionada(nuevo_valor) {
+    },
+    actualizar_calendario(nuevo_valor = this.fecha_seleccionada) {
+      this.$trace("lsw-calendario.methods.actualizar_calendario");
       try {
         const dias = [];
         const dia_1_del_mes = new Date(nuevo_valor);
@@ -3095,22 +3367,599 @@ Vue.component("LswCalendario", {
           dias.push(fila_actual);
         }
         this.celdas_del_mes_actual = dias;
-        if(typeof this.alCambiarValor === "function") {
-          this.alCambiarValor(nuevo_valor, this);
-        }
+        this.propagar_cambio();
+        this.actualizar_fecha_seleccionada(false);
       } catch (error) {
         console.log(error);
         throw error;
       }
-
+    },
+    actualizar_fecha_seleccionada(con_propagacion = true, fecha_seleccionada = this.fecha_seleccionada) {
+      this.$trace("lsw-calendario.methods.actualizar_fecha_seleccionada");
+      if (con_propagacion) {
+        const clon_fecha = new Date(fecha_seleccionada);
+        this.fecha_seleccionada = clon_fecha;
+      }
+    },
+    propagar_cambio() {
+      this.$trace("lsw-calendario.methods.propagar_cambio");
+      if (typeof this.alCambiarValor === "function") {
+        this.alCambiarValor(this.fecha_seleccionada, this);
+      }
+    },
+    obtener_expresion_de_hora(fecha = this.fecha_seleccionada) {
+      let hours = fecha.getHours();
+      let minutes = fecha.getMinutes();
+      let seconds = fecha.getSeconds();
+      hours = this.espaciar_izquierda(hours, 2, "0");
+      minutes = this.espaciar_izquierda(minutes, 2, "0");
+      seconds = this.espaciar_izquierda(seconds, 2, "0");
+      return `${hours}:${minutes}:${seconds}`;
+    },
+    establecer_marcadores_del_mes(marcadores_del_mes) {
+      this.marcadores_del_mes = marcadores_del_mes;
     }
   },
+  watch: {
+    fecha_seleccionada(nuevo_valor) {
+      this.$trace("lsw-calendario.watch.fecha_seleccionada");
+      this.actualizar_calendario(nuevo_valor);
+    },
+  },
   mounted() {
+    this.$trace("lsw-calendario.mounted");
     try {
-      this.fecha_seleccionada = new Date();
+      this.fecha_seleccionada = this.valor_inicial_adaptado;
+      this.es_carga_inicial = false;
     } catch (error) {
       console.log(error);
       throw error;
+    }
+  }
+});
+Vue.component("LswAgenda", {
+  name: "LswAgenda",
+  template: `<div class="lsw_agenda">
+    <div v-descriptor="'agenda.calendar.buttons_panel_1'"
+        class="flex_1 flex_row"
+        style="gap: 4px;">
+        <div class="flex_1">
+            <button class="width_100 nowrap"
+                v-on:click="() => selectSubmenu1('add')"
+                :class="{activated: selectedSubmenu1 === 'add'}">+</button>
+            <div class="hidden_menu"
+                v-if="selectedSubmenu1 === 'add'">
+                <div class="hidden_menu_fixed_layer"
+                    v-on:click="() => selectSubmenu1('none')"></div>
+                <div class="hidden_menu_box"
+                    style="min-width: 160px;">
+                    <div class="hidden_menu_items">
+                        <div class="title">
+                            <div class="flex_100"
+                                style="padding-left: 4px;">
+                                Insertar info
+                            </div>
+                            <div class="flex_1">
+                                <button v-on:click="() => selectSubmenu1('none')">❌</button>
+                            </div>
+                        </div>
+                        <div class="button_cell">
+                            <button v-on:click="() => selectContext('accion.add', { initialValues: { tiene_inicio: selectedDate } })">Crear
+                                acción</button>
+                        </div>
+                        <div class="button_cell">
+                            <button v-on:click="() => selectContext('concepto.add')">Crear concepto</button>
+                        </div>
+                        <div class="button_cell">
+                            <button v-on:click="() => selectContext('limitador.add')">Crear limitador</button>
+                        </div>
+                        <div class="button_cell">
+                            <button v-on:click="() => selectContext('impresion.add')">Crear impresión</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex_1">
+            <button class="width_100 nowrap"
+                v-on:click="() => selectSubmenu1('search')"
+                :class="{activated: selectedSubmenu1 === 'search'}">🔎</button>
+            <div class="hidden_menu"
+                v-if="selectedSubmenu1 === 'search'">
+                <div class="hidden_menu_fixed_layer"
+                    v-on:click="() => selectSubmenu1('none')"></div>
+                <div class="hidden_menu_box">
+                    <div class="hidden_menu_items">
+                        <div class="title">
+                            <div class="flex_100"
+                                style="padding-left: 4px;">
+                                Buscar info
+                            </div>
+                            <div class="flex_1">
+                                <button v-on:click="() => selectSubmenu1('none')">❌</button>
+                            </div>
+                        </div>
+                        <div class="separator">
+                            <div class="flex_100"
+                                style="padding-left: 4px;">Tablas físicas:</div>
+                        </div>
+                        <div class="button_cell">
+                            <button v-on:click="() => selectContext('accion.search')">Buscar por acción</button>
+                        </div>
+                        <div class="button_cell">
+                            <button v-on:click="() => selectContext('concepto.search')">Buscar por concepto</button>
+                        </div>
+                        <div class="button_cell">
+                            <button v-on:click="() => selectContext('propagador.search')">Buscar por propagador</button>
+                        </div>
+                        <div class="button_cell">
+                            <button v-on:click="() => selectContext('limitador.search')">Buscar por límite</button>
+                        </div>
+                        <div class="button_cell">
+                            <button v-on:click="() => selectContext('impresion.search')">Buscar por impresión</button>
+                        </div>
+                        <div class="separator">
+                            <div class="flex_100"
+                                style="padding-left: 4px;">Tablas virtuales:</div>
+                        </div>
+                        <div class="button_cell">
+                            <button v-on:click="() => selectContext('propagacion.search')">Buscar por propagación</button>
+                        </div>
+                        <div class="button_cell"
+                            style="padding-top: 2px;">
+                            <button v-on:click="() => selectContext('infraccion.search')">Buscar por infracción</button>
+                        </div>
+                        <div class="button_cell">
+                            <button v-on:click="() => selectContext('postimpresion.search')">Buscar por postimpresión</button>
+                        </div>
+                        <div class="button_cell">
+                            <button v-on:click="() => selectContext('evento.search')">Buscar por evento</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex_1">
+            <button class="width_100 nowrap"
+                v-on:click="() => selectSubmenu1('reports')">📊</button>
+        </div>
+        <div class="flex_1">
+            <button class="width_100 nowrap"
+                v-on:click="() => selectSubmenu1('settings')">⚙️</button>
+        </div>
+        <div class="flex_100"></div>
+    </div>
+
+    <div class="calendar_main_panel">
+        <div v-if="selectedContext === 'accion.add'">
+            <div class="breadcrumb_box">
+                <lsw-agenda-breadcrumb :agenda="this"
+                    :path-items="[{label:'Añadir acción'}]" />
+            </div>
+            <lsw-agenda-accion-add :initial-data="selectedContextParameters.values" />
+        </div>
+        <div v-else-if="selectedContext === 'accion.search'">
+            <div class="breadcrumb_box">
+                <lsw-agenda-breadcrumb :agenda="this"
+                    :path-items="[{label:'Buscar acción'}]" />
+            </div>
+            <lsw-agenda-accion-search />
+        </div>
+        <div v-else-if="selectedContext === 'concepto.add'">
+            <div class="breadcrumb_box">
+                <lsw-agenda-breadcrumb :agenda="this"
+                    :path-items="[{label:'Añadir concepto'}]" />
+            </div>
+            <lsw-agenda-concepto-add />
+        </div>
+        <div v-else-if="selectedContext === 'concepto.search'">
+            <div class="breadcrumb_box">
+                <lsw-agenda-breadcrumb :agenda="this"
+                    :path-items="[{label:'Buscar concepto'}]" />
+            </div>
+            <lsw-agenda-concepto-search />
+        </div>
+        <div v-else-if="selectedContext === 'limitador.add'">
+            <div class="breadcrumb_box">
+                <lsw-agenda-breadcrumb :agenda="this"
+                    :path-items="[{label:'Añadir límite'}]" />
+            </div>
+            <lsw-agenda-limitador-add />
+        </div>
+        <div v-else-if="selectedContext === 'limitador.search'">
+            <div class="breadcrumb_box">
+                <lsw-agenda-breadcrumb :agenda="this"
+                    :path-items="[{label:'Buscar límite'}]" />
+            </div>
+            <lsw-agenda-limitador-search />
+        </div>
+        <div v-else-if="selectedContext === 'impresion.add'">
+            <div class="breadcrumb_box">
+                <lsw-agenda-breadcrumb :agenda="this"
+                    :path-items="[{label:'Añadir impresión'}]" />
+            </div>
+            <lsw-agenda-impresion-add />
+        </div>
+        <div v-else-if="selectedContext === 'impresion.search'">
+            <div class="breadcrumb_box">
+                <lsw-agenda-breadcrumb :agenda="this"
+                    :path-items="[{label:'Buscar impresión'}]" />
+            </div>
+            <lsw-agenda-impresion-search />
+        </div>
+        <div v-else-if="selectedContext === 'propagacion.search'">
+            <div class="breadcrumb_box">
+                <lsw-agenda-breadcrumb :agenda="this"
+                    :path-items="[{label:'Buscar propagación'}]" />
+            </div>
+            <lsw-agenda-propagacion-search />
+        </div>
+        <div v-else-if="selectedContext === 'postimpresion.search'">
+            <div class="breadcrumb_box">
+                <lsw-agenda-breadcrumb :agenda="this"
+                    :path-items="[{label:'Buscar postimpresión'}]" />
+            </div>
+            <lsw-agenda-postimpresion-search />
+        </div>
+        <div v-else-if="selectedContext === 'infraccion.search'">
+            <div class="breadcrumb_box">
+                <lsw-agenda-breadcrumb :agenda="this"
+                    :path-items="[{label:'Buscar infracción'}]" />
+            </div>
+            <lsw-agenda-infraccion-search />
+        </div>
+        <div v-else-if="selectedContext === 'evento.search'">
+            <div class="breadcrumb_box">
+                <lsw-agenda-breadcrumb :agenda="this"
+                    :path-items="[{label:'Buscar evento'}]" />
+            </div>
+            <lsw-agenda-evento-search />
+        </div>
+        <div v-else-if="selectedContext === 'propagador.search'">
+            <div class="breadcrumb_box">
+                <lsw-agenda-breadcrumb :agenda="this"
+                    :path-items="[{label:'Buscar propagador'}]" />
+            </div>
+            <lsw-agenda-propagador-search />
+        </div>
+    </div>
+    <div v-if="selectedContext === 'agenda'">
+        <div class="breadcrumb_box"
+            style="padding-left: 8px; padding-right: 8px;">
+            <lsw-agenda-breadcrumb :agenda="this"
+                :path-items="[{label:'Día ' + \$lsw.timer.utils.formatDatestringFromDate(selectedDate, true),noop:true}]" />
+        </div>
+        <div class="calendar_viewer">
+            <lsw-calendario ref="calendario"
+                modo="date"
+                :al-cambiar-valor="(v, cal) => loadDateTasks(v, cal)" />
+        </div>
+        <div class="tasks_viewer">
+            <div class="selected_day_title"
+                v-if="selectedDate">
+                <div class="flex_row centered">
+                    <div class="flex_1 margin_right_1"><button class="bright_border" v-on:click="() => selectHour('new')" :class="{activated: selectedForm === 'new'}">#️⃣</button></div>
+                    <div class="flex_100">{{ \$lsw.timer.utils.formatDateToSpanish(selectedDate, true) }}</div>
+                    <div class="flex_1 nowrap" :style="(!isLoading) && Array.isArray(selectedDateTasksFormattedPerHour) && selectedDateTasksFormattedPerHour.length ? '' : 'visibility: hidden'">
+                        <button class="bright_border" v-on:click="togglePsicodelia" :class="{activated: hasPsicodelia}">❤️</button>
+                        <button class="bright_border" v-on:click="showAllHours">🔓*</button>
+                        <button class="bright_border" v-on:click="hideAllHours">🔒*</button>
+                    </div>
+                </div>
+            </div>
+            <div v-if="selectedForm === 'new'">
+                <lsw-schema-based-form
+                    :on-submit="v => onInsertTask(v)"
+                    :on-delete-row="refreshTasks"
+                    :overriden-values="{
+                        tiene_inicio: \$lsw.timer.utils.formatDatestringFromDate(selectedDate, 1)
+                        + ' '
+                        + \$lsw.timer.utils.formatHour(0, 0)
+                    }"
+                    :model="{
+                        connection: \$lsw.database,
+                        databaseId: 'lsw_default_database',
+                        rowId: -1,
+                        tableId: 'Accion',
+                    }" />
+            </div>
+            <div class="no_tasks_message"
+                v-if="isLoading">
+                Por favor, aguarde hasta recuperar los datos.
+            </div>
+            <div class="box_for_date_details"
+                v-else-if="(!isLoading) && Array.isArray(selectedDateTasksFormattedPerHour) && selectedDateTasksFormattedPerHour.length">
+                <div class="hour_table"
+                    v-for="franja, franjaIndex in selectedDateTasksFormattedPerHour"
+                    v-bind:key="'franja_horaria_' + franjaIndex">
+                    <div class="hour_lapse_separator">
+                        <div class="flex_row centered">
+                            <div class="flex_1 pad_right_1">
+                                <button class="bright_border nowrap"
+                                    style="margin-right: 1px;"
+                                    v-on:click="() => selectHour(franja.hora)"
+                                    :class="{activated: selectedForm === franja.hora}">#️⃣</button>
+                            </div>
+                            <div class="flex_100">
+                                <span>{{ \$lsw.timer.utils.formatHourFromMomento(franja) }}</span>
+                                <span> · </span>
+                                <span class="hour_compromises">{{ \$lsw.utils.pluralizar("compromiso", "compromisos", "%i %s", Object.keys(franja.tareas).length) }}</span>
+                            </div>
+                            <div class="flex_1">
+                                <div class="flex_1 flex_row centered">
+                                    <span v-on:click="() => toggleHour(franja.hora)">
+                                        <button class="bright_border nowrap activated"
+                                            v-if="hiddenDateHours.indexOf(franja.hora) === -1">🔓</button>
+                                        <button class="bright_border nowrap"
+                                            v-else>🔒</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <lsw-schema-based-form v-if="selectedForm === franja.hora"
+                        :on-submit="v => \$lsw.database.insert('Accion', v).then(refreshTasks)"
+                        :on-delete-row="refreshTasks"
+                        :overriden-values="{
+                            tiene_inicio: \$lsw.timer.utils.formatDatestringFromDate(selectedDate, 1)
+                            + ' '
+                            + \$lsw.timer.utils.formatHour(franja.hora, franja.minuto || 0)
+                        }"
+                        :model="{
+                            connection: \$lsw.database,
+                            databaseId: 'lsw_default_database',
+                            rowId: -1,
+                            tableId: 'Accion',
+                        }" />
+                    <div class="hour_lapse_list"
+                        v-show="hiddenDateHours.indexOf(franja.hora) === -1">
+                        <template v-for="tarea, tareaIndex in franja.tareas">
+                            <div class="hour_task_block"
+                                :class="{is_completed: tarea.tiene_estado === 'completada', is_failed: tarea.tiene_estado === 'fallida', is_pending: tarea.tiene_estado === 'pendiente'}"
+                                v-bind:key="'franja_horaria_' + franjaIndex + '_tarea_' + tareaIndex">
+                                <div class="hour_task_pill pill">
+                                    <div class="flex_1 hour_task_dragger pill_start"
+                                        style="padding-top: 4px;">
+                                        <div class=""
+                                            style="min-width: 20px;padding-left: 3px;padding-top: 2px;">❗️</div>
+                                    </div>
+                                    <div class="flex_1 hour_task_details_start pill_middle">
+                                        <div class="lighted_cell" :class="{psicodelic_cell: hasPsicodelia}">{{ \$lsw.timer.utils.formatHourFromMomentoCode(tarea.tiene_inicio, true) ?? '💩' }}
+                                        </div>
+                                    </div>
+                                    <div class="flex_1 hour_task_details_duration pill_middle">
+                                        <div class="lighted_cell">{{ tarea.tiene_duracion || '🤔' }}</div>
+                                    </div>
+                                    <div class="flex_100 hour_task_name pill_middle" style="overflow: hidden;">
+                                        <div class="lighted_cell" style="text-overflow: ellipsis; overflow: clip; max-width: 100%;">{{ tarea.en_concepto || '🤔' }}</div>
+                                    </div>
+                                    <div class="flex_1 hour_task_editer pill_middle button_pill_cell">
+                                        <button v-on:click="() => openUpdateTaskDialog(tarea)"
+                                            :class="{activated: selectedForm === tarea.id}">#️⃣</button>
+                                    </div>
+                                    <div class="flex_1 hour_task_editer pill_end button_pill_cell">
+                                        <button class="danger_button" v-on:click="(e) => openDeleteTaskDialog(tarea, e)">❌</button>
+                                    </div>
+                                </div>
+                                <lsw-schema-based-form v-if="selectedForm === tarea.id"
+                                    :on-submit="v => onUpdateTask(v, tarea)"
+                                    :on-delete-row="refreshTasks"
+                                    :overriden-values="{
+                                        tiene_inicio: \$lsw.timer.utils.formatDatestringFromDate(selectedDate, 1)
+                                        + ' '
+                                        + \$lsw.timer.utils.formatHour(franja.hora, franja.minuto || 0)
+                                    }"
+                                    :model="{
+                                        connection: \$lsw.database,
+                                        databaseId: 'lsw_default_database',
+                                        rowId: tarea.id,
+                                        tableId: 'Accion',
+                                    }" />
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <div class="no_tasks_message"
+                v-else>
+                No hay tareas asignadas para este día.
+            </div>
+        </div>
+    </div>
+    <div>
+    </div>
+</div>`,
+  props: {},
+  data() {
+    this.$trace("lsw-agenda.data");
+    return {
+      counter: 0,
+      isLoading: false,
+      hasPsicodelia: true,
+      selectedContext: "agenda",
+      selectedSubmenu1: 'none',
+      selectedDate: undefined,
+      selectedDateTasks: undefined,
+      selectedDateTasksFormattedPerHour: undefined,
+      selectedForm: undefined,
+      hiddenDateHours: [],
+    };
+  },
+  methods: {
+    showAllHours() {
+      this.$trace("lsw-agenda.methods.showAllHours");
+      this.hiddenDateHours = [];
+    },
+    hideAllHours() {
+      this.$trace("lsw-agenda.methods.hideAllHours");
+      this.hiddenDateHours = ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"];
+    },
+    selectContext(id, parameters = {}) {
+      this.$trace("lsw-agenda.methods.selectContext");
+      this.selectedSubmenu1 = "none";
+      this.selectedContextParameters = parameters;
+      this.selectedContext = id;
+    },
+    selectSubmenu1(id) {
+      this.$trace("lsw-agenda.methods.selectSubmenu1");
+      this.selectedSubmenu1 = id;
+    },
+    togglePsicodelia() {
+      this.$trace("lsw-agenda.methods.togglePsicodelia");
+      this.hasPsicodelia = !this.hasPsicodelia;
+    },
+    toggleHour(hourInt) {
+      this.$trace("lsw-agenda.methods.toggleHour");
+      const pos = this.hiddenDateHours.indexOf(hourInt);
+      if (pos === -1) {
+        this.hiddenDateHours.push(hourInt);
+      } else {
+        this.hiddenDateHours.splice(pos, 1);
+      }
+    },
+    async loadDateTasks(newDate, calendario) {
+      this.$trace("lsw-agenda.methods.loadDateTasks");
+      this.isLoading = true;
+      console.log("Loading date tasks of: " + newDate);
+      try {
+        this.selectedDate = newDate;
+        const selectedDate = this.selectedDate;
+        const selectedDateTasks = await this.$lsw.database.selectMany("Accion", valueBrute => {
+          const valueList = Timeformat_parser.parse(valueBrute.tiene_inicio);
+          const value = valueList[0];
+          const isSameYear = value.anio === selectedDate.getFullYear();
+          const isSameMonth = value.mes === (selectedDate.getMonth() + 1);
+          const isSameDay = value.dia === selectedDate.getDate();
+          const isAccepted = isSameYear && isSameMonth && isSameDay;
+          return isAccepted;
+        });
+        this.selectedDateTasks = selectedDateTasks;
+        this.propagateDateTasks();
+      } catch (error) {
+        console.log("Error loading date taskes:", error);
+      } finally {
+        setTimeout(() => {this.isLoading = false}, 100);
+      }
+      if(calendario) {
+        const selectedDate = this.selectedDate;
+        const tasksOfMonth = await this.$lsw.database.selectMany("Accion", valueBrute => {
+          const valueList = Timeformat_parser.parse(valueBrute.tiene_inicio);
+          const value = valueList[0];
+          const isSameYear = value.anio === selectedDate.getFullYear();
+          const isSameMonth = value.mes === (selectedDate.getMonth() + 1);
+          const isAccepted = isSameYear && isSameMonth;
+          return isAccepted;
+        });
+        const tasksOfMonthByDay = tasksOfMonth.reduce((out, item) => {
+          const valueList = Timeformat_parser.parse(item.tiene_inicio);
+          const value = valueList[0];
+          const day = value.dia;
+          if(!(day in out)) {
+            out[day] = [];
+          }
+          out[day].push(item);
+          return out;
+        }, {});
+        calendario.establecer_marcadores_del_mes(tasksOfMonthByDay);
+      }
+    },
+    groupTasksByHour(tareas = this.selectedDateTasks) {
+      this.$trace("lsw-agenda.methods.groupTasksByHour");
+      const mapaHoras = {};
+      Agrupacion_inicial:
+      for (let i = 0; i < tareas.length; i++) {
+        const tarea = tareas[i];
+        const { tiene_inicio } = tarea;
+        const [inicioObject] = Timeformat_parser.parse(tiene_inicio);
+        const { hora, minuto } = inicioObject;
+        if(typeof hora !== "number") {
+          continue Agrupacion_inicial;
+        }
+        if (!(hora in mapaHoras)) {
+          mapaHoras[hora] = [];
+        }
+        mapaHoras[hora].push(tarea);
+      }
+      //return mapaHoras;
+      const segunHoras = [];
+      Formateo_final:
+      for(let hora in mapaHoras) {
+        const lista = mapaHoras[hora];
+        segunHoras.push({
+          hora,
+          tareas: lista,
+        });
+      }
+      return segunHoras;
+    },
+    propagateDateTasks() {
+      this.$trace("lsw-agenda.methods.propagateDateTasks");
+      this.selectedDateTasksFormattedPerHour = this.groupTasksByHour();
+    },
+    async openInsertTaskDialog() {
+      this.$trace("lsw-agenda.methods.openInsertTaskDialog");
+      // @TODO: 
+    },
+    async openUpdateTaskDialog(tarea) {
+      this.$trace("lsw-agenda.methods.openUpdateTaskDialog");
+      // @TODO: 
+      this.selectHour(tarea.id);
+    },
+    async openDeleteTaskDialog(tarea, e) {
+      this.$trace("lsw-agenda.methods.openDeleteTaskDialog");
+      const confirmed = await Vue.prototype.$dialogs.open({
+        title: "Eliminar registro",
+        template: `
+          <div>
+            <div class="pad_2">¿Seguro que quieres eliminar el registro?</div>
+            <hr class="margin_0" />
+            <div class="pad_2 text_align_right">
+              <button class="danger_button" v-on:click="() => accept(true)">Eliminar</button>
+              <button class="" v-on:click="() => accept(false)">Cancelar</button>
+            </div>
+          </div>
+        `,
+      });
+      console.log(confirmed);
+      if(!confirmed) return false;
+      await this.$lsw.database.delete("Accion", tarea.id);
+      this.selectedForm = undefined;
+      this.refreshTasks();
+    },
+    selectHour(hora) {
+      this.$trace("lsw-agenda.methods.selectHour");
+      if(this.selectedForm === hora) {
+        this.selectedForm = undefined;
+      } else {
+        this.selectedForm = hora;
+      }
+    },
+    async refreshTasks() {
+      this.$trace("lsw-agenda.methods.refreshTasks");
+      this.loadDateTasks(new Date(this.selectedDate));
+    },
+    async onUpdateTask(v, tarea) {
+      this.$trace("lsw-agenda.methods.onUpdateTask");
+      await this.$lsw.database.update('Accion', tarea.id, v);
+      this.selectedForm = tarea.id;
+      this.refreshTasks();
+    },
+    async onInsertTask(v, tarea) {
+      this.$trace("lsw-agenda.methods.onInsertTask");
+      const id = await this.$lsw.database.insert('Accion', v);
+      this.selectedForm = id;
+      this.refreshTasks();
+    }
+  },
+  watch: {
+  },
+  async mounted() {
+    try {
+      this.$trace("lsw-agenda.mounted");
+      const selectedDate = this.$refs.calendario.getValue();
+      this.loadDateTasks(selectedDate);
+    } catch (error) {
+      console.log(error);
     }
   }
 });
@@ -3124,20 +3973,20 @@ Vue.component("LswAgendaAccionAdd", {
   data() {
     this.$trace("lsw-agenda-accion-add.data");
     return {
-      refers_to_concept: "",
-      has_duration: "",
-      starts_at: "",
-      has_emotions: "",
-      has_details: "",
-      has_description: "",
-      has_steps: "",
-      has_reasoning: "",
-      has_expectations: "",
+      en_concepto_de: "",
+      tiene_duracion: "",
+      tiene_inicio: "",
+      tiene_emociones: "",
+      tiene_detalles: "",
+      tiene_descripcion: "",
+      tiene_pasos: "",
+      tiene_razonamiento: "",
+      tiene_expectativas: "",
       has_learning: "",
-      has_intention: "",
-      has_result: "",
-      has_history: "",
-      has_consequences: "",
+      tiene_intenciones: "",
+      tiene_resultados: "",
+      tiene_historial: "",
+      tiene_consecuencias: "",
       // Campos para el formulario:
       formScope: Object.freeze({}), // El scope que usará el formulario que queremos.
       formMetadata: false, // Los metadatos, que incluyen fields y form.
@@ -3149,32 +3998,32 @@ Vue.component("LswAgendaAccionAdd", {
       const fields = [{
         type: "input",
         enunciate: "Concepto al que se refiere:",
-        code1: "it.refers_to_concept",
-        code2: "refers_to_concept",
+        code1: "it.en_concepto_de",
+        code2: "en_concepto_de",
         code3: "string",
-        explanation: "tiene que coincidir con el «has_name» del concepto para que funcionen los propagadores correspondientes.",
+        explanation: "tiene que coincidir con el «tiene_nombre» del concepto para que funcionen los propagadores correspondientes.",
         placeholder: "Ej: Desayunar",
         errorConfig: {
-          parentId: "refers_to_concept",
+          parentId: "en_concepto_de",
           parentScope: outterFormScope,
         },
         inputConfig: {
           parentId: "formularioInicial",
           parentScope: outterFormScope,
-          selfId: "refers_to_concept",
+          selfId: "en_concepto_de",
           selfScope: outterFormScope,
-          name: "refers_to_concept"
+          name: "en_concepto_de"
         }
       }, {
         type: "input",
         enunciate: "Duración:",
-        code1: "it.has_duration",
-        code2: "has_duration",
+        code1: "it.tiene_duracion",
+        code2: "tiene_duracion",
         code3: "string",
         explanation: "tiene que cumplir con el formato «0y 0mon 0d 0h 0min 0s» para referir a una duración.",
         placeholder: "Ej: 0y 0mon 0d 0h 0min",
         errorConfig: {
-          parentId: "has_duration",
+          parentId: "tiene_duracion",
           parentScope: outterFormScope,
           onSuccessStatus: {
             name: "OK",
@@ -3184,9 +4033,9 @@ Vue.component("LswAgendaAccionAdd", {
         inputConfig: {
           parentId: "formularioInicial",
           parentScope: outterFormScope,
-          selfId: "has_duration",
+          selfId: "tiene_duracion",
           selfScope: outterFormScope,
-          name: "has_duration",
+          name: "tiene_duracion",
           onValidate: function(value) {
             const result = Timeformat_parser.parse(value);
             if(result.length !== 1) {
@@ -3200,13 +4049,13 @@ Vue.component("LswAgendaAccionAdd", {
       }, {
         type: "input",
         enunciate: "Inicio:",
-        code1: "it.starts_at",
-        code2: "starts_at",
+        code1: "it.tiene_inicio",
+        code2: "tiene_inicio",
         code3: "string",
         explanation: "tiene que cumplir con el formato «2025/01/01 23:59» para ser válido.",
         placeholder: "2025/01/01 00:00",
         errorConfig: {
-          parentId: "starts_at",
+          parentId: "tiene_inicio",
           parentScope: outterFormScope,
           onSuccessStatus: {
             name: "OK",
@@ -3216,9 +4065,9 @@ Vue.component("LswAgendaAccionAdd", {
         inputConfig: {
           parentId: "formularioInicial",
           parentScope: outterFormScope,
-          selfId: "starts_at",
+          selfId: "tiene_inicio",
           selfScope: outterFormScope,
-          name: "starts_at",
+          name: "tiene_inicio",
           onValidate: function(value) {
             const result = Timeformat_parser.parse(value);
             if(result.length !== 1) {
@@ -3260,116 +4109,116 @@ Vue.component("LswAgendaAccionAdd", {
       }, {
         type: "input",
         enunciate: "Emociones asociadas:",
-        code1: "it.has_emotions",
-        code2: "has_emotions",
+        code1: "it.tiene_emociones",
+        code2: "tiene_emociones",
         code3: "string",
         explanation: "blablabla.",
         placeholder: "blabla",
         errorConfig: {
-          parentId: "has_emotions",
+          parentId: "tiene_emociones",
           parentScope: outterFormScope,
         },
         inputConfig: {
           parentId: "formularioInicial",
           parentScope: outterFormScope,
-          selfId: "has_emotions",
+          selfId: "tiene_emociones",
           selfScope: outterFormScope,
-          name: "has_emotions"
+          name: "tiene_emociones"
         }
       }, {
         type: "input",
         enunciate: "Detalles:",
-        code1: "it.has_details",
-        code2: "has_details",
+        code1: "it.tiene_detalles",
+        code2: "tiene_detalles",
         code3: "string",
         explanation: "blablabla.",
         placeholder: "blabla",
         errorConfig: {
-          parentId: "has_details",
+          parentId: "tiene_detalles",
           parentScope: outterFormScope,
         },
         inputConfig: {
           parentId: "formularioInicial",
           parentScope: outterFormScope,
-          selfId: "has_details",
+          selfId: "tiene_detalles",
           selfScope: outterFormScope,
-          name: "has_details"
+          name: "tiene_detalles"
         }
       }, {
         type: "input",
         enunciate: "Descripción:",
-        code1: "it.has_description",
-        code2: "has_description",
+        code1: "it.tiene_descripcion",
+        code2: "tiene_descripcion",
         code3: "string",
         explanation: "blablabla.",
         placeholder: "blabla",
         errorConfig: {
-          parentId: "has_description",
+          parentId: "tiene_descripcion",
           parentScope: outterFormScope,
         },
         inputConfig: {
           parentId: "formularioInicial",
           parentScope: outterFormScope,
-          selfId: "has_description",
+          selfId: "tiene_descripcion",
           selfScope: outterFormScope,
-          name: "has_description"
+          name: "tiene_descripcion"
         }
       }, {
         type: "input",
         enunciate: "Pasos:",
-        code1: "it.has_steps",
-        code2: "has_steps",
+        code1: "it.tiene_pasos",
+        code2: "tiene_pasos",
         code3: "string",
         explanation: "blablabla.",
         placeholder: "blabla",
         errorConfig: {
-          parentId: "has_steps",
+          parentId: "tiene_pasos",
           parentScope: outterFormScope,
         },
         inputConfig: {
           parentId: "formularioInicial",
           parentScope: outterFormScope,
-          selfId: "has_steps",
+          selfId: "tiene_pasos",
           selfScope: outterFormScope,
-          name: "has_steps"
+          name: "tiene_pasos"
         }
       }, {
         type: "input",
         enunciate: "Razonamiento:",
-        code1: "it.has_reasoning",
-        code2: "has_reasoning",
+        code1: "it.tiene_razonamiento",
+        code2: "tiene_razonamiento",
         code3: "string",
         explanation: "blablabla.",
         placeholder: "blabla",
         errorConfig: {
-          parentId: "has_reasoning",
+          parentId: "tiene_razonamiento",
           parentScope: outterFormScope,
         },
         inputConfig: {
           parentId: "formularioInicial",
           parentScope: outterFormScope,
-          selfId: "has_reasoning",
+          selfId: "tiene_razonamiento",
           selfScope: outterFormScope,
-          name: "has_reasoning"
+          name: "tiene_razonamiento"
         }
       }, {
         type: "input",
         enunciate: "Expectativas:",
-        code1: "it.has_expectations",
-        code2: "has_expectations",
+        code1: "it.tiene_expectativas",
+        code2: "tiene_expectativas",
         code3: "string",
         explanation: "blablabla.",
         placeholder: "blabla",
         errorConfig: {
-          parentId: "has_expectations",
+          parentId: "tiene_expectativas",
           parentScope: outterFormScope,
         },
         inputConfig: {
           parentId: "formularioInicial",
           parentScope: outterFormScope,
-          selfId: "has_expectations",
+          selfId: "tiene_expectativas",
           selfScope: outterFormScope,
-          name: "has_expectations"
+          name: "tiene_expectativas"
         }
       }, {
         type: "input",
@@ -3393,78 +4242,78 @@ Vue.component("LswAgendaAccionAdd", {
       }, {
         type: "input",
         enunciate: "Intención:",
-        code1: "it.has_intention",
-        code2: "has_intention",
+        code1: "it.tiene_intenciones",
+        code2: "tiene_intenciones",
         code3: "string",
         explanation: "blablabla.",
         placeholder: "blabla",
         errorConfig: {
-          parentId: "has_intention",
+          parentId: "tiene_intenciones",
           parentScope: outterFormScope,
         },
         inputConfig: {
           parentId: "formularioInicial",
           parentScope: outterFormScope,
-          selfId: "has_intention",
+          selfId: "tiene_intenciones",
           selfScope: outterFormScope,
-          name: "has_intention"
+          name: "tiene_intenciones"
         }
       }, {
         type: "input",
         enunciate: "Resultado:",
-        code1: "it.has_result",
-        code2: "has_result",
+        code1: "it.tiene_resultados",
+        code2: "tiene_resultados",
         code3: "string",
         explanation: "blablabla.",
         placeholder: "blabla",
         errorConfig: {
-          parentId: "has_result",
+          parentId: "tiene_resultados",
           parentScope: outterFormScope,
         },
         inputConfig: {
           parentId: "formularioInicial",
           parentScope: outterFormScope,
-          selfId: "has_result",
+          selfId: "tiene_resultados",
           selfScope: outterFormScope,
-          name: "has_result"
+          name: "tiene_resultados"
         }
       }, {
         type: "input",
         enunciate: "Historia:",
-        code1: "it.has_history",
-        code2: "has_history",
+        code1: "it.tiene_historial",
+        code2: "tiene_historial",
         code3: "string",
         explanation: "blablabla.",
         placeholder: "blabla",
         errorConfig: {
-          parentId: "has_history",
+          parentId: "tiene_historial",
           parentScope: outterFormScope,
         },
         inputConfig: {
           parentId: "formularioInicial",
           parentScope: outterFormScope,
-          selfId: "has_history",
+          selfId: "tiene_historial",
           selfScope: outterFormScope,
-          name: "has_history"
+          name: "tiene_historial"
         }
       }, {
         type: "input",
         enunciate: "Consequencias:",
-        code1: "it.has_consequences",
-        code2: "has_consequences",
+        code1: "it.tiene_consecuencias",
+        code2: "tiene_consecuencias",
         code3: "string",
         explanation: "blablabla.",
         placeholder: "blabla",
         errorConfig: {
-          parentId: "has_consequences",
+          parentId: "tiene_consecuencias",
           parentScope: outterFormScope,
         },
         inputConfig: {
           parentId: "formularioInicial",
           parentScope: outterFormScope,
-          selfId: "has_consequences",
+          selfId: "tiene_consecuencias",
           selfScope: outterFormScope,
-          name: "has_consequences"
+          name: "tiene_consecuencias"
         }
       }, ];
       this.formMetadata = Object.freeze({
@@ -3493,7 +4342,7 @@ Vue.component("LswAgendaAccionAdd", {
 });
 Vue.component("LswAgendaAccionSearch", {
   template: `<div class="LswAgendaAccionSearch">
-  <lsw-table :initial-input="[{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)},{nombre:$lsw.utils.getRandomString(5)}]"></lsw-table>
+  <lsw-table :initial-input="[{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)},{nombre:\$lsw.utils.getRandomString(5)}]"></lsw-table>
 </div>`,
   props: {},
   data() {
@@ -3611,21 +4460,21 @@ Vue.component("LswAgendaConceptoAdd", {
         fields: [{
           type: "input",
           enunciate: "Consequencias:",
-          code1: "it.has_consequences",
-          code2: "has_consequences",
+          code1: "it.tiene_consecuencias",
+          code2: "tiene_consecuencias",
           code3: "string",
           explanation: "blablabla.",
           placeholder: "blabla",
           errorConfig: {
-            parentId: "has_consequences",
+            parentId: "tiene_consecuencias",
             parentScope: outterFormScope,
           },
           inputConfig: {
             parentId: "formularioInicial",
             parentScope: outterFormScope,
-            selfId: "has_consequences",
+            selfId: "tiene_consecuencias",
             selfScope: outterFormScope,
-            name: "has_consequences"
+            name: "tiene_consecuencias"
           }
         }]
       }
@@ -3682,66 +4531,7 @@ Vue.component("LswAgendaEventoSearch", {
 
 Vue.component("LswAgendaForm", {
   template: `<div>
-    <div class="form_structure"
-        v-form.form="formMetadata.form"
-        ref="agenda_form">
-        <div class="form_item text_align_right">
-            <button v-on:click="() => $refs.agenda_form.$lswFormMetadata.methods.submit()">Submit</button>
-        </div>
-        <div class="form_item"
-            v-for="field, fieldIndex in formMetadata.fields"
-            v-bind:key="'form_field_' + fieldIndex">
-            <div class="form_label">
-                <div class="enunciate_box2">
-                    <div class="enunciate">
-                        <span class="enunciate_text">{{ fieldIndex + 1 }}. {{ field.enunciate }}</span>
-                        <span class="coderef">
-                            <span class="codenote as_note">como</span>
-                            <span class="codetext codetype">{{ field.code3 }}</span>
-                            <span class="codenote as_note">en</span>
-                            <span class="codetext codetype">{{ field.code1 }}</span>
-                        </span>
-                        <span class="explanation_block">
-                            <span class="iconref"
-                                style="flex:100;">
-                                <span class="info_icon"
-                                    v-on:click="() => toggleExplanation(field.code2)">ℹ️</span>
-                            </span>
-                            <span class="explanation"
-                                v-if="expandedExplanations.indexOf(field.code2) !== -1">{{ field.explanation }}</span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <template v-if="field.type === 'input'">
-                <input class="form_control"
-                    type="text"
-                    :placeholder="field.placeholder"
-                    v-form.input="field.inputConfig" />
-                <div class="validationBox"
-                    v-form.error="field.errorConfig"></div>
-            </template>
-            <template v-else-if="field.type === 'textarea'">
-                <textarea class="form_control"
-                    :placeholder="field.placeholder"
-                    v-form.input="field.inputConfig" />
-                <div class="validationBox"
-                    v-form.error="field.errorConfig"></div>
-            </template>
-            <template v-else-if="field.type === 'select'">
-                <select class="form_control" v-form.input="field.inputConfig">
-                    <option :value="option.value" v-for="option, optionIndex in field.options" v-bind:key="'field_' + fieldIndex + '_selector_option_' + optionIndex">
-                        {{ option.text }}
-                    </option>
-                </select>
-                <div class="validationBox"
-                    v-form.error="field.errorConfig"></div>
-            </template>
-        </div>
-        <div class="form_item text_align_right">
-            <button v-on:click="() => $refs.agenda_form.$lswFormMetadata.methods.submit()">Submit</button>
-        </div>
-    </div>
+    
 </div>`,
   props: {
     formMetadata: {
@@ -3943,6 +4733,1505 @@ Vue.component("LswAgendaPropagadorSearch", {
     try {
       this.$trace("lsw-agenda-propagador-search.mounted");
     } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswFormBuilder", {
+  template: `<div class="lsw-form-builder">
+    <div v-if="formMetadata">
+        <div v-form.form="formMetadata.form.vForm"
+            ref="currentFormElement"></div>
+        <button v-if="validate?.text"
+            v-on:click="() => \$refs.currentFormElement.\$lswFormMetadata.methods.validate()">{{ validate.text }}</button>
+        <button v-if="submit?.text"
+            v-on:click="() => \$refs.currentFormElement.\$lswFormMetadata.methods.submit()">{{ submit.text }}</button>
+        <div v-form.error="{
+            parentScope: formMetadata.form.scope,
+            parentId: formMetadata.form.id + '.error'
+        }"></div>
+        <div :class="field?.css?.classes?.group || {}"
+            v-for="field, fieldIndex in formMetadata.fields"
+            v-bind:key="'list_of_fields_index_' + fieldIndex">
+            <div class="form_field_label"
+                v-if="field.label">
+                {{ field.label }}
+            </div>
+            <div v-if="field.component">
+                <component :is="field.component.id"
+                    v-bind="field.component.props || {}"
+                    v-on="field.component.events || {}"></component>
+            </div>
+            <template v-else-if="field.type">
+                <lsw-formtype v-if="Vue.options.components.LswFormtype" :of="field" />
+                <div v-if="field.type === 'text'">
+                    <input type="text"
+                        v-bind="field.input?.props || {}"
+                        v-on="field.input?.events || {}"
+                        v-form.input="field.vForm" />
+                </div>
+                <div v-else-if="field.type === 'longtext'">
+                    <textarea v-bind="field.input?.props || {}"
+                        v-on="field.input?.events || {}"
+                        v-form.input="field.vForm"></textarea>
+                </div>
+                <div v-else-if="field.type === 'point'">
+                    <div class="control_upper" v-form.control="field.vForm">
+                        <div class="control_lower" v-form.control="field.vFormForPoint">
+                            <div v-for="dimension, dimensionIndex in field.dimensions" v-bind:key="'list_' + fieldIndex + '_dimensions_index_' + dimensionIndex">
+                                <div class="form_field_label" v-if="dimension.label">{{ dimension.label }}</div>
+                                <input type="number"
+                                    v-bind="dimension.input?.props || {}"
+                                    v-on="dimension.input?.events || {}"
+                                    v-form.input="dimension.vForm" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>`,
+  props: {
+    validate: {
+      type: Object,
+      default: () => ({})
+    },
+    submit: {
+      type: Object,
+      default: () => ({})
+    },
+    fields: {
+      type: Array,
+      required: true,
+    }
+  },
+  data() {
+    this.$trace("lsw-form-builder.data");
+    this.formatFields();
+    return {
+      formMetadata: false,
+    };
+  },
+  methods: {
+    setError(error) {
+      this.$trace("lsw-form-builder.setError");
+      this.error = error;
+    },
+    formatFields(value = this.fields) {
+      this.$trace("lsw-form-builder.formatFields");
+      try {
+        const $outterScope = {};
+        if (value.length === 0) {
+          throw new Error("Required property «prop.fields» to be an array on «LswFormBuilder.props.fields.validator»");
+        }
+        const fields = [];
+        const form = {
+          scope: $outterScope,
+          id: "form.default"
+        };
+        const metadata = { fields, form, scope: $outterScope };
+        form.vForm = {
+          selfScope: $outterScope,
+          selfId: form.id,
+          onValidate: typeof this.validate.onClick === 'function' ? this.validate.onClick : this.$noop,
+          onSubmit: typeof this.submit.onClick === 'function' ? this.submit.onClick : this.$noop,
+        }
+        for (let index = 0; index < value.length; index++) {
+          const row = value[index];
+          if (typeof row !== "object") {
+            throw new Error(`Required all rows on «prop.fields» to be an object but row «${index}» does not on «LswFormBuilder.props.fields.validator»`)
+          }
+          if (!("type" in row)) {
+            throw new Error(`Required all rows on «prop.fields» to have property «type» but row «${index}» does not on «LswFormBuilder.props.fields.validator»`)
+          }
+          if (typeof row.type !== "string") {
+            throw new Error(`Required all rows on «prop.fields» to have property «type» as a string but row «${index}» does not on «LswFormBuilder.props.fields.validator»`)
+          }
+          if (!("name" in row)) {
+            throw new Error(`Required all rows on «prop.fields» to have property «name» but row «${index}» does not on «LswFormBuilder.props.fields.validator»`)
+          }
+          if (typeof row.name !== "string") {
+            throw new Error(`Required all rows on «prop.fields» to have property «name» as a string but row «${index}» does not on «LswFormBuilder.props.fields.validator»`)
+          }
+          const $innerScope = {};
+          row.vForm = {
+            parentScope: $outterScope,
+            parentId: metadata.form.id,
+            selfScope: $innerScope,
+            selfId: row.name,
+            name: row.name,
+          };
+          if (row.type === "point") {
+            row.dimensions = [];
+            row.vFormForPoint = {
+              parentScope: $innerScope,
+              parentId: row.name,
+              selfScope: $innerScope,
+              selfId: "point.control",
+              name: null,
+            };
+            row.dimensions = [{
+              label: "Axis 1:",
+              vForm: {
+                parentScope: $innerScope,
+                parentId: "point.control",
+                name: "axis_1"
+              }
+            }, {
+              label: "Axis 2:",
+              vForm: {
+                parentScope: $innerScope,
+                parentId: "point.control",
+                name: "axis_2"
+              }
+            }];
+            if (row.dimensions.length < 2) {
+              throw new Error(`Required property «row.dimensions» to have more than 1 item on row «${index}» on «adaptRowToVForm»`);
+            }
+            for (let indexDimension = 0; indexDimension < row.dimensions.length; indexDimension++) {
+
+            }
+          }
+          fields.push(row);
+        }
+        this.formMetadata = Object.freeze(metadata);
+      } catch (error) {
+        console.log(error);
+        this.setError(error);
+      }
+    },
+    adaptRowToVForm(row, metadata, indexRow) {
+      this.$trace("lsw-form-builder.adaptRowToVForm");
+
+    }
+  },
+  watch: {},
+  mount() {
+    try {
+      this.$trace("lsw-form-builder.mount");
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  mounted() {
+    try {
+      this.$trace("lsw-form-builder.mounted");
+      this.formatFields();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswFormtype", {
+  template: `<div class="lsw-formtype">
+    <component
+        v-if="definition.name in Vue.options.components"
+        :is="definition.name"
+        v-on="definition.events"
+        v-bind="definition.props"></component>
+    <div v-else>No se encontró tipo {{ definition.name || "-" }}</div>
+</div>`,
+  props: {
+    definition: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  data() {
+    this.$trace("lsw-formtype.data");
+    this._validateDefinition(this.definition);
+    return {
+
+    };
+  },
+  methods: {
+    _validateDefinition(definitionObject) {
+      const ensureDefinition = $ensure(definitionObject);
+      ensureDefinition.type("object");
+      ensureDefinition.to.have.uniquelyKeys(["name", "props", "events"]);
+      ensureDefinition.to.have.key("name");
+      ensureDefinition.its("name").type("string");
+      if ("props" in definitionObject) {
+        ensureDefinition.its("props").type("object");
+      }
+      if ("events" in definitionObject) {
+        ensureDefinition.its("events").type("object");
+      }
+    }
+  },
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-formtype.mounted");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswControlLabel", {
+  template: `<div class="lsw_control_label">
+    <div class="flex_row centered"
+        style="margin-bottom:2px;">
+        <div class="formtype_enunciate_block flex_100">
+            <div class="formtype_label">
+                <template v-if="typeof label === 'string'">
+                    {{ label }}
+                </template>
+                <template v-else-if="label !== false">
+                    Campo {{ name }}:
+                </template>
+            </div>
+        </div>
+        <div class="flex_1 pad_left_1 flex_row">
+            <template v-if="parentFormtype && (parentFormtype.isEditable === true)">
+                <button class="margin_left_1" v-on:click="() => parentFormtype.validate()" v-if="settings.column?.hasValidator || true">
+                    ✅
+                </button>
+            </template>
+            <button class="margin_left_1" :class="{activated: isShowingDescription}" v-on:click="() => toggleDescription()">ℹ️</button>
+            <template v-if="parentFormtype && (parentFormtype.isEditable === true)">
+                <button class="margin_left_1 button_to_uneditable activated" v-on:click="makeUneditable">🔓</button>
+            </template>
+            <template v-else>
+                <button class="margin_left_1 button_to_editable" v-on:click="makeEditable">🔒</button>
+            </template>
+        </div>
+    </div>
+    <div class="formtype_enunciate_extra_info" v-if="isShowingDescription">
+        ℹ️: {{ description }}
+    </div>
+</div>`,
+  props: {
+    parentFormtype: {
+      type: Object,
+      required: false,
+    },
+    settings: {
+      type: Object,
+      default: () => ({})
+    },
+  },
+  data() {
+    this.$trace("lsw-control-label-control.data");
+    this.validateSettings();
+    return {
+      uuid: LswRandomizer.getRandomString(5),
+      isShowingDescription: false,
+      name: this.settings?.name,
+      label: (typeof (this.settings?.label) !== "undefined") ? this.settings.label : this.settings?.column?.hasLabel,
+      description: this.settings?.column?.hasDescription
+    };
+  },
+  methods: {
+    toggleDescription() {
+      this.isShowingDescription = !this.isShowingDescription;
+    },
+    validateSettings() {
+      this.$trace("lsw-control-label-control.methods.validateSettings");
+      LswXForm.validateSettings(this.settings);
+      const ensureSettings = $ensure(this.settings);
+      const checkSettings = $check(this.settings);
+      // @OK
+    },
+    makeEditable() {
+      this.$trace("lsw-control-label-control.methods.makeEditable");
+      Behaviour_for_controls: {
+        const immediateControl = LswVue2.getClosestParent(this, component => {
+          return component.$el.classList.contains("lsw_form_control");
+        });
+        if (immediateControl) {
+          immediateControl.isEditable = true;
+          // immediateControl.$forceUpdate(true);
+        }
+      }
+      Behaviour_for_schema_forms: {
+        
+      }
+    },
+    makeUneditable() {
+      this.$trace("lsw-control-label-control.methods.makeUneditable");
+      Behaviour_for_controls: {
+        const immediateControl = LswVue2.getClosestParent(this, component => {
+          return component.$el.classList.contains("lsw_form_control");
+        });
+        if (immediateControl) {
+          immediateControl.isEditable = false;
+          // immediateControl.$forceUpdate(true);
+        }
+
+      }
+      Behaviour_for_schema_forms: {
+        
+      }
+    }
+  },
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-control-label-control.mounted");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswControlError", {
+  template: `<div class="lsw_control_error">
+    <div class="box_error_container position_relative"
+        ref="errorBox"
+        v-xform.error="{}">
+        <div class="position_absolute top_0" style="right: 20px;">
+            <div class="pad_1">
+                <button v-on:click="removeError">❎</button>
+            </div>
+        </div>
+        <div class="box_error_content">
+            <div class="errorMessage"></div>
+        </div>
+    </div>
+</div>`,
+  props: {
+    
+  },
+  data() {
+    this.$trace("lsw-control-error-control.data");
+    return {
+      
+    };
+  },
+  methods: {
+    removeError() {
+      this.$trace("lsw-control-error-control.methods.removeError");
+      this.$refs.errorBox.$xform.$clearError();
+    }
+  },
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-control-error-control.mounted");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswTextControl", {
+  template: `<div class="lsw_text_control lsw_formtype lsw_form_control">
+    <lsw-control-label :settings="settings" :parent-formtype="this" />
+    <div v-show="isEditable">
+        <div ref="controller" v-xform.control="{
+            name: settings.name,
+            onValidate: settings.column.hasValidator || \$noop,
+            onSetError: () => {
+                isEditable = true;
+            }
+        }">
+            <div class="flex_row">
+                <input class="flex_100"
+                    type="text"
+                    v-model="value"
+                    v-on="settings.input?.events || {}"
+                    v-bind="settings.input?.props || {}"
+                    v-xform.input="{name: '*',onValidate: settings.input?.onValidate || \$noop}"
+                    ref="textInput" />
+            </div>
+            <lsw-control-error />
+        </div>
+    </div>
+</div>`,
+  props: {
+    settings: {
+      type: Object,
+      default: () => ({})
+    },
+  },
+  data() {
+    this.$trace("lsw-text-control.data");
+    this.validateSettings();
+    return {
+      uuid: LswRandomizer.getRandomString(5),
+      value: this.settings?.initialValue || "",
+      isEditable: true,
+    };
+  },
+  methods: {
+    async submit() {
+      this.$trace("lsw-text-control.methods.submit");
+      return LswFormtypes.utils.submitControl.call(this);
+      
+    },
+    validate() {
+      this.$trace("lsw-text-control.methods.validateSettings");
+      return LswFormtypes.utils.validateControl.call(this);
+    },
+    validateSettings() {
+      this.$trace("lsw-text-control.methods.validateSettings");
+      return LswFormtypes.utils.validateSettings.call(this);
+    }
+  },
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-text-control.mounted");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswLongTextControl", {
+  template: `<div class="lsw_long_text_control lsw_formtype lsw_form_control">
+    <lsw-control-label :settings="settings"
+        :parent-formtype="this" />
+    <div v-show="isEditable">
+        <div ref="controller" v-xform.control="{
+            name: settings.name,
+            onValidate: settings.column.hasValidator || \$noop,
+            onSetError: () => {
+                isEditable = true;
+            }
+        }">
+            <div class="flex_row">
+                <textarea class="flex_100"
+                    type="text"
+                    v-model="value"
+                    v-on="settings?.input?.events || {}"
+                    v-bind="settings?.input?.props || {}"
+                    v-xform.input="{name: '*'}"
+                    ref="textInput" />
+            </div>
+            <lsw-control-error />
+        </div>
+    </div>
+</div>`,
+  props: {
+    settings: {
+      type: Object,
+      default: () => ({})
+    },
+  },
+  data() {
+    this.$trace("lsw-long-text-control.data");
+    this.validateSettings();
+    return {
+      uuid: LswRandomizer.getRandomString(5),
+      value: this.settings?.initialValue || "",
+      isEditable: true,
+    };
+  },
+  methods: {
+    async submit() {
+      this.$trace("lsw-text-control.methods.submit");
+      return LswFormtypes.utils.submitControl.call(this);
+      
+    },
+    validate() {
+      this.$trace("lsw-text-control.methods.validateSettings");
+      return LswFormtypes.utils.validateControl.call(this);
+    },
+    validateSettings() {
+      this.$trace("lsw-text-control.methods.validateSettings");
+      return LswFormtypes.utils.validateSettings.call(this);
+    }
+  },
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-long-text-control.mounted");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswDateControl", {
+  template: `<div class="lsw_date_control lsw_formtype lsw_form_control">
+    <lsw-control-label :settings="settings"
+        :parent-formtype="this" />
+    <div v-show="isEditable">
+        <div ref="controller" v-xform.control="{
+            name: settings.name,
+            onValidate: settings.column.hasValidator || \$noop,
+            onSetError: () => {
+                isEditable = true;
+            }
+        }">
+            <div class="">
+                <div class="flex_row">
+                    <div class="flex_1 pad_right_1">
+                        <button v-on:click="toggleCalendar" :class="{activated: isShowingCalendar}">📆</button>
+                    </div>
+                    <div class="flex_100">
+                        <input class="width_100" type="text" v-model="value" :placeholder="respectivePlaceholder" v-xform.input="{name:'*'}"/>
+                    </div>
+                </div>
+                <!--pre>{{ \$lsw.utils.stringify(settings) }}</pre-->
+            </div>
+            <div class="pad_top_1" v-if="isShowingCalendar">
+                <lsw-calendario :modo="settings.column.isFormSubtype" :al-cambiar-valor="setValueFromCalendar" :valor-inicial="value" />
+            </div>
+            <lsw-control-error />
+        </div>
+    </div>
+</div>`,
+  props: {
+    settings: {
+      type: Object,
+      default: () => ({})
+    },
+    mode: {
+      type: String,
+      default: () => "date" // can be: date, datetime, time
+    }
+  },
+  data() {
+    this.$trace("lsw-date-control.data");
+    this.validateMode();
+    this.validateSettings();
+    const respectivePlaceholder = this.generatePlaceholder();
+    return {
+      uuid: LswRandomizer.getRandomString(5),
+      value: this.settings?.initialValue || "",
+      isEditable: true,
+      isShowingCalendar: false,
+      respectivePlaceholder,
+      formMode: this.settings?.column.isFormSubtype || false,
+    };
+  },
+  methods: {
+    toggleCalendar() {
+      this.$trace("LswDateControl.methods.toggleCalendar", arguments);
+      this.isShowingCalendar = !this.isShowingCalendar;
+    },
+    generatePlaceholder() {
+      return this.settings.column.isFormSubtype === "date" ? 'Ej: 2025/01/01' :
+        this.settings.column.isFormSubtype === "datetime" ? 'Ej: 2025/01/01 00:00' :
+        this.settings.column.isFormSubtype === "time" ? 'Ej: 00:00' : ''
+    },
+    async submit() {
+      this.$trace("lsw-text-control.methods.submit");
+      return LswFormtypes.utils.submitControl.call(this);
+    },
+    validate() {
+      this.$trace("lsw-text-control.methods.validateSettings");
+      return LswFormtypes.utils.validateControl.call(this);
+    },
+    validateSettings() {
+      this.$trace("lsw-text-control.methods.validateSettings");
+      return LswFormtypes.utils.validateSettings.call(this);
+    },
+    validateMode() {
+      this.$trace("lsw-date-control.methods.validateSettings");
+      $ensure({mode: this.mode}, 1).to.be.oneOf(["date", "time", "datetime"]);
+    },
+    setValueFromCalendar(v) {
+      this.$trace("lsw-date-control.methods.setValueFromCalendar");
+      console.log("Valor:", v);
+      const value = LswTimer.utils.formatDatestringFromDate(v);
+      if(this.mode === "datetime") {
+        this.value = value;
+      } else if(this.mode === "date") {
+        this.value = value.split(" ")[0];
+      } else if(this.mode === "time") {
+        this.value = value.split(" ")[1];
+      } else {
+        this.value = value;
+      }
+    }
+  },
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-date-control.mounted");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswDurationControl", {
+  template: `<div class="lsw_duration_control lsw_formtype lsw_form_control">
+    <lsw-control-label :settings="settings"
+        :parent-formtype="this" />
+    <div v-show="isEditable">
+        <div ref="controller"
+            v-xform.control="{
+            name: settings.name,
+            onValidate: settings.column.hasValidator || \$noop,
+            onSetError: () => {
+                isEditable = true;
+            }
+        }">
+            <div class="flex_row">
+                <div class="pad_right_1">
+                    <button v-on:click="toggleDetails"
+                        disabled>⌛️</button>
+                </div>
+                <input class="flex_100"
+                    type="text"
+                    v-model="value"
+                    v-on="settings?.input?.events || {}"
+                    v-bind="settings?.input?.props || {}"
+                    v-xform.input="{name: '*'}"
+                    ref="textInput" />
+            </div>
+            <lsw-control-error />
+        </div>
+    </div>
+</div>`,
+  props: {
+    settings: {
+      type: Object,
+      default: () => ({})
+    },
+  },
+  data() {
+    this.$trace("lsw-duration-control.data");
+    this.validateSettings();
+    return {
+      uuid: LswRandomizer.getRandomString(5),
+      value: this.settings?.initialValue || "",
+      isEditable: true,
+      isShowingDetails: false,
+    };
+  },
+  methods: {
+    async submit() {
+      this.$trace("lsw-duration-control.methods.submit");
+      return LswFormtypes.utils.submitControl.call(this);
+      
+    },
+    async submit() {
+      this.$trace("lsw-text-control.methods.submit");
+      return LswFormtypes.utils.submitControl.call(this);
+    },
+    validate() {
+      this.$trace("lsw-text-control.methods.validateSettings");
+      return LswFormtypes.utils.validateControl.call(this);
+    },
+    validateSettings() {
+      this.$trace("lsw-text-control.methods.validateSettings");
+      return LswFormtypes.utils.validateSettings.call(this);
+    },
+    toggleDetails() {
+      this.$trace("lsw-duration-control.methods.toggleDetails");
+      this.isShowingDetails = !this.isShowingDetails;
+    },
+    increasePosition(pos) {
+      this.$trace("lsw-duration-control.methods.increasePosition");
+
+    },
+    decreasePosition(pos) {
+      this.$trace("lsw-duration-control.methods.decreasePosition");
+
+    }
+  },
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-duration-control.mounted");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswNumberControl", {
+  template: `<div class="lsw_number_control">
+    number control
+</div>`,
+  props: {
+    configurations: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  data() {
+    this.$trace("lsw-number-control.data");
+    return {};
+  },
+  methods: {},
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-number-control.mounted");
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswOptionsControl", {
+  template: `<div class="lsw_options_control lsw_formtype lsw_form_control" keep-alive="true">
+    <lsw-control-label :settings="settings"
+        :parent-formtype="this" />
+    <div v-show="isEditable">
+        <div
+            v-show="settings.column.hasFormtypeParameters.type === 'selector'"
+            ref="controller"
+            v-xform.control="{
+                name: settings.name,
+                onValidate: settings.column.hasValidator || \$noop,
+                onSetError: () => {
+                    isEditable = true;
+                }
+            }">
+            <select class="width_100" ref="inputter" v-xform.input="{name:'*'}" v-model="value">
+                <option :value="opt"
+                    v-for="opt, optIndex in settings.column.hasFormtypeParameters.available"
+                    v-bind:key="'option-' + optIndex">
+                    {{ opt }}
+                </option>
+            </select>
+            <lsw-control-error />
+        </div>
+    </div>
+</div>`,
+  props: {
+    settings: {
+      type: Object,
+      default: () => ({})
+    },
+  },
+  data() {
+    this.$trace("lsw-options-control.data");
+    this.validateSettings();
+    return {
+      uuid: LswRandomizer.getRandomString(5),
+      value: this.settings?.initialValue || "",
+      isEditable: true,
+      parameters: this.settings?.hasFormtypeParameters || {}
+    };
+  },
+  methods: {
+    async submit() {
+      this.$trace("lsw-text-control.methods.submit");
+      return LswFormtypes.utils.submitControl.call(this);
+    },
+    validate() {
+      this.$trace("lsw-text-control.methods.validateSettings");
+      return LswFormtypes.utils.validateControl.call(this);
+    },
+    validateSettings() {
+      this.$trace("lsw-text-control.methods.validateSettings");
+      return LswFormtypes.utils.validateSettings.call(this);
+    }
+  },
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-options-control.mounted");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswSourceCodeControl", {
+  template: `<div class="lsw_source_code_control">
+    source code control
+</div>`,
+  props: {
+    configurations: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  data() {
+    this.$trace("lsw-source-code.data");
+    return {};
+  },
+  methods: {},
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-source-code.mounted");
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswRefObjectControl", {
+  template: `<div class="lsw_ref_object_control lsw_formtype lsw_form_control">
+    <lsw-control-label :settings="settings"
+        :parent-formtype="this" />
+    <div v-show="isEditable">
+        <div ref="controller"
+            v-xform.control="{
+                name: settings.name,
+                onValidate: settings.column.hasValidator || \$noop,
+                onSetError: () => {
+                    isEditable = true;
+                }
+            }">
+            <div class="flex_row">
+                <div class="flex_1 pad_right_1">
+                    <button :class="{activated: isShownSelector}"
+                        v-on:click="toggleSelector">🔎</button>
+                </div>
+                <input class="flex_100"
+                    type="text"
+                    v-model="value"
+                    v-xform.input="{name: '*',onValidate: settings.input?.onValidate || \$noop}"
+                    :disabled="settings.column.refersTo.constraint"
+                    ref="textInput" />
+                <div class="flex_1 pad_left_1" v-if="\$window.process.env.NODE_ENV === 'test' && false">
+                    <button :class="{activated: isShownInfo}"
+                        v-on:click="toggleInfo">ℹ️</button>
+                </div>
+            </div>
+            <div class="pad_top_1" v-if="isShownInfo">
+                <div class="" style="white-space: pre; font-size:12px; border: 1px solid white; background-color: white; color: black;">{{ \$lsw.utils.stringify(settings) }}</div>
+            </div>
+            <div class=""
+                v-if="isShownSelector">
+                <lsw-table
+                    :initial-input="rows"
+                    :initial-settings="{title: \`Un ítem de «\${settings.column.refersTo.table}.\${settings.column.refersTo.property}»:\`, itemsPerPage: 50 }"
+                    selectable="one"
+                    :on-choose-row="v => value = \$window.console.log('valueee', v) || v"
+                    :initial-choosen-value="value"
+                    choosable-id="tiene_nombre"></lsw-table>
+            </div>
+            <lsw-control-error />
+        </div>
+    </div>
+</div>`,
+  props: {
+    settings: {
+      type: Object,
+      default: () => ({})
+    },
+  },
+  data() {
+    this.$trace("lsw-ref-object-control.data");
+    this.validateSettings();
+    return {
+      uuid: LswRandomizer.getRandomString(5),
+      value: this.settings.initialValue || [],
+      isValueLoaded: false,
+      isEditable: true,
+      isShownSelector: false,
+      isShownInfo: false,
+      rows: []
+    };
+  },
+  methods: {
+    toggleSelector() {
+      this.$trace("lsw-ref-object-control.methods.toggleSelector");
+      this.isShownSelector = !this.isShownSelector;
+    },
+    toggleInfo() {
+      this.$trace("lsw-ref-object-control.methods.toggleInfo");
+      this.isShownInfo = !this.isShownInfo;
+    },
+    async submit() {
+      this.$trace("lsw-ref-object-control.methods.submit");
+      return LswFormtypes.utils.submitControl.call(this);
+      
+    },
+    validate() {
+      this.$trace("lsw-ref-object-control.methods.validateSettings");
+      return LswFormtypes.utils.validateControl.call(this);
+    },
+    validateSettings() {
+      this.$trace("lsw-ref-object-control.methods.validateSettings");
+      return LswFormtypes.utils.validateSettings.call(this);
+    },
+    async loadRows() {
+      this.$trace("lsw-page-rows.methods.loadRows", arguments);
+      const selection = await this.$lsw.database.select(this.settings.column.refersTo.table, it => true);
+      this.rows = selection;
+      return selection;
+    },
+    async loadValue() {
+      this.$trace("lsw-ref-object-control.methods.loadValue");
+      const selection = await this.$lsw.database.select(this.settings.tableId, it => true);
+    },
+  },
+  watch: {},
+  async mounted() {
+    try {
+      this.$trace("lsw-ref-object-control.mounted");
+      await this.loadRows();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswRefListControl", {
+  template: `<div class="lsw_ref_list_control lsw_formtype lsw_form_control">
+    <lsw-control-label :settings="settings"
+        :parent-formtype="this" />
+    <div v-show="isEditable">
+        <div ref="controller"
+            v-zzzform.control="{
+                name: settings.name,
+                onValidate: settings.column.hasValidator || \$noop,
+                onSetError: () => {
+                    isEditable = true;
+                }
+            }">
+            <div class="flex_row">
+                <div class="flex_1 pad_right_1">
+                    <button :class="{activated: isShownSelector}"
+                        v-on:click="toggleSelector">🔎</button>
+                </div>
+                <input class="flex_100"
+                    type="text"
+                    v-model="value"
+                    v-zzzform.input="{name: '*',onValidate: settings.input?.onValidate || \$noop}"
+                    disabled="true"
+                    ref="textInput" />
+                <div class="flex_1 pad_left_1" v-if="\$window.process.env.NODE_ENV === 'test' && false">
+                    <button :class="{activated: isShownInfo}"
+                        v-on:click="toggleInfo">ℹ️</button>
+                </div>
+            </div>
+            <div class="pad_top_1" v-if="isShownInfo">
+                <div class="" style="white-space: pre; font-size:12px; border: 1px solid white; background-color: white; color: black;">{{ \$lsw.utils.stringify(settings) }}</div>
+            </div>
+            <div class=""
+                v-if="isShownSelector">
+                <lsw-table
+                    :initial-input="rows"
+                    :initial-settings="{title: \`Un ítem de «\${settings.column.refersTo.table}.\${settings.column.refersTo.property}»:\`, itemsPerPage: 50 }"
+                    selectable="many"
+                    :on-choose-row="v => value = \$window.console.log('valueee', v) || v"
+                    :initial-choosen-value="value"
+                    :columns-order="['id']"
+                    choosable-id="id"></lsw-table>
+            </div>
+            <lsw-control-error />
+        </div>
+    </div>
+</div>`,
+  props: {
+    settings: {
+      type: Object,
+      default: () => ({})
+    },
+  },
+  data() {
+    this.$trace("lsw-ref-list-control.data");
+    this.validateSettings();
+    return {
+      uuid: LswRandomizer.getRandomString(5),
+      value: this.settings.initialValue || [],
+      isValueLoaded: false,
+      isEditable: true,
+      isShownSelector: false,
+      isShownInfo: false,
+      rows: []
+    };
+  },
+  methods: {
+    toggleSelector() {
+      this.$trace("lsw-ref-list-control.methods.toggleSelector");
+      this.isShownSelector = !this.isShownSelector;
+    },
+    toggleInfo() {
+      this.$trace("lsw-ref-list-control.methods.toggleInfo");
+      this.isShownInfo = !this.isShownInfo;
+    },
+    async submit() {
+      this.$trace("lsw-ref-list-control.methods.submit");
+      return LswFormtypes.utils.submitControl.call(this);
+      
+    },
+    validate() {
+      this.$trace("lsw-ref-list-control.methods.validateSettings");
+      return LswFormtypes.utils.validateControl.call(this);
+    },
+    validateSettings() {
+      this.$trace("lsw-ref-list-control.methods.validateSettings");
+      return LswFormtypes.utils.validateSettings.call(this);
+    },
+    async loadRows() {
+      this.$trace("lsw-page-rows.methods.loadRows", arguments);
+      const selection = await this.$lsw.database.select(this.settings.column.refersTo.table, it => true);
+      this.rows = selection;
+      return selection;
+    },
+    async loadValue() {
+      this.$trace("lsw-ref-list-control.methods.loadValue");
+      const selection = await this.$lsw.database.select(this.settings.tableId, it => true);
+    },
+  },
+  watch: {},
+  async mounted() {
+    try {
+      this.$trace("lsw-ref-list-control.mounted");
+      await this.loadRows();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswRefRelationControl", {
+  template: `<div class="lsw_ref_relation_control">
+    Ref relation control
+</div>`,
+  props: {
+    settings: {
+      type: Object,
+      default: () => ({})
+    },
+  },
+  data() {
+    this.$trace("lsw-ref-relation-control.data");
+    this.validateSettings();
+    return {
+      uuid: LswRandomizer.getRandomString(5),
+      value: this.settings?.initialValue || "",
+      isEditable: true,
+    };
+  },
+  methods: {
+    async submit() {
+      this.$trace("lsw-ref-relation-control.methods.submit");
+      return LswFormtypes.utils.submitControl.call(this);
+      
+    },
+    validate() {
+      this.$trace("lsw-ref-relation-control.methods.validateSettings");
+      return LswFormtypes.utils.validateControl.call(this);
+    },
+    validateSettings() {
+      this.$trace("lsw-ref-relation-control.methods.validateSettings");
+      return LswFormtypes.utils.validateSettings.call(this);
+    }
+  },
+  watch: {},
+  mounted() {
+    try {
+      this.$trace("lsw-ref-relation-control.mounted");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswSchemaBasedForm", {
+  template: `<div class="lsw_schema_form">
+    <div class="lsw_schema_form_container">
+        <div class="lsw_schema_form_content">
+            <div class="pad_1"
+                ref="schemaForm0"
+                v-xform.form="{ onSubmit, onValidate }"
+                v-if="isLoaded">
+                <div class="">
+                    <div class="position_relative">
+                        <div class="pad_left_1 schema_form_title_box nowrap schema_form_title_text">
+                            <div class="flex_row">
+                                <div class="flex_100">
+                                    <div class="title_box_one_line">
+                                        <div class="title_text_cell">
+                                            {{ tableDefinition?.hasExtraAttributes?.readableName ?
+                                            \$lsw.utils.capitalize(tableDefinition.hasExtraAttributes.readableName) : model.tableId }}
+                                            <span v-if="isUpdateOperation">[#{{ model.rowId }}]</span>
+                                            <span v-else>[new]</span>
+                                        </div>
+                                        <div class="title_database_id_cell" style="font-size: 10px;">[{{model.databaseId}}]</div>
+                                    </div>
+                                </div>
+                                <div class="flex_1 flex_row centered pad_left_1 pad_right_1">
+                                    <button class="bright_border margin_right_1 nowrap" v-on:click="submitForm">⚡️</button>
+                                    <button class="danger_button nowrap"
+                                        v-if="isUpdateOperation"
+                                        v-on:click="deleteRow">❌ #{{model.rowId}}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex_row centered schema_form_top_panel"
+                        style="min-height: 30px;border-top: 4px double #210e64; padding: 6px;">
+                        <div class="flex_1 flex_row centered">
+                            <button class="bright_border margin_left_1 nowrap"
+                                :class="{activated: section === 'campos propios'}"
+                                v-on:click="() => selectSection('campos propios')">🧱</button>
+                            <button class="bright_border margin_left_1 nowrap"
+                                :class="{activated: section === 'campos reflejos'}"
+                                v-on:click="() => selectSection('campos reflejos')">↔️</button>
+                        </div>
+                        <div class="flex_100"></div>
+                        <div class="flex_1 flex_row centered">
+                            <button class="bright_border margin_right_1 nowrap"
+                                v-on:click="validateForm">✅</button>
+                            <button class="bright_border margin_right_1 nowrap"
+                                :class="{activated: isShowingFormInfo}"
+                                v-on:click="toggleFormInfo">ℹ️</button>
+                            <button class="bright_border margin_right_1 nowrap"
+                                v-on:click="openEditables">🔓*</button>
+                            <button class="bright_border margin_right_1 nowrap"
+                                v-on:click="closeEditables">🔒*</button>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="isShowingFormInfo"
+                    class="scrollable_text_area">
+                    <pre style="background-color: white; color: black; font-family: Arial; font-size: 11px; padding: 4px; margin: 0px; border-top: 1px solid white;">ℹ️: {{ tableDefinition }}</pre>
+                </div>
+                <div class="lsw_table_viewer" style="padding: 0px; min-height: 0%;">
+                    <div class="pestania"
+                        v-if="section === 'campos propios'">
+                        <div class="subtitle_box">Campos propios:</div>
+                        <table class="collapsed_table lsw_table_itself width_100">
+                            <tbody>
+                                <tr v-for="column, columnId, columnCounter in columnDefinitions"
+                                    v-bind:key="'schema-column-' + columnCounter"
+                                    class="row_for_table"
+                                    :class="((columnCounter === 0) || (columnCounter % 2 === 0)) ? 'odd' : ''">
+                                    <td class="pad_1">
+                                        <!--This will load component [typically] placed on:-->
+                                        <!--src/lsw-framework/components/lsw-formtype/type/lsw-*-control/lsw-*-control.{html,css,js}-->
+                                        <component :is="column.hasFormtypeSettings.id"
+                                            v-bind="{}"
+                                            :settings="{
+                                            name: columnId,
+                                            database: model.databaseId,
+                                            table: model.tableId,
+                                            entity: model.entityId,
+                                            column: column,
+                                            parentSchemaForm: own,
+                                            label: (columnCounter+1) + '. ' + (column.hasLabel || ('Campo «' + columnId + '»')),
+                                            extraAttributes: column.hasExtraAttributes,
+                                            initialValue: ((typeof value !== 'undefined') && (columnId in value)) ? value[columnId] : '',
+                                            input: {
+                                                props: {
+                                                    ...column.hasFormtypeSettings.input.props,
+                                                },
+                                                events: {
+                                                    ...column.hasFormtypeSettings.input.events
+                                                }
+                                            },
+                                            formtypeParameters: column.hasFormtypeParameters || {},
+                                            formtypeSettings: column.hasFormtypeSettings
+                                        }" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="flex_100">
+                            <div class="flex_row centered schema_form_title_box bottom_title_box"
+                                style="background-color: #333333; padding-top: 6px; padding-bottom: 4px;">
+                                <div class="flex_1 flex_row centered"
+                                    v-if="isUpdateOperation">
+                                    <button class="margin_left_1 nowrap danger_button"
+                                        v-on:click="deleteRow">❌ #{{model.rowId}}</button>
+                                </div>
+                                <div class="flex_100"></div>
+                                <div class="flex_1 flex_row centered pad_right_1">
+                                    <button class="bright_border margin_left_1 nowrap"
+                                        v-on:click="submitForm">⚡️ Enviar</button>
+                                    <button class="bright_border margin_left_1 nowrap"
+                                        v-on:click="validateForm">✅ Validar</button>
+                                    <button class="bright_border margin_left_1 nowrap"
+                                        v-on:click="openEditables">🔓*</button>
+                                    <button class="bright_border margin_left_1 nowrap"
+                                        v-on:click="closeEditables">🔒*</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pestania"
+                        v-if="section === 'campos reflejos'">
+                        <div class="subtitle_box">Campos reflejos:</div>
+                        <table class="collapsed_table lsw_table_itself width_100">
+                            <tbody>
+                                <tr v-for="externalColumn, externalColumnId, externalColumnCounter in tableDefinition.externalProperties"
+                                    v-bind:key="'schema-external-column-' + externalColumnCounter"
+                                    class="row_for_table"
+                                    :class="((externalColumnCounter === 0) || (externalColumnCounter % 2 === 0)) ? 'odd' : ''">
+                                    <td class="pad_1">
+                                        <!--This will load component [typically] placed on:-->
+                                        <!--src/lsw-framework/components/lsw-formtype/type/lsw-*-control/lsw-*-control.{html,css,js}-->
+                                        <template v-if="externalColumn.isType === 'ref-list'">
+                                            <lsw-ref-list-control :settings="{
+                                            name: externalColumnId,
+                                            database: model.databaseId,
+                                            table: model.tableId,
+                                            entity: model.entityId,
+                                            column: externalColumn,
+                                            parentSchemaForm: own,
+                                            label: (externalColumnCounter+1) + '. ' + (externalColumn.hasLabel || ('Campo «' + externalColumnId + '»')),
+                                        }" />
+                                        </template>
+                                        <!--component :is="column.hasFormtypeSettings.id"
+                                        v-bind="{}"
+                                        :settings="{
+                                            name: columnId,
+                                            database: model.databaseId,
+                                            table: model.tableId,
+                                            entity: model.entityId,
+                                            column: column,
+                                            parentSchemaForm: own,
+                                            label: (externalColumnCounter+1) + '. ' + (column.hasLabel || ('Campo «' + columnId + '»')),
+                                            extraAttributes: column.hasExtraAttributes,
+                                            initialValue: ((typeof value !== 'undefined') && (columnId in value)) ? value[columnId] : '',
+                                            input: {
+                                                props: {
+                                                    ...column.hasFormtypeSettings.input.props,
+                                                },
+                                                events: {
+                                                    ...column.hasFormtypeSettings.input.events
+                                                }
+                                            },
+                                            formtypeParameters: column.hasFormtypeParameters || {},
+                                            formtypeSettings: column.hasFormtypeSettings
+                                        }" /-->
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>`,
+  props: {
+    model: {
+      type: Object,
+      required: true,
+    },
+    onSubmit: {
+      type: Function,
+      default: () => this.$noop,
+    },
+    onValidate: {
+      type: Function,
+      default: () => this.$noop,
+    },
+    onDeleteRow: {
+      type: Function,
+      default: () => this.$noop,
+    },
+    overridenValues: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  data() {
+    this.$trace("lsw-schema-based-form.data");
+    this.validateModel(this.model);
+    const isOperation = (this.model.row && this.model.row.id) || (this.model.rowId && (this.model.rowId !== -1)) ? "update" : "insert";
+    return {
+      own: this,
+      validFormtypes: [
+        "text",
+        "long-text",
+        "options",
+        "boolean",
+        "date",
+        "duration",
+        "ref-object",
+        "ref-list",
+        "ref-relation",
+        "source-code",
+      ],
+      section: 'campos propios', // 'campos reflejos'
+      isShowingFormInfo: false,
+      isLoaded: false,
+      tableDefinition: false,
+      columnDefinitions: false,
+      value: this.model.row ?? false,
+      editableFields: [],
+      minimizedFields: [],
+      isOperation,
+      isUpdateOperation: isOperation === "update",
+      isInsertOperation: isOperation === "insert",
+    };
+  },
+  methods: {
+    selectSection(section) {
+      this.section = section;
+    },
+    toggleMinimizedField(field) {
+      this.$trace("lsw-schema-based-form.methods.toggleMinimizedField");
+      const fieldPos = this.minimizedFields.indexOf(field);
+      if (fieldPos === -1) {
+        this.minimizedFields.push(field);
+      } else {
+        this.minimizedFields.splice(fieldPos, 1);
+      }
+      this.$forceUpdate(true);
+    },
+    hideMinimizedField(field) {
+      this.$trace("lsw-schema-based-form.methods.hideMinimizedField");
+      const fieldPos = this.minimizedFields.indexOf(field);
+      if (fieldPos === -1) {
+        this.minimizedFields.push(field);
+      }
+      this.$forceUpdate(true);
+    },
+    showMinimizedField(field) {
+      this.$trace("lsw-schema-based-form.methods.showMinimizedField");
+      const fieldPos = this.minimizedFields.indexOf(field);
+      if (fieldPos !== -1) {
+        this.minimizedFields.splice(fieldPos, 1);
+      }
+      this.$forceUpdate(true);
+    },
+    toggleEditableField(field) {
+      this.$trace("lsw-schema-based-form.methods.toggleEditableField");
+      const fieldPos = this.editableFields.indexOf(field);
+      if (fieldPos === -1) {
+        this.editableFields.push(field);
+      } else {
+        this.editableFields.splice(fieldPos, 1);
+      }
+    },
+    saveField(field, value) {
+      this.$trace("lsw-schema-based-form.methods.saveField");
+      console.log("Should save field:", field, value);
+      // @TODO: use $lsw.database.overwrite to send the field only
+
+    },
+    validateModel(model) {
+      this.$trace("lsw-schema-based-form.methods.validateModel");
+      try {
+        const ensureModel = $ensure({ model }, 1);
+        const checkModel = $check(model);
+        Basic_type_and_signature: {
+          ensureModel.type("object");
+          ensureModel.to.have.uniquelyKeys(["connection", "databaseId", "tableId", "rowId", "row", "databaseExplorer"]);
+          ensureModel.to.have.keys(["databaseId", "tableId"]);
+          const correctOption = $ensure.$or({
+            "has connection and rowId": () => ensureModel.to.have.key("rowId"),
+            "has row": () => ensureModel.to.have.key("row"),
+          });
+          if (!checkModel.to.have.key("rowId")) {
+            ensureModel.to.have.key("row");
+          }
+        }
+        Component_types_and_signatures: {
+          if (checkModel.to.have.key("connection")) {
+            ensureModel.its("connection").type("object");
+          }
+          if (checkModel.to.have.key("databaseId")) {
+            ensureModel.its("databaseId").type("string");
+          }
+          if (checkModel.to.have.key("tableId")) {
+            ensureModel.its("tableId").type("string");
+          }
+          if (checkModel.to.have.key("rowId")) {
+            ensureModel.its("rowId").type("number");
+          }
+          if (checkModel.to.have.key("row")) {
+            $ensure.$or({
+              "row is object": () => ensureModel.its("row").type("object"),
+              "row is false": () => ensureModel.its("row").type("boolean").is(false),
+            });
+          }
+          if(checkModel.to.have.key("databaseExplorer")) {
+            ensureModel.its("databaseExplorer").type("object");
+          }
+        }
+      } catch (error) {
+        console.error("Failed validating «model» property on «lsw-schema-based-form.validateModel»");
+        console.error(error);
+      }
+    },
+    async loadValue() {
+      this.$trace("lsw-schema-based-form.methods.loadValue");
+      if (this.model.rowId) {
+        const originalValues = await LswDatabase.pickRow(this.model.databaseId, this.model.tableId, this.model.rowId);
+        this.value = Object.assign({}, originalValues, this.overridenValues);
+      }
+    },
+    onlyKnownTypes(formtype) {
+      if(this.validFormtypes.indexOf(formtype) !== -1) {
+        return formtype;
+      }
+      return "long-text";
+    },
+    async loadSchema() {
+      this.$trace("lsw-schema-based-form.methods.loadSchema");
+      const columnIds = Object.keys($lswSchema.$schema.hasTables[this.model.tableId].hasColumns);
+      for(let columnId of columnIds) {
+        const columnData = $lswSchema.$schema.hasTables[this.model.tableId].hasColumns[columnId];
+        Object.assign(columnData, {
+          belongsToDatabase: this.model.databaseId,
+          belongsToTable: this.model.tableId,
+          hasFormtypeSettings: {
+            id: 'lsw-' + this.onlyKnownTypes(columnData.isFormType) + '-control',
+            name: columnId,
+            input: {
+              props: {
+                placeholder: columnData.hasPlaceholder,
+              },
+              events: {
+                
+              }
+            },
+          }
+        })
+      }
+      this.tableDefinition = $lswSchema.$schema.hasTables[this.model.tableId];
+      this.columnDefinitions = this.tableDefinition.hasColumns;
+    },
+    toggleFormInfo() {
+      this.$trace("lsw-schema-based-form.methods.toggleFormInfo");
+      this.isShowingFormInfo = !this.isShowingFormInfo;
+    },
+    closeEditables() {
+      this.$trace("lsw-schema-based-form.methods.closeEditables");
+      const uneditables = this.$el.querySelectorAll(".lsw_form_control .lsw_control_label .button_to_uneditable");
+      for(let index=0; index<uneditables.length; index++) {
+        const uneditable = uneditables[index];
+        uneditable.click();
+      }
+    },
+    openEditables() {
+      this.$trace("lsw-schema-based-form.methods.openEditables");
+      const editables = this.$el.querySelectorAll(".lsw_form_control .lsw_control_label .button_to_editable");
+      for(let index=0; index<editables.length; index++) {
+        const editable = editables[index];
+        editable.click();
+      }
+    },
+    validateForm() {
+      this.$trace("lsw-schema-based-form.methods.validateForm");
+      return this.$refs.schemaForm0.$xform.validate();
+    },
+    async submitForm(v) {
+      this.$trace("lsw-schema-based-form.methods.submitForm");
+      return await this.$refs.schemaForm0.$xform.submit();
+    },
+    async deleteRow() {
+      this.$trace("lsw-schema-based-form.methods.submitForm");
+      const confirmed = await Vue.prototype.$dialogs.open({
+        title: "Eliminar registro",
+        template: `
+          <div>
+            <div class="pad_2">¿Seguro que quieres eliminar el registro?</div>
+            <hr class="margin_0" />
+            <div class="pad_2 text_align_right">
+              <button class="danger_button" v-on:click="() => accept(true)">Eliminar</button>
+              <button class="" v-on:click="() => accept(false)">Cancelar</button>
+            </div>
+          </div>
+        `,
+      });
+      if(!confirmed) return false;
+      await this.$lsw.database.delete(this.model.tableId, this.model.rowId || this.model.row.id);
+      if(this.onDeleteRow) {
+        this.onDeleteRow(this.model.rowId, this.model.tableId, true);
+      }
+      if(this.model.databaseExplorer) {
+        this.model.databaseExplorer.selectPage("LswPageRows", {
+          database: this.model.databaseId,
+          table: this.model.tableId,
+        });
+      }
+    }
+  },
+  watch: {
+    
+  },
+  async mounted() {
+    try {
+      this.$trace("lsw-schema-based-form.mounted");
+      await this.loadSchema();
+      await this.loadValue();
+      this.isLoaded = true;
+      this.$nextTick(() => {
+        window.sf0 = this.$refs.schemaForm0;
+      });
+    } catch (error) {
       console.log(error);
     }
   }

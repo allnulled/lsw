@@ -1,0 +1,13 @@
+{
+  "TODO": "GJITHÇKA",
+  "proporcionar conexión por patrón singleton": "a",
+  "Firstly, we create the object and the resolve function.": "Së pari, ne krijojmë objektin dhe funksionin e zgjidhjes.",
+  "Luego cargamos la API de base de datos.": "Pastaj mbushim bazën e të dhënave.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "Dhe në fund definojmë fillimin dhe funksionet e ngushta, dhe e kthejmë objektin e API-së.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Nga për\nqë në fund është një objekt që është i arritshëm, normalisht,\nOse si kjo në metodat e vetë kornizës,\nose si parametër.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Thuhet se API është gjithmonë i arritshëm sepse në përgjithësi ky projekt miraton modelet ose idetë e programeve funksionale. Dhe provoni, edhe pse jo rreptësisht, që të gjitha variablat e përdorura në funksion janë të siguruara me anë të ♫ky apo nëpërmjet parametrave është një klauzolë në stilin tim programues.",
+  "ATENCIÓN": "FJALIMI",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "modulët duhet të jenë në rend të ngarkesës, përndryshe zbatoni strategjinë tuaj ose mbështilleni si një grup.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Thuhet se API është gjithmonë i arritshëm sepse në përgjithësi ky projekt miraton modelet ose idetë e programeve funksionale. Dhe provoni (jo rreptësisht) që të gjitha variablat e përdorura në funksion janë dhënë me anë të ♫ky ose me anë të parametrave është një kusht në stilin tim programues.",
+  "i18n.hello": "Përshëndetje të gjithëve!"
+}

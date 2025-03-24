@@ -1,0 +1,13 @@
+{
+  "TODO": "सब",
+  "proporcionar conexión por patrón singleton": "सिंगलटन पैटर्न कनेक्शन प्रदान करता है",
+  "Firstly, we create the object and the resolve function.": "सबसे पहले, हम वस्तु और संकल्प समारोह बनाते हैं।.",
+  "Luego cargamos la API de base de datos.": "फिर हम डेटाबेस एपीआई लोड करते हैं।.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "और अंत में हम शुरू और बंद कार्यों को परिभाषित करते हैं, और हम एपीआई की वस्तु वापस करते हैं।.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "लोडर एपीआई वह कार्य है जो पूरे एपीआई को माउंट करने के लिए जिम्मेदार है,\nअंत में एक वस्तु है जो सुलभ है, सामान्य रूप से,\nया 'इस' के रूप में ढांचे के तरीकों में ही,\nया एक पैरामीटर के रूप में।\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "यह कहा जाता है कि एपीआई हमेशा सुलभ है क्योंकि सामान्य तौर पर, यह परियोजना कार्यात्मक प्रोग्रामिंग के पैटर्न या विचारों को गोद लेती है। और कोशिश करें, हालांकि सख्ती से नहीं, कि समारोह में उपयोग किए जाने वाले सभी चर को 'इस' के माध्यम से प्रदान किया जाता है या मापदंडों के माध्यम से मेरी प्रोग्रामिंग शैली में एक खंड है।.",
+  "ATENCIÓN": "ध्यान",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "मॉड्यूल लोड के क्रम में होना चाहिए, अन्यथा अपनी रणनीति को लागू करना या इसे 1 समूह के रूप में लपेटना चाहिए।.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "यह कहा जाता है कि एपीआई हमेशा सुलभ है क्योंकि सामान्य तौर पर, यह परियोजना कार्यात्मक प्रोग्रामिंग के पैटर्न या विचारों को गोद लेती है। और कोशिश करें ( सख्ती से नहीं) कि समारोह में इस्तेमाल किए गए सभी चर को 'इस' के माध्यम से प्रदान किया जाता है या मापदंडों के माध्यम से मेरी प्रोग्रामिंग शैली में एक खंड है।.",
+  "i18n.hello": "नमस्कार!"
+}

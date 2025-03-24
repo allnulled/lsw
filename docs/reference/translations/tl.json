@@ -1,0 +1,13 @@
+{
+  "TODO": "LAHAT",
+  "proporcionar conexión por patrón singleton": "nagbibigay ng isangton na koneksiyon",
+  "Firstly, we create the object and the resolve function.": "Una, nililikha natin ang bagay na iyon at ang layunin ng paglutas.",
+  "Luego cargamos la API de base de datos.": "Pagkatapos ay isasakay namin ang database API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "At sa katapusan ay binibigyang - kahulugan natin ang pasimula at malapit na mga gawain, at ibinabalik natin ang layunin ng API.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Ang Pasan API ang tungkulin na may pananagutan sa pag-unlad ng buong API,\nna sa bandang huli ay isang bagay na madaling marating, normal,\nO bilang `this` sa mga paraan ng balangkas mismo,\no bilang isang parameter.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Sinasabing laging madaling makuha ang API dahil, sa pangkalahatan, ang proyektong ito ay tumatanggap ng mga dibuho o ideya ng functional programming. At subukan, bagaman hindi mahigpit, na ang lahat ng mga variable na ginagamit sa tungkulin ay inilalaan sa pamamagitan ng `this` o sa pamamagitan ng parameters ay isang sugnay sa aking istilo ng programming.",
+  "ATENCIÓN": "KABUTIAN",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "ang mga module ay dapat na sunud - sunod, kung hindi ay ipatupad ang iyong sariling estratehiya o balutin ito bilang 1 grupo.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "Sinasabing laging madaling makuha ang API dahil, sa pangkalahatan, ang proyektong ito ay tumatanggap ng mga dibuho o ideya ng functional programming. At subukan (hindi mahigpit) na ang lahat ng mga variable na ginagamit sa tungkulin ay inilalaan sa pamamagitan ng `this` o sa pamamagitan ng parameters ay isang sugnay sa aking istilong programming.",
+  "i18n.hello": "Hello, lahat!"
+}

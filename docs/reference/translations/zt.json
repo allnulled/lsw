@@ -1,0 +1,13 @@
+{
+  "TODO": "全部",
+  "proporcionar conexión por patrón singleton": "提供單通模式接通",
+  "Firstly, we create the object and the resolve function.": "首先,我們要建立物件和決心功能.",
+  "Luego cargamos la API de base de datos.": "然後再加載數據庫API.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "最后我們定義了起點和關閉的函數 而回傳API的目標.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "載入器 API 是负责上載整個 API 的功能,\n在最終是能被取取的物件 在平時\n在框架本身的方法中,或作`此',\n或作參數.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "有位相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相相相關相關相相相相關相關相相相關相相相相相相相關相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相 盡管不是嚴格地想.",
+  "ATENCIÓN": "注意",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "模組必須依次是載入相關的相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相相相關相關相關相相關相相相相相關相關相關相相相相關相相相相相關相相相相相相關相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "有位相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相關相相相關相關相相相相關相關相相相關相相相相相相相關相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相相 試想( 不嚴格地) 在函數中用到的所有變數都取自「 此」 或參數.",
+  "i18n.hello": "大家好!"
+}

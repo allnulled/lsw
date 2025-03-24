@@ -1,0 +1,13 @@
+{
+  "TODO": "TÜM",
+  "proporcionar conexión por patrón singleton": "tekton desen bağlantı bağlantısı sağlar",
+  "Firstly, we create the object and the resolve function.": "İlk olarak, nesneyi ve çözümü yaratırız.",
+  "Luego cargamos la API de base de datos.": "Sonra veritabanı API'sini yükleriz.",
+  "Y al final definimos las funciones de inicio y cierre, y devolvemos el objeto de la API.": "Ve sonunda başlangıç ve yakın işlevleri tanımlarız ve API'nin nesnesini döndürürüz.",
+  "El API Loader es la función que se encarga de montar toda la API,\nque al final es un objeto que está accesible, normalmente,\no como `this` en los métodos del propio framework,\no como algún parámetro.\n": "Panel API, tüm API'yi güçlendirmekten sorumlu olan işlevdir,\nSonunda erişilebilir olan bir nesnedir, normalde,\nYa da “bu” çerçevenin kendi yöntemlerinde,\nveya bir parametre olarak.\n.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar, aunque no estrictamente, que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "API'nin her zaman erişilebilir olduğu söylenir, çünkü genel olarak, bu proje işlevsel programlama modellerini veya fikirlerini kabul eder. Ve deneyin, kesinlikle olmasa da, işlevde kullanılan tüm değişkenler “bu” veya parametre aracılığıyla programlama tarzımda bir maddedir.",
+  "ATENCIÓN": "TEN",
+  "los módulos deben estar en orden de carga, de lo contrario implementa tu propia estrategia o envuélvelo como 1 grupo.": "modüller yük siparişinde olmalıdır, aksi takdirde kendi stratejinizi uygulayın veya 1 grup olarak kapatılmalıdır.",
+  "Se dice que la API siempre está accesible porque, en general, este proyecto adopta patrones o ideas de la programación funcional. E intentar (no estrictamente) que todas las variables que se usan en la función se proporcionen vía `this` o vía parámetros es una cláusula en mi estilo de programación.": "API'nin her zaman erişilebilir olduğu söylenir, çünkü genel olarak, bu proje işlevsel programlama modellerini veya fikirlerini kabul eder. Ve deneyin (kesinlikle değil) işlevinde kullanılan tüm değişkenlerin “bu” veya parametreler aracılığıyla programlama tarzımda bir maddedir.",
+  "i18n.hello": "Merhaba, herkes!"
+}

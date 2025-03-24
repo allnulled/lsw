@@ -1,0 +1,1724 @@
+:root {
+    --altura_de_dias_de_calendario: 40px;
+}
+.visor_de_calendario {
+    max-width: 260px;
+}
+.LswCalendario .like_table {
+    display: table;
+    width: 100%;
+}
+.LswCalendario .like_row {
+    display: table-row;
+}
+.LswCalendario .like_cell {
+    display: table-cell;
+}
+table.tabla_de_calendario {
+    width: 100%;
+    border: none;
+    border-collapse: collapse;
+    margin-left: 1px;
+}
+button.boton_de_calendario {
+    min-width: auto;
+    width: auto;
+    padding: 2px;
+    min-width: 25px;
+}
+button.boton_de_dia_de_calendario {
+    min-width: 32px;
+}
+button.boton_de_dia_de_calendario.current {
+    background-color: rgb(46, 46, 97);
+    color: white;
+}
+button.boton_de_dia_de_calendario.active {
+    background-color: white;
+    color: black;
+}
+button.boton_de_mover_mes {
+    width: 100%;
+    min-width: 25px;
+}
+input.entrada_de_calendario {
+    min-width: auto;
+    width: auto;
+    text-align: center;
+}
+.chivato_de_fecha {
+    font-size: 10px;
+    font-family: Arial;
+    text-align: center;
+}
+table.tabla_para_horas {
+    width: 100%;
+    border-left: 1px solid white;
+}
+table.tabla_para_horas button {
+    width: 100%;
+    height: 100%;
+}
+table.tabla_para_horas input {
+    width: 100%;
+}
+.Component.LswCalendario button {
+    
+}
+tr.fila_de_dias_de_semana > td > div {
+    background-color: #232;
+    color: white;
+    text-align: center;
+    padding: 4px;
+    border-bottom: 1px solid white;
+    border-right: 1px solid white;
+    border-radius: 4pt;
+}
+tbody.dias_de_calendario > tr > td {
+    padding: 0px;
+    border-right: 1px solid white;
+    border-bottom: 1px solid white;
+}
+tbody.dias_de_calendario > tr > td > span {
+    display: inline-block;
+    background-color: #BBB;
+    color: black;
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+    min-height: var(--altura_de_dias_de_calendario);
+}
+tbody.dias_de_calendario > tr > td > span > button {
+    width: 100%;
+    height: 100%;
+    min-height: var(--altura_de_dias_de_calendario);
+}
+.no_borders_table {
+    border-collapse: collapse;
+    border: none;
+}
+.fila_de_digito {
+    text-align: center;
+}
+.fila_de_digito > td {
+    vertical-align: middle;
+    padding-right: 1px;
+}
+.boton_de_ajuste_de_hora {
+    width: 100%;
+}
+.total_de_tareas_de_dia {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    font-size: 10px;
+}
+.total_de_tareas_de_dia > div {
+    text-align: center;
+    background-color: #336;
+    color: white;
+    text-shadow: 0 0 1px black;
+    min-width: 10px;
+    min-height: 10px;
+    border-radius: 1pt;
+    padding: 4px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+button.active > .total_de_tareas_de_dia > div {
+    background-color: #FFF;
+    color: black;
+}
+
+.dia_de_calendario_texto {
+    margin-top: -12px;
+}
+.lsw_table {}
+
+.lsw_table .button_separation {
+    margin-left: 4px;
+}
+
+.lsw_table_itself {}
+
+.lsw_table_viewer {
+    border: 1px solid #333;
+    padding: 4px;
+    overflow: scroll;
+    min-height: 180px;
+}
+
+table.lsw_table_itself>thead>tr>th {
+    text-align: left;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+table.lsw_table_itself .max_row_height {
+    max-height: 25px;
+}
+
+table.lsw_table_itself>thead>tr>th.table_header {
+    padding: 4px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    text-align: left;
+}
+
+table.lsw_table_itself>thead>tr>th.button_header {
+    padding: 0px !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+    text-align: center;
+    font-size: 8px;
+}
+
+.lsw_table .title_box {
+    padding: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.table_menu_button {
+    background-color: transparent;
+    color: black;
+    border: 1px solid black;
+}
+
+.table_navigation_menu_cell {
+    padding: 0px;
+    padding-top: 0px;
+    padding-bottom: 4px;
+}
+
+.table_navigation_menu {
+    background-color: #DDD;
+    box-shadow: 0 0 4px black;
+    border-top-left-radius: 2pt;
+    border-top-right-radius: 2pt;
+    padding: 4px;
+}
+
+.lsw_table_itself>tbody>tr>td {
+    vertical-align: top;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-left: 1px solid #999;
+    padding: 4px;
+}
+
+.lsw_table_itself>tbody>tr>td:first-child {
+    border-left: 0px solid #999;
+}
+
+.lsw_table_itself>tbody>tr>td.index_cell {
+    text-align: right;
+    vertical-align: top;
+}
+
+.lsw_table_itself>tbody>tr>td.data_cell {
+    padding: 4px;
+    padding-bottom: 0px;
+}
+
+.lsw_table_itself>tbody>tr>td.data_cell>* {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.lsw_table_itself>tbody>tr>td.data_cell>pre {
+    margin: 0px;
+    border: 1px solid #999;
+    background-color: #FFF;
+    font-size: 12px;
+    font-family: Arial;
+    white-space: pre;
+    overflow: scroll;
+    padding: 4px;
+}
+
+.lsw_table_itself>tbody>tr>td.details_cell {
+    padding: 4px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.lsw_table_itself>tbody>tr.row_for_table ul {
+    margin: 0px;
+    padding-bottom: 6px;
+}
+
+.lsw_table_itself>tbody>tr.row_for_table.odd {
+    background-color: #BBB;
+}
+
+.lsw_table .pagination_button {
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.lsw_table .pagination_button_box {
+    padding-left: 1px;
+}
+
+.lsw_table .pagination_button_box.first_box {
+    padding-left: 0px;
+}
+
+.lsw_table_top_panel {
+    background-color: #CCC;
+    padding: 4px;
+    padding-top: 0;
+    padding-bottom: 0;
+    box-shadow: 0 0 4px black;
+    margin-bottom: 4px;
+}
+.lsw_table_top_button {
+    margin-right: 2px;
+}
+.lsw_data_implorer {
+    
+}
+.lsw_data_explorer {
+    
+}
+.entry.flex_row {
+    align-items: center;
+}
+.prop_row {
+    white-space: nowrap;
+}
+.prop_cell {
+    color: #113;
+    font-style: italic;
+}
+.val_cell {
+    padding-left: 4px;
+    font-weight: bold;
+}
+.type_cell {
+    padding-left: 4px;
+    font-style: italic;
+    font-size: 10px;
+}
+.path_cell_container {
+    padding-left: 4px;
+    position: relative;
+}
+.path_cell {
+    font-size: 10px;
+    text-decoration: underline;
+    white-space: nowrap;
+}
+.level_cell {
+    font-size: 9px;
+}
+.path_row {
+    align-items: center;
+    padding-left: 20px;background: #333;
+    color: white;
+}
+.inner_sight_row {
+    
+}
+.top_panel_showable {
+    padding-left: 1px;
+    padding-right: 1px;
+}
+.top_panel_showable > .content {
+    padding: 4px;
+    border: 1px solid black;
+    border-radius: 2pt;
+    background-color: #DDD;
+}
+.lsw_data_implorer {
+    padding-top: 2px;
+}
+
+.lsw_data_implorer.paginated {
+    margin-left: 1px;
+    padding: 2px;
+}
+
+.lsw_data_implorer.paginated>.paginated_entry>.inner_sight_row {}
+
+.entry {}
+
+.entry.flex_row {
+    align-items: center;
+}
+
+.prop_row {
+    white-space: nowrap;
+}
+
+.prop_cell {
+    color: #113;
+}
+
+.val_cell {
+    padding-left: 4px;
+    font-weight: bold;
+}
+
+.type_cell {
+    padding-left: 4px;
+    font-size: 10px;
+}
+
+.path_cell_container {
+    padding-left: 4px;
+    position: relative;
+}
+
+.path_cell {
+    font-size: 10px;
+    text-decoration: underline;
+    white-space: nowrap;
+}
+
+.level_cell {
+    font-size: 9px;
+}
+
+.path_row {
+    display: none !important;
+    align-items: center;
+    padding-left: 20px;
+    background: #333;
+    color: white;
+    padding-bottom: 1px;
+}
+
+.inner_sight_row {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    box-shadow: 0 0 4px black;
+}
+
+.paginator button {
+    max-height: 18px;
+    padding-top: 0px;
+}
+.paginator > div {
+    padding-left: 1px;
+}
+.paginator > div:first-child {
+    padding-left: 0px;
+}
+.prop_id {
+    font-weight: bold;
+    text-decoration: underline;
+}
+.prop_type {
+    font-style: italic;
+}
+
+.lsw_dialogs_root {
+    
+}
+.lsw_dialogs {
+    position: fixed;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+}
+
+.lsw_dialogs_box {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.dialog_window {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255,255,255,0.85);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid black;
+}
+.dialog_window .dialog_topbar {
+    padding: 4px;
+    border-bottom: 1px solid black;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.dialog_window .dialog_topbar .dialog_title {
+    flex: 100;
+}
+.dialog_window .dialog_topbar .dialog_topbar_buttons {
+    
+}
+.dialog_window .dialog_body {
+    position: relative;
+    flex: 100;
+    padding: 0px;
+    overflow: scroll;
+}
+.dialog_window .dialog_footer {
+    padding: 4px;
+    border-top: 1px solid black;
+    text-align: right;
+}
+.lsw_windows_main_tab {
+    position: fixed;
+    top: 5px;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    background-color: white;
+    color: black;
+}
+.lsw_windows_main_tab .main_tab_topbar {
+    border-bottom: 1px solid black;
+    padding: 4px;
+    padding-bottom: 3px;
+    background-color: #DFDFDF;
+    text-align: right;
+}
+.main_tab_topbar_button {
+    
+}
+.pad_normal {
+    padding: 4px;
+}
+
+.dialog_title {
+    
+}
+
+.lsw_windows_pivot_button {
+    position: fixed;
+    top: auto;
+    bottom: 9px;
+    left: 9px;
+    right: auto;
+    background-color: transparent;
+    padding: 0px;
+    border: 1px solid #000;
+    border-radius: 3pt;
+    background-color: #AFFF00;
+    box-shadow: 0 0 4px black;
+    cursor: pointer;
+}
+.lsw_windows_pivot_button:hover {
+}
+
+.lsw_windows_pivot_button > button {
+    max-height: 22px;
+    min-width: 22px;
+    vertical-align: middle;
+    border: none;
+    background-color: transparent;
+}
+
+.lsw_windows_pivot_button > button:hover {
+    background-color: transparent;
+}
+.lsw_windows_pivot_button:hover > button {
+    
+}
+.lsw_toasts {
+    position: fixed;
+    top: auto;
+    left: 30px;
+    right: 30px;
+    bottom: 10px;
+}
+.lsw_toasts .toasts_box {
+    position: relative;
+}
+.lsw_toasts .toasts_box > .toast_list {
+    position: absolute;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.lsw_toasts .toast_box {
+    text-align: center;
+}
+.lsw_toasts .toast_box > .toast_item {
+    display: block;
+    width: auto;
+}
+.lsw_toasts .toast_box > .toast_item > .toast {
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    justify-content: center;
+    align-items: center;
+    border: 3px double black;
+    border-radius: 0pt;
+    box-shadow: 0 0 4px black;
+    min-height: 30px;
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding: 10px;
+    margin-bottom: 2px;
+    cursor: pointer;
+}
+.console-hooker.hide {
+    display: none;
+}
+.console-hooker .console_viewer {
+    margin: 0px;
+    padding: 0px;
+    z-index: 1000;
+    position: absolute;
+    top: auto;
+    right: 30px;
+    left: 30px;
+    bottom: 40px;
+    padding: 4px;
+}
+.console-hooker .console_box {
+    max-height: 120px;
+    font-size: 12px;
+    color: black;
+    background-color: rgba(255,255,255,0.6);
+    border: 3px double #030;
+    border-radius: 2pt;
+    text-shadow: 0 0 1px black;
+    display: flex;
+    flex-direction: column;
+}
+.console_box_title {
+    padding: 4px;
+    background-color: rgba(0,0,0,0.6);
+    color: white;
+}
+.console_box_output_container {
+    overflow: scroll;
+}
+.console_box_output {
+    padding: 4px;
+    flex: 100;
+}
+
+
+.database_breadcrumb {
+    padding: 4px;
+    padding-top: 0px;
+}
+.database_breadcrumb_box {
+    padding: 4px;
+    border: 1px solid #999;
+    background-color: #DDD;
+    text-shadow: 0 0 1px black;
+}
+
+
+table.top_aligned > tbody > tr > td {
+    vertical-align: top;
+}
+
+
+.lsw_filesystem_explorer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.lsw_filesystem_explorer .current_node_box {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid black;
+    font-size: 12px;
+    font-family: Arial;
+    white-space: nowrap;
+    justify-content: stretch;
+}
+.current_node_box > .current_node_filename,
+.current_node_box > .current_node_path {
+    display: inline-block;
+    padding: 4px;
+}
+.current_node_box > .current_node_filename {
+    flex: 1;
+    border-left: 1px solid black;
+}
+.current_node_box > .current_node_path {
+    flex: 100;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
+}
+.current_node_box > .previous_node_path {
+    align-self: center;
+}
+.current_node_box > .previous_node_path > .previous_node_button {
+    font-size: 10px;
+    padding: 3px;
+    text-align: center;
+    margin-left: 1px;
+    padding-top: 3px;
+    padding-bottom: 4px;
+}
+
+.lsw_filesystem_explorer .filesystem_ui {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: calc(100% - 23px);
+}
+.lsw_filesystem_explorer .leftside {
+    flex: 1;
+}
+.lsw_filesystem_explorer .middleside {
+    flex: 100;
+    display: flex;
+    flex-direction: column;
+}
+.lsw_filesystem_explorer .rightside {
+    flex: 1;
+}
+.lsw_filesystem_explorer .headerside {
+    flex: 1;
+}
+.lsw_filesystem_explorer .bodyside {
+    flex: 100;
+    position: relative;
+}
+.lsw_filesystem_explorer .footerside {
+    flex: 1;
+}
+
+
+.lsw_filesystem_explorer .leftside,
+.lsw_filesystem_explorer .rightside,
+.lsw_filesystem_explorer .headerside,
+.lsw_filesystem_explorer .bodyside,
+.lsw_filesystem_explorer .footerside {
+    border: 0px solid black;
+}
+
+/* Start: Bordes de 1 sola línea entre paneles: */
+.lsw_filesystem_explorer .rightside {
+    border-left: 1px solid black;
+    min-width: 32px;
+}
+.lsw_filesystem_explorer .leftside {
+    border-right: 1px solid black;
+    min-width: 32px;
+}
+.lsw_filesystem_explorer .bodyside {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.lsw_filesystem_explorer .headerside,
+.lsw_filesystem_explorer .footerside {
+    min-height: 32px;
+}
+/* End */
+.lsw_filesystem_buttons_panel {}
+.lsw_filesystem_editor {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 1px;
+    right: 0;
+}
+
+.lsw_filesystem_editor .editor {
+    width: calc(100% - 1px);
+    height: calc(100% - 2px);
+    resize: none;
+    border: 1px solid black;
+    border-radius: 0pt;
+    outline: none;
+}
+.lsw_filesystem_editor .editor:focus {
+    background-color: #E0E0E0;
+}
+.lsw_filesystem_treeviewer {}
+
+.treeviewer_row {
+    padding: 2px;
+}
+.treeviewer_row a {
+    display: inline-block;
+    padding: 2px;
+}
+.treeviewer_row:nth-last-child(odd) {
+    background-color: #DDD;
+}
+.treeviewer_row:hover {
+    background-color: #CCC;
+}
+table.filesystem_treeviewer_table {
+    width: 100%;
+    border: none;
+    border-collapse: collapse;
+}
+table.filesystem_treeviewer_table {
+    padding: 2px;
+    font-weight: normal;
+    text-align: left;
+}
+table.filesystem_treeviewer_table > tbody > tr > td:nth-child(1) {
+    width: 1%;
+}
+table.filesystem_treeviewer_table > tbody > tr > td:nth-child(2) {
+    width: 100%;
+}
+.lsw_wiki {
+    
+}
+.lsw_wiki .wiki_searcher_1_box {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.lsw_wiki .wiki_searcher_1_input_cell {
+    flex: 100;
+    padding: 2px;
+}
+.lsw_wiki .wiki_searcher_1_input {
+    width: 100%;
+
+}
+.lsw_wiki .wiki_searcher_1_button_cell {
+    flex: 1;
+    padding: 2px;
+    padding-left: 0px;
+}
+:root {
+    --altura_de_dias_de_calendario: 40px;
+}
+.visor_de_calendario {
+    max-width: 260px;
+}
+.LswCalendario .like_table {
+    display: table;
+    width: 100%;
+}
+.LswCalendario .like_row {
+    display: table-row;
+}
+.LswCalendario .like_cell {
+    display: table-cell;
+}
+table.tabla_de_calendario {
+    width: 100%;
+    border: none;
+    border-collapse: collapse;
+    margin-left: 1px;
+}
+button.boton_de_calendario {
+    min-width: auto;
+    width: auto;
+    padding: 2px;
+    min-width: 25px;
+}
+button.boton_de_dia_de_calendario {
+    min-width: 32px;
+}
+button.boton_de_dia_de_calendario.current {
+    background-color: rgb(46, 46, 97);
+    color: white;
+}
+button.boton_de_dia_de_calendario.active {
+    background-color: white;
+    color: black;
+}
+button.boton_de_mover_mes {
+    width: 100%;
+    min-width: 25px;
+}
+input.entrada_de_calendario {
+    min-width: auto;
+    width: auto;
+    text-align: center;
+}
+.chivato_de_fecha {
+    font-size: 10px;
+    font-family: Arial;
+    text-align: center;
+}
+table.tabla_para_horas {
+    width: 100%;
+    border-left: 1px solid white;
+}
+table.tabla_para_horas button {
+    width: 100%;
+    height: 100%;
+}
+table.tabla_para_horas input {
+    width: 100%;
+}
+.Component.LswCalendario button {
+    
+}
+tr.fila_de_dias_de_semana > td > div {
+    background-color: #232;
+    color: white;
+    text-align: center;
+    padding: 4px;
+    border-bottom: 1px solid white;
+    border-right: 1px solid white;
+    border-radius: 4pt;
+}
+tbody.dias_de_calendario > tr > td {
+    padding: 0px;
+    border-right: 1px solid white;
+    border-bottom: 1px solid white;
+}
+tbody.dias_de_calendario > tr > td > span {
+    display: inline-block;
+    background-color: #BBB;
+    color: black;
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+    min-height: var(--altura_de_dias_de_calendario);
+}
+tbody.dias_de_calendario > tr > td > span > button {
+    width: 100%;
+    height: 100%;
+    min-height: var(--altura_de_dias_de_calendario);
+}
+.no_borders_table {
+    border-collapse: collapse;
+    border: none;
+}
+.fila_de_digito {
+    text-align: center;
+}
+.fila_de_digito > td {
+    vertical-align: middle;
+    padding-right: 1px;
+}
+.boton_de_ajuste_de_hora {
+    width: 100%;
+}
+.total_de_tareas_de_dia {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    font-size: 10px;
+}
+.total_de_tareas_de_dia > div {
+    text-align: center;
+    background-color: #336;
+    color: white;
+    text-shadow: 0 0 1px black;
+    min-width: 10px;
+    min-height: 10px;
+    border-radius: 1pt;
+    padding: 4px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+button.active > .total_de_tareas_de_dia > div {
+    background-color: #FFF;
+    color: black;
+}
+
+.dia_de_calendario_texto {
+    margin-top: -12px;
+}
+.lsw_agenda {}
+
+.calendar_viewer {
+    padding: 6px;
+    padding-top: 2px;
+    padding-bottom: 0px;
+}
+
+.no_tasks_message {
+    padding: 8px;
+}
+
+.hour_separator_cell {
+    background-color: #113;
+    color: white;
+    padding: 4px;
+    font-weight: bold;
+}
+
+.hour_lapse_separator {
+    background-color: #112;
+    color: white;
+    padding: 4px;
+    border-bottom: 1px solid #FFF;
+}
+
+.hour_lapse_list {
+    background-color: #CCC;
+}
+
+.hour_task_block {
+    display: block;
+    border-bottom: 1px solid #AAA;
+    border-bottom: 1px solid #AAA;
+    padding: 0px;
+    padding-left: 1px;
+    padding-right: 1px;
+}
+
+.hour_task_pill {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.hour_task_pill>* {
+    flex: 1;
+    position: relative;
+}
+
+.hour_task_pill>.button_pill_cell {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.lighted_cell {
+    border: 1px solid white;
+    padding: 0px;
+    padding-top: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-bottom: 4px;
+    height: 100%;
+}
+
+.psicodelic_cell {
+    animation: fondoPsicodelicoTio 20s infinite, bordeLatido 2s infinite;
+    color: white;
+    text-shadow: 0 0 1px black;
+}
+
+.hour_task_pill>*>button {
+    border: 1px solid #c7c7c7;
+    border-radius: 0pt;
+}
+
+.hour_task_pill>.pill_end.button_pill_cell>button {
+    border-top-right-radius: 2pt;
+    border-bottom-right-radius: 2pt;
+}
+
+.hour_task_dragger {
+    flex: 1;
+    background-color: orange;
+}
+
+.box_for_date_details {}
+
+.hour_task_details_start,
+.hour_task_details_duration {
+    background-color: rgba(229, 234, 125, 0.87);
+    color: #020d48;
+    text-shadow: 0 0 1px #9691b3;
+}
+
+.hour_task_name {
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+}
+
+.hour_compromises {
+    color: rgb(112, 112, 112);
+}
+
+.hour_table {
+    border-left: 1px solid #114;
+    border-right: 1px solid #114;
+    border-bottom: 1px solid #114;
+}
+
+.pill_start,
+.pill_middle,
+.pill_end {}
+
+.pill_start {
+    border: 1px solid black;
+    border-radius: 2pt;
+    border-top-right-radius: 0pt;
+    border-bottom-right-radius: 0pt;
+    font-weight: bold;
+    white-space: nowrap;
+    padding-top: 2px;
+}
+
+.pill_middle,
+.pill_end {
+    border: 1px solid black;
+    border-left: none;
+    white-space: nowrap;
+}
+
+.pill_middle {
+    border-radius: 0pt;
+}
+
+.pill_end {
+    border: 1px solid black;
+    border-left: none;
+    border-radius: 2pt;
+    border-top-left-radius: 0pt;
+    border-bottom-left-radius: 0pt;
+    white-space: nowrap;
+}
+
+.hour_task_block.is_completed .hour_task_name {
+    background-color: #46c01a;
+}
+
+.hour_task_block.is_pending .hour_task_name {
+    background-color: #e5df23;
+}
+
+.hour_task_block.is_failed .hour_task_name {
+    background-color: #5a2020;
+    color: white;
+    text-shadow: 0 0 4px black;
+    text-decoration: line-through;
+    font-weight: bold;
+}
+
+.hour_task_editer {}
+
+.hour_task_deleter {}
+
+.hour_task_editer,
+.hour_task_deleter {
+    cursor: pointer;
+}
+
+.hidden_menu {
+    position: relative;
+}
+
+.hidden_menu_box {
+    position: absolute;
+    top: 0;
+    bottom: auto;
+    left: 0;
+    right: auto;
+    padding: 4px;
+    padding-top: 4px;
+    padding-left: 0px;
+    z-index: 1001;
+}
+
+.hidden_menu_items {
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid #999;
+    border-radius: 2pt;
+    box-shadow: 0 0 4px black;
+}
+
+.hidden_menu_items>div {
+    white-space: nowrap;
+    padding: 0px;
+    border-top: 0px solid #999;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.hidden_menu_items>div:first-child {
+    border-top: 0px solid white;
+}
+
+.hidden_menu_items>div>button {
+    width: 100%;
+    padding: 2px;
+    text-align: left;
+}
+
+.hidden_menu_items>.button_cell {
+    padding-bottom: 0px;
+}
+
+.hidden_menu_items>.separator {
+    width: 100%;
+    padding: 0px;
+    padding-bottom: 1px;
+    text-align: left;
+    min-height: 25px;
+    /* @CAUTION: depends on button{height} */
+    display: flex;
+    align-items: center;
+}
+
+.hidden_menu_items>.title {
+    width: 100%;
+    padding: 0px;
+    font-weight: bold;
+    text-align: left;
+    min-height: 25px;
+    /* @CAUTION: depends on button{height} */
+    display: flex;
+    align-items: center;
+    border-bottom: 1px dotted #000;
+    background-color: #AAA8;
+    background-color: #33BC;
+    color: white;
+    padding: 2px;
+    padding-left: 2px;
+    padding-left: 0px;
+}
+
+.hidden_menu_fixed_layer {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+
+.form_label {
+    padding-top: 4px;
+}
+
+input.form_control {
+    width: 100%;
+}
+
+
+.form_label {}
+
+@keyframes fondoPsicodelicoTio {
+    0% {
+        background-color: rgb(74, 0, 0);
+    }
+
+    16% {
+        background-color: rgb(74, 74, 0);
+    }
+
+    32% {
+        background-color: rgb(0, 74, 0);
+    }
+
+    48% {
+        background-color: rgb(0, 74, 74);
+    }
+
+    64% {
+        background-color: rgb(0, 0, 74);
+    }
+
+    80% {
+        background-color: rgb(74, 0, 74);
+    }
+
+    100% {
+        background-color: rgb(74, 0, 0);
+    }
+}
+
+@keyframes bordePsicodelicoTio {
+    0% {
+        background-color: rgb(74, 0, 0);
+    }
+
+    16% {
+        background-color: rgb(74, 74, 0);
+    }
+
+    32% {
+        background-color: rgb(0, 74, 0);
+    }
+
+    48% {
+        background-color: rgb(0, 74, 74);
+    }
+
+    64% {
+        background-color: rgb(0, 0, 74);
+    }
+
+    80% {
+        background-color: rgb(74, 0, 74);
+    }
+
+    100% {
+        background-color: rgb(74, 0, 0);
+    }
+}
+
+@keyframes bordeLatido {
+    0% {
+        border-color: #FFF;
+    }
+
+    20% {
+        border-color: #FFF;
+    }
+
+    25% {
+        border-color: #FFF;
+    }
+
+    30% {
+        border-color:#000;
+    }
+
+    40% {
+        border-color: #FFF;
+    }
+
+    43% {
+        border-color:#000;
+    }
+
+    50% {
+        border-color: #FFF;
+    }
+
+    100% {
+        border-color: #FFF;
+    }
+}
+
+.bordePsicodelicoTio {
+    animation: bordePsicodelicoTio 30s infinite;
+}
+
+.fondoPsicodelicoTio {
+    animation: fondoPsicodelicoTio 30s infinite;
+}
+
+/*
+RGB=
+100
+
+subir(G) 110
+bajar(R) 010
+subir(B) 011
+bajar(G) 001
+subir(R) 101
+bajar(B) 100
+
+=100
+74,0,0
+74,74,0
+0,74,0
+0,74,74
+0,0,74
+74,0,74
+74,0,0
+
+0,0,74
+0,74,0
+0,74,74
+74,0,0
+74,0,74
+74,74,0
+*/
+
+.form_label .enunciate_box {
+    display: inline-block;
+}
+
+.form_label .info_icon {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.form_label .explanation {
+    display: inline;
+    color: #777;
+}
+
+.form_title {
+    background-color: #555;
+    color: white;
+    padding: 8px;
+    border: 1px solid black;
+    font-weight: bold;
+}
+
+.selected_day_title {
+    background-color: #0f0f0f;
+    color: #c4e8bc;
+    padding: 4px;
+    border: 1px solid black;
+    font-weight: bold;
+    text-shadow: 0 0 1px black;
+    min-height: 37px;
+    border-bottom: 1px solid #4f4f4f;
+}
+
+.tasks_viewer {
+    padding: 8px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+.LswAgendaAccionAdd {
+
+}
+
+.LswAgendaAccionSearch {
+
+}
+.lsw_agenda_breadcrumb {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.agenda_breadcrumb {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    border: 1px solid #999;
+    border-radius: 2pt;
+    padding: 4px;
+    background-color: rgba(193, 193, 193, 0.51);
+}
+.agenda_breadcrumb_item {
+    flex: 1;
+    padding: 4px;
+}
+.agenda_breadcrumb_link {
+    color: black;
+    font-weight: normal;
+    cursor: pointer;
+}
+.agenda_breadcrumb_link:hover {
+    text-decoration: underline;
+}
+.agenda_breadcrumb_link.only_label {
+    font-weight: normal;
+    text-decoration: none;
+    cursor: inherit;
+}
+.LswAgendaConceptoAdd {
+
+}
+.LswAgendaConceptoSearch {
+
+}
+.LswAgendaEventoSearch {
+
+}
+.form_item {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border-top: 1px solid #CCC;
+}
+select.form_control {
+    width: 100%;
+}
+.enunciate_box2 {
+    padding-bottom: 2px;
+}
+.enunciate {
+    font-weight: bold;
+    display: block;
+}
+.enunciate > .enunciate_text {
+    display: inline;
+    white-space: nowrap;
+}
+.enunciate_box {
+    padding-left: 4px;
+    float: right;
+}
+.enunciate > .coderef {
+    display: inline;
+    padding-bottom: 2px;
+}
+.enunciate > .coderef > .codenote {
+    display: inline;
+    font-weight: normal;
+    font-size: 9px;
+    white-space: nowrap;
+    padding-right: 2px;
+}
+.enunciate > .coderef > .codenote.as_note {
+    padding-left: 2px;
+}
+.enunciate > .coderef > .codetext {
+    display: inline;
+    font-weight: normal;
+    font-family: monospace;
+    font-size: 8px;
+    white-space: nowrap;
+}
+.enunciate > .coderef > .codetype {
+    font-size: 10px;
+    background-color: #CCC;
+    box-shadow: 0 0 2px black;
+    padding: 0px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+.validationBox {
+    display: none;
+    padding: 4px;
+    border: 1px solid #999;
+    margin-top: 1px;
+}
+.validationBox.errorBox {
+    display: block;
+    background-color: rgb(207, 100, 100);
+}
+.validationBox.successBox {
+    display: block;
+    background-color: rgb(127, 223, 127);
+}
+.LswAgendaImpresionAdd {
+
+}
+.LswAgendaImpresionSearch {
+
+}
+.LswAgendaInfraccionSearch {
+
+}
+.LswAgendaLimitadorAdd {
+
+}
+.LswAgendaLimitadorSearch {
+
+}
+.LswAgendaPostimpresionSearch {
+
+}
+.LswAgendaPropagacionSearch {
+
+}
+.LswAgendaPropagadorSearch {
+
+}
+.lsw-form-builder {
+    
+}
+
+.errorBox {
+    background-color: rgb(206, 133, 133);
+    color: black;
+    font-weight: bold;
+    border: red;
+    border-radius: 2pt;
+    margin-top: 2px;
+    margin-bottom: 4px;
+    padding: 8px;
+}
+.formtype_enunciate_block {
+    display: inline-block;
+}
+.formtype_label {
+    display: inline-block;
+}
+.formtype_info_button {
+    display: inline-block;
+}
+.formtype_enunciate_extra_info {
+    display: block;
+    border-top: 1px solid #888;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-size: 10px;
+}
+.formtype_label {
+    font-weight: bold;
+}
+.box_error_container {
+    display: none;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.box_error_container.error_is_affecting_field {
+    display: block;
+}
+
+.box_error_container > .box_error_content {
+    background-color: rgb(217, 70, 70);
+    color: #000;
+    border: 1px solid black;
+    padding: 4px;
+    margin-top: 4px;
+    border-radius: 2pt;
+    box-shadow: 0 0 4px black;
+    white-space: pre;
+    overflow: scroll;
+    height: 80px;
+    resize: vertical;
+}
+.lsw_text_control {
+    
+}
+.lsw_long_text_control {
+    
+}
+.lsw_date_control {
+    
+}
+.lsw_duration_control {
+    
+}
+.lsw_number_control {
+    
+}
+.lsw_options_control {
+    
+}
+.lsw_source_code_control {
+    
+}
+.lsw_ref_object_control {}
+.lsw_ref_list_control {}
+.lsw_ref_relation_control {}
+.lsw-schema-based-form {}
+
+.schema_form_top_panel {
+    background-color: #113;
+}
+
+.title_box_one_line {
+    display: flex;
+    flex-direction: column;
+}
+
+.title_text_cell {
+    flex: 1;
+    padding: 4px;
+    padding-left: 0px;
+}
+
+.title_database_id_cell {
+    flex: 1;
+    color: #AAA;
+    padding-bottom: 4px;
+}
+
+.schema_form_title_box {
+  background-color: rgb(2, 2, 32);
+  color: white;
+  padding-top: 0px;
+  font-size: 14px;
+  box-shadow: 0 0 4px black;
+  border: 4px double yellow;
+}
+
+.subtitle_box {
+    background-color: #333;
+    color: white;
+    padding: 8px;
+    font-weight: bold;
+}
+
+.bottom_title_box {
+    border: 0px solid black;
+    border-top: 0px solid black;
+}
+
+.schema_form_title_text {
+    text-shadow: 0 0 1px white;
+}
+
+.lsw_schema_form_container {
+    text-align: center;
+}
+
+.lsw_schema_form_content {
+    display: inline-block;
+    text-align: left;
+    max-width: 450px;
+    width: 100%;
+    resize: vertical;
+}
+
+
+
+
+
+/* RESET STYLES */
+h3 {
+    margin: 0;
+    padding: 4px;
+}
+
+/* STYLE-BASED COMPONENTS */
+.pill_group {
+
+}
+.pill_group > * {
+    border-radius: 0pt;
+}
+.pill_group > *:first-child {
+    border-top-left-radius: 2pt;
+    border-bottom-left-radius: 2pt;
+}
+.pill_group > *:last-child {
+    border-top-right-radius: 2pt;
+    border-bottom-right-radius: 2pt;
+}
+
+table.collapsed_table {
+    border-collapse: collapse;
+    border: 1px solid #999;
+}
+table.collapsed_table > thead > tr > th {
+    /*padding: 8px;*/
+    background-color: black;
+    color: white;
+    border-right: 1px solid #999;
+    vertical-align: middle;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-bottom: 1px solid white;
+}
+table.collapsed_table > thead > tr > th:last-child {
+    border-right: none;
+}
+
+table.basic_table {
+    border-collapse: collapse;
+    border: 0px solid white;
+}
+table.basic_table > tbody > tr:nth-child(odd) {
+    background-color: #FFF;
+}
+table.basic_table > tbody > tr > td {
+    vertical-align: top;
+}
+table.basic_table > thead > tr,
+table.basic_table > tbody > tr:nth-child(even) {
+    background-color: #DDD;
+}
+table.basic_table > thead > tr > th {
+    
+}
+table.basic_table > thead > tr > th:last-child {
+    border-right: none solid white;
+}
+
+/* INLINE RULES */
+.display_block { display: block; }
+.display_flex_row { display: flex; flex-direction: row; }
+.display_flex_column { display: flex; flex-direction: column; }
+.display_inline_block { display: inline-block; }
+.text_align_center { text-align: center; }
+.text_align_left { text-align: left; }
+.text_align_right { text-align: right; }
+.width_100 { width: 100%; }
+.width_1 { width: 1%; }
+.width_auto { width: auto; }
+
