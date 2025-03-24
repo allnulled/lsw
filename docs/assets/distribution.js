@@ -20055,7 +20055,6 @@ Vue.component("LswCalendario", {
         }
         this.celdas_del_mes_actual = dias;
         this.propagar_cambio();
-        this.actualizar_fecha_seleccionada(false);
       } catch (error) {
         console.log(error);
         throw error;
@@ -21586,13 +21585,10 @@ Vue.component("LswConsoleHooker", {
   },
   mounted() {
     this.instance = new ConsoleHooker("lsw-console-hooker-output");
-    if(process.env.NODE_ENV === "test") {
-      // !@DESCOMENTAR: para restaurar consola (OFUSCA LOGS EN desarrollo)
-      this.instance.restoreConsole();
+    if(process.env.NODE_ENV !== "production") {
     }
-    if(process.env.NODE_ENV === "production") {
-      this.hide();
-    }
+    this.instance.restoreConsole();
+    this.hide();
     this.$vue.prototype.$consoleHooker = this;
     this.$window.LswConsoleHooker = this;
   },
@@ -22919,7 +22915,6 @@ Vue.component("LswCalendario", {
         }
         this.celdas_del_mes_actual = dias;
         this.propagar_cambio();
-        this.actualizar_fecha_seleccionada(false);
       } catch (error) {
         console.log(error);
         throw error;
@@ -23411,7 +23406,7 @@ Vue.component("LswAgenda", {
           out[day].push(item);
           return out;
         }, {});
-        calendario.establecer_marcadores_del_mes(tasksOfMonthByDay);
+        // calendario.establecer_marcadores_del_mes(tasksOfMonthByDay);
       }
     },
     groupTasksByHour(tareas = this.selectedDateTasks) {
