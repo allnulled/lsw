@@ -2,8 +2,8 @@ Start_environment: {
   window.process = Object.assign(window.process || {});
   window.process.env = Object.assign(window.process || {});
   window.process.env.NODE_ENV = window.location.href.startsWith("https") ? "production" : "test";
+  window.process.env.NODE_ENV = "production";      
   window.process.env.NODE_ENV = "test";
-  window.process.env.NODE_ENV = "production";
 }
 
 const boot = async function () {
@@ -139,6 +139,7 @@ const boot = async function () {
               importer.importVueComponent("lsw-framework/src/components/lsw-formtypes/components/lsw-formtype/lsw-formtype"),
               importer.importVueComponent("lsw-framework/src/components/lsw-formtypes/components/lsw-formtype/partials/lsw-control-label/lsw-control-label"),
               importer.importVueComponent("lsw-framework/src/components/lsw-formtypes/components/lsw-formtype/partials/lsw-control-error/lsw-control-error"),
+              importer.importVueComponent("lsw-framework/src/components/lsw-formtypes/components/lsw-formtype/partials/lsw-error-viewer/lsw-error-viewer"),
               importer.importVueComponent("lsw-framework/src/components/lsw-formtypes/components/lsw-formtype/type/lsw-text-control/lsw-text-control"),
               importer.importVueComponent("lsw-framework/src/components/lsw-formtypes/components/lsw-formtype/type/lsw-long-text-control/lsw-long-text-control"),
               importer.importVueComponent("lsw-framework/src/components/lsw-formtypes/components/lsw-formtype/type/lsw-date-control/lsw-date-control"),

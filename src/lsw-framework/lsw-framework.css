@@ -202,13 +202,12 @@ table.lsw_table_itself>thead>tr>th.button_header {
 }
 
 .lsw_table_itself>tbody>tr>td {
-    vertical-align: top;
+    vertical-align: middle;
     max-width: 180px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     border-left: 1px solid #999;
-    padding: 4px;
 }
 
 .lsw_table_itself>tbody>tr>td:first-child {
@@ -221,8 +220,10 @@ table.lsw_table_itself>thead>tr>th.button_header {
 }
 
 .lsw_table_itself>tbody>tr>td.data_cell {
-    padding: 4px;
+    padding: 0px;
     padding-bottom: 0px;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 .lsw_table_itself>tbody>tr>td.data_cell>* {
@@ -272,9 +273,7 @@ table.lsw_table_itself>thead>tr>th.button_header {
 .lsw_table_top_panel {
     background-color: #CCC;
     padding: 4px;
-    padding-top: 0;
-    padding-bottom: 0;
-    box-shadow: 0 0 4px black;
+    border: 1px solid #88888888;
     margin-bottom: 4px;
 }
 .lsw_table_top_button {
@@ -628,7 +627,9 @@ table.top_aligned > tbody > tr > td {
     vertical-align: top;
 }
 
-
+.page_tables.page .lsw_table_itself > tbody > tr > td {
+    vertical-align: top !important;
+}
 .lsw_filesystem_explorer {
     position: absolute;
     top: 0;
@@ -1126,19 +1127,21 @@ button.active > .total_de_tareas_de_dia > div {
     background-color: rgba(255, 255, 255, 0.7);
     border: 1px solid #999;
     border-radius: 2pt;
+    border-top: 0px solid #999;
+    border-bottom: 1px solid #999;
     box-shadow: 0 0 4px black;
 }
 
 .hidden_menu_items>div {
     white-space: nowrap;
     padding: 0px;
-    border-top: 0px solid #999;
-    padding-top: 1px;
-    padding-bottom: 1px;
+    border-top: 1px solid #999;
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 
 .hidden_menu_items>div:first-child {
-    border-top: 0px solid white;
+    border-top: 1px solid white;
 }
 
 .hidden_menu_items>div>button {
@@ -1361,7 +1364,7 @@ bajar(B) 100
     border: 1px solid black;
     font-weight: bold;
     text-shadow: 0 0 1px black;
-    min-height: 37px;
+    min-height: 35px;
     border-bottom: 1px solid #4f4f4f;
 }
 
@@ -1561,6 +1564,7 @@ select.form_control {
     height: 80px;
     resize: vertical;
 }
+
 .lsw_text_control {
     
 }

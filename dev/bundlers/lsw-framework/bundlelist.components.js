@@ -47,6 +47,7 @@ module.exports = [
   `${basepath}/src/components/lsw-formtypes/components/lsw-formtype/lsw-formtype`,
   `${basepath}/src/components/lsw-formtypes/components/lsw-formtype/partials/lsw-control-label/lsw-control-label`,
   `${basepath}/src/components/lsw-formtypes/components/lsw-formtype/partials/lsw-control-error/lsw-control-error`,
+  `${basepath}/src/components/lsw-formtypes/components/lsw-formtype/partials/lsw-error-viewer/lsw-error-viewer`,
   `${basepath}/src/components/lsw-formtypes/components/lsw-formtype/type/lsw-text-control/lsw-text-control`,
   `${basepath}/src/components/lsw-formtypes/components/lsw-formtype/type/lsw-long-text-control/lsw-long-text-control`,
   `${basepath}/src/components/lsw-formtypes/components/lsw-formtype/type/lsw-date-control/lsw-date-control`,
