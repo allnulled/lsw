@@ -2,8 +2,8 @@ Start_environment: {
   window.process = Object.assign(window.process || {});
   window.process.env = Object.assign(window.process || {});
   window.process.env.NODE_ENV = window.location.href.startsWith("https") ? "production" : "test";
-  window.process.env.NODE_ENV = "production";      
   window.process.env.NODE_ENV = "test";
+  window.process.env.NODE_ENV = "production";      
 }
 
 const boot = async function () {
