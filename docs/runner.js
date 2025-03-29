@@ -18,6 +18,55 @@ LswLifecycle.hooks.register("app:all_loaded", "inject_development_point", async 
   Step_2_inject_development_point: {
     try {
       console.log("[*] Application is ready here!");
+      // @TOUNCOMMENT:
+      // return;
+      Load_e2e_utils: {
+        window.filterDomElements = function (selector, filterCallback, base = document) {
+          return Array.from(base.querySelectorAll(selector)).filter(filterCallback);
+        };
+        window.getButtonFromLswTableCellText = function (text, buttonIndex = 0, context = undefined, selector = ".lsw_database_ui table td.data_cell") {
+          return jQuery(selector, context).filter((i, cell) => {
+            return cell.textContent.trim() === text
+          }).eq(0).closest("tr").find("button").eq(buttonIndex);
+        };
+      }
+
+      Working_on_filesystem: {
+        break Working_on_filesystem;
+        document.querySelector("#windows_pivot_button").click();
+        await waitForMilliseconds(100);
+        filterDomElements(".main_tab_topbar > button", button => button.textContent.trim() === "📂 Files")[0].click();
+        await waitForMilliseconds(100);
+      }
+
+      Fill_database_with_limitadores_fake: {
+        if(process.env.NODE_ENV === "production") {
+          break Fill_database_with_limitadores_fake
+        };
+        await Vue.prototype.$lsw.database.deleteMany("Limitador", it => true);
+        await Vue.prototype.$lsw.database.insertMany("Limitador", [{
+          en_concepto: "Ejercicio físico * 1 al día",
+          tiene_funcion: (async function() {
+            const hoy = new Date();
+            const fechaDeHoy = `${hoy.getFullYear()}/${((hoy.getMonth() +1) + "").padStart(2, "0")}/${(hoy.getDate() + "").padStart(2, "0")}`;
+            const acciones = await this.$lsw.database.selectMany("Accion", accion => {
+              return accion.tiene_inicio.startsWith(fechaDeHoy);
+            });
+            const ejerciciosFisicos = [];
+            for(let index=0; index<acciones.length; index++) {
+              const accion = acciones[index];
+              const isAccepted = accion.en_concepto === "Ejercicio físico";
+              if(isAccepted) {
+                ejerciciosFisicos.push(accion);
+              }
+            }
+            if(!ejerciciosFisicos.length) {
+              throw new Error("Debes hacer ejercicio físico 1 vez al día");
+            }
+          }).toString()
+        }]);
+      }
+
       break Step_2_inject_development_point;
       // Vue.prototype.$consoleHooker.instance.restoreConsole();
       Fill_database: {
@@ -106,14 +155,6 @@ LswLifecycle.hooks.register("app:all_loaded", "inject_development_point", async 
           tiene_funcion: "console.log('ok')",
         });
       }
-      window.filterDomElements = function (selector, filterCallback, base = document) {
-        return Array.from(base.querySelectorAll(selector)).filter(filterCallback);
-      }
-      window.getButtonFromLswTableCellText = function (text, buttonIndex = 0, context = undefined, selector = ".lsw_database_ui table td.data_cell") {
-        return jQuery(selector, context).filter((i, cell) => {
-          return cell.textContent.trim() === text
-        }).eq(0).closest("tr").find("button").eq(buttonIndex);
-      };
 
       // return;
 
@@ -144,7 +185,7 @@ LswLifecycle.hooks.register("app:all_loaded", "inject_development_point", async 
           await waitForMilliseconds(100);
           filterDomElements("button", button => button.textContent.trim() === "➕")[0].click();
           await waitForMilliseconds(100);
-          
+
         }
       }
       Working_on_agenda: {

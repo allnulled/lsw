@@ -39,6 +39,7 @@ module.exports = [
   `${basepath}/src/components/lsw-agenda/components/lsw-agenda-infraccion-search/lsw-agenda-infraccion-search`,
   `${basepath}/src/components/lsw-agenda/components/lsw-agenda-limitador-add/lsw-agenda-limitador-add`,
   `${basepath}/src/components/lsw-agenda/components/lsw-agenda-limitador-search/lsw-agenda-limitador-search`,
+  `${basepath}/src/components/lsw-agenda/components/lsw-agenda-limitador-viewer/lsw-agenda-limitador-viewer`,
   `${basepath}/src/components/lsw-agenda/components/lsw-agenda-postimpresion-search/lsw-agenda-postimpresion-search`,
   `${basepath}/src/components/lsw-agenda/components/lsw-agenda-propagacion-search/lsw-agenda-propagacion-search`,
   `${basepath}/src/components/lsw-agenda/components/lsw-agenda-propagador-search/lsw-agenda-propagador-search`,

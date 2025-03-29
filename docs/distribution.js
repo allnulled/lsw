@@ -18944,24 +18944,24 @@ Vue.component("LswFilesystemExplorer", {
       this._update_current_node_basename();
       this._update_current_node_basedir();
     },
-    set_panel_buttons(panelOptions = {}) {
+    setPanelButtons(panelOptions = {}) {
       Validation: {
         if (typeof panelOptions !== "object") {
-          throw new Error("Required argument «panelOptions» to be an object on «LswFilesystemExplorer.methods.set_panel_buttons»");
+          throw new Error("Required argument «panelOptions» to be an object on «LswFilesystemExplorer.methods.setPanelButtons»");
         }
         const keys = Object.keys(panelOptions);
         if (keys.length === 0) {
-          throw new Error("Required argument «panelOptions» to be have 1 or more keys on «LswFilesystemExplorer.methods.set_panel_buttons»");
+          throw new Error("Required argument «panelOptions» to be have 1 or more keys on «LswFilesystemExplorer.methods.setPanelButtons»");
         }
         const valid_keys = ["top", "bottom", "left", "right"];
         for (let index = 0; index < keys.length; index++) {
           const key = keys[index];
           if(valid_keys.indexOf(key) === -1) {
-            throw new Error(`Required argument «panelOptions[${key}]» to be a valid key out of «${valid_keys.join(",")}», not «${key}» on «LswFilesystemExplorer.methods.set_panel_buttons»`);
+            throw new Error(`Required argument «panelOptions[${key}]» to be a valid key out of «${valid_keys.join(",")}», not «${key}» on «LswFilesystemExplorer.methods.setPanelButtons»`);
           }
           const value = panelOptions[key];
           if(typeof value !== "object") {
-            throw new Error(`Required argument «panelOptions[${key}]» to be an object or array, not ${typeof value}» on «LswFilesystemExplorer.methods.set_panel_buttons»`);
+            throw new Error(`Required argument «panelOptions[${key}]» to be an object or array, not ${typeof value}» on «LswFilesystemExplorer.methods.setPanelButtons»`);
           }
         }
       }
@@ -19105,7 +19105,7 @@ Vue.component("LswFilesystemTreeviewer", {
     }
   },
   mounted() {
-    this.explorer.set_panel_buttons({
+    this.explorer.setPanelButtons({
       top: [],
       left: [],
       right: [],

@@ -12954,15 +12954,14 @@ if (process?.env?.NODE_ENV === "test") {
       return this.$db.close(...args);
     }
 
-    // Método para seleccionar elementos de un store con un filtro
-    select(store, filter) {
+    // Método para seleccionar 1 elemento de un store con un filtro
+    select(store, filter = {}) {
       this.constructor.trace("browsie.select", arguments);
       this.triggers.emit(`crud.select.one.${store}`, { store, filter });
       return new Promise((resolve, reject) => {
         const transaction = this.$db.transaction(store, 'readonly');
         const objectStore = transaction.objectStore(store);
         const request = objectStore.getAll();
-
         request.onsuccess = () => {
           const result = request.result.filter(item => {
             return Object.keys(filter).every(key => item[key] === filter[key]);
@@ -13005,7 +13004,7 @@ if (process?.env?.NODE_ENV === "test") {
     async overwrite(store, idOrItem, item) {
       this.constructor.trace("browsie.overwrite", arguments);
       this.triggers.emit(`crud.overwrite.one.${store}`, { store, idOrItem, item });
-      const isId = typeof idOrItem === "string";
+      const isId = (typeof idOrItem === "string") || (typeof idOrItem === "number");
       const isItem = typeof idOrItem === "object";
       let previousItem = undefined;
       if (isItem) {
@@ -13046,7 +13045,7 @@ if (process?.env?.NODE_ENV === "test") {
       Iterating_tables:
       for (let indexTables = 0; indexTables < tableIds.length; indexTables++) {
         const tableId = tableIds[indexTables];
-        if(tableId === store) {
+        if (tableId === store) {
           return innerSchema.hasTables[tableId];
         }
       }
@@ -13078,7 +13077,7 @@ if (process?.env?.NODE_ENV === "test") {
               break When_it_has_references;
             }
             const isSameEntity = schemaEntityId === sourceEntityId;
-            if(!isSameEntity) {
+            if (!isSameEntity) {
               break When_it_has_references;
             }
             boundColumns.push({
@@ -13137,12 +13136,10 @@ if (process?.env?.NODE_ENV === "test") {
     selectMany(store, filterFn = i => true) {
       this.constructor.trace("browsie.selectMany", arguments);
       this.triggers.emit(`crud.select.many.${store}`, { store, filterFn });
-
       return new Promise((resolve, reject) => {
         const transaction = this.$db.transaction(store, 'readonly');
         const objectStore = transaction.objectStore(store);
         const request = objectStore.openCursor(); // Usa cursor para recorrer la BD sin cargar todo en memoria
-
         const results = [];
         request.onsuccess = (event) => {
           const cursor = event.target.result;
@@ -13161,7 +13158,6 @@ if (process?.env?.NODE_ENV === "test") {
             resolve(results); // Se terminó el recorrido
           }
         };
-
         request.onerror = (error) =>
           reject(this._expandError(error, `Error on «browsie.selectMany» operation over store «${store}»: `));
       });
@@ -13234,9 +13230,9 @@ if (process?.env?.NODE_ENV === "test") {
     }
 
     // Método para eliminar varios items de un store según un filtro
-    deleteMany(store, filter) {
+    deleteMany(store, filterCallback) {
       this.constructor.trace("browsie.deleteMany", arguments);
-      this.triggers.emit(`crud.delete.many.${store}`, { store, filter });
+      this.triggers.emit(`crud.delete.many.${store}`, { store, filterCallback });
       return new Promise((resolve, reject) => {
         const transaction = this.$db.transaction(store, 'readwrite');
         const objectStore = transaction.objectStore(store);
@@ -13244,18 +13240,22 @@ if (process?.env?.NODE_ENV === "test") {
         let deletedCount = 0;
         request.onsuccess = () => {
           const cursor = request.result;
-          if (cursor) {
-            if (Object.keys(filter).every(key => cursor.value[key] === filter[key])) {
-              const deleteRequest = cursor.delete();
-              deleteRequest.onsuccess = () => {
-                deletedCount++;
-                if (deletedCount === cursor.value.length) resolve();
-              };
-            }
-            cursor.continue();
+          if (!cursor) {
+            return resolve();
           }
+          const isAccepted = filterCallback(cursor.value);
+          if (isAccepted) {
+            const deleteRequest = cursor.delete();
+            deleteRequest.onsuccess = () => {
+              deletedCount++;
+              if (deletedCount === cursor.value.length) {
+                return resolve();
+              }
+            };
+            deleteRequest.onerror = (error) => reject(this._expandError(error, `Error on «browsie.deleteMany» operation over store «${store}» and id «${cursor.value.id}»: `));
+          }
+          cursor.continue();
         };
-
         request.onerror = (error) => reject(this._expandError(error, `Error on «browsie.deleteMany» operation over store «${store}»: `));
       });
     }
@@ -16527,7 +16527,7 @@ return Store;
       return this;
     }
     trace(method, args = []) {
-      console.log("[ufs][node-driver][" + method + "]", Array.from(args).map(arg => typeof(arg) + ": " + arg).join(", "));
+      console.log("[ufs][node-driver][" + method + "]", Array.from(args).map(arg => typeof (arg) + ": " + arg).join(", "));
     }
     resolve_path(...args) {
       this.trace("resolve_path", arguments);
@@ -16586,7 +16586,7 @@ return Store;
       return require("fs").rmdirSync(node, { recursive: true });
     }
   }
-  
+
   const UFS_manager_for_localstorage = class extends UFS_manager_for_node {
     constructor(storage_id = "ufs_main_storage") {
       super();
@@ -16594,7 +16594,7 @@ return Store;
       this.current_directory = this.environment === "node" ? process.cwd : "/";
     }
     trace(method, args = []) {
-      console.log("[ufs][ls-driver][" + method + "]", Array.from(args).map(arg => typeof(arg) + ": " + arg).join(", "));
+      console.log("[ufs][ls-driver][" + method + "]", Array.from(args).map(arg => typeof (arg) + ": " + arg).join(", "));
     }
     get_persisted_data() {
       this.trace("get_persisted_data", arguments);
@@ -16849,7 +16849,7 @@ return Store;
     }
 
     trace(method, args = []) {
-      console.log("[ufs][idb-driver][" + method + "]", Array.from(args).map(arg => typeof(arg) + ": " + arg).join(", "));
+      console.log("[ufs][idb-driver][" + method + "]", Array.from(args).map(arg => typeof (arg) + ": " + arg).join(", "));
     }
 
     init() {
@@ -16858,8 +16858,11 @@ return Store;
         request.onupgradeneeded = (event) => {
           let db = event.target.result;
           if (!db.objectStoreNames.contains("ufs")) {
-            let store = db.createObjectStore("ufs", { keyPath: "id" });
-            store.createIndex("parentId", "parentId", { unique: false });
+            let store = db.createObjectStore("ufs", {
+              keyPath: "id",
+              autoIncrement: true,
+            });
+            store.createIndex("filepath", "filepath", { unique: true });
           }
         };
         request.onsuccess = (event) => {
@@ -16870,20 +16873,66 @@ return Store;
       });
     }
 
+    _get_filename(somepath) {
+      return somepath.split("/").filter(p => typeof (p) !== "undefined").pop();
+    }
+
+    isImmediateSubpathFrom(subpath, matchable) {
+      const matchablePos = matchable.length;
+      const coincidesParentPath = subpath.substr(0, matchablePos) === matchable;
+      if (!coincidesParentPath) return false;
+      const hasNoMoreSlashes = subpath.substr(matchablePos).indexOf("/") === -1;
+      if (!hasNoMoreSlashes) return false;
+      return true;
+    }
+
     read_directory(parentIdInput = "/") {
       this.trace("read_directory", arguments);
       const parentId = this.resolve_path(parentIdInput);
       return new Promise((resolve, reject) => {
-        const transaction = this.db.transaction("ufs", "readonly");
-        const store = transaction.objectStore("ufs");
-        const index = store.index("parentId");
-        const request = index.getAll(parentId);
-        request.onsuccess = () => {
-          let result = {};
-          for (let item of request.result) {
-            result[item.name] = item.type === "file" ? "..." : {};
+        The_previous_process: {
+          break The_previous_process;
+          const transaction = this.db.transaction("ufs", "readonly");
+          const store = transaction.objectStore("ufs");
+          const index = store.index("filepath");
+          const request = index.getAll(parentId);
+          request.onsuccess = () => {
+            let result = {};
+            for (let item of request.result) {
+              result[item.name] = item.type === "file" ? "..." : {};
+            }
+            resolve(result);
+          };
+        }
+        const transaction = this.db.transaction("ufs", 'readonly');
+        const objectStore = transaction.objectStore("ufs");
+        const request = objectStore.openCursor(); // Usa cursor para recorrer la BD sin cargar todo en memoria
+        const results = [];
+        const matchableSubpath = (parentId === "/") ? parentId : (parentId + "/");
+        request.onsuccess = (event) => {
+          const cursor = event.target.result;
+          if (cursor) {
+            let isAccepted = false;
+            try {
+              isAccepted = cursor.value.filepath.startsWith(matchableSubpath);
+              isAccepted = isAccepted && this.isImmediateSubpathFrom(cursor.value.filepath, matchableSubpath);
+            } catch (error) {
+              console.error("Error arised from filter callback on «browsie.selectMany»", error);
+            }
+            if (isAccepted) {
+              // Añade a la colección de salida
+              results.push(cursor.value);
+            }
+            cursor.continue(); // Avanza al siguiente registro
+          } else {
+            // Se formatean los resultados:
+            const formattedResults = {};
+            results.forEach(row => {
+              const rowName = this._get_filename(row.filepath);
+              formattedResults[rowName] = row.type === "file" ? "..." : {};
+            });
+            resolve(formattedResults);
           }
-          resolve(result);
         };
         request.onerror = () => reject(request.error);
       });
@@ -16895,7 +16944,8 @@ return Store;
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction("ufs", "readonly");
         const store = transaction.objectStore("ufs");
-        const request = store.get(node);
+        const indexStore = store.index("filepath");
+        const request = indexStore.get(node);
         request.onsuccess = () => {
           resolve(request.result ? request.result.content : null);
         };
@@ -16903,25 +16953,30 @@ return Store;
       });
     }
 
-    write_file(nodeInput, contents) {
+    async write_file(nodeInput, contents) {
       this.trace("write_file", arguments);
       const node = this.resolve_path(nodeInput);
-      return new Promise((resolve, reject) => {
+      const file = await this.$filepath(node);
+      return await new Promise((resolve, reject) => {
         const transaction = this.db.transaction("ufs", "readwrite");
         const store = transaction.objectStore("ufs");
-        store.put({ id: node, name: node.split("/").pop(), parentId: node.split("/").slice(0, -1).join("/") || "/", type: "file", content: contents });
+        const filedata = { filepath: node, type: "file", content: contents };
+        if (file) {
+          filedata.id = file.id;
+        }
+        store.put(filedata);
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);
       });
     }
 
-    make_directory(nodeInput) {
+    async make_directory(nodeInput) {
       this.trace("make_directory", arguments);
       const node = this.resolve_path(nodeInput);
-      return new Promise((resolve, reject) => {
+      return await new Promise((resolve, reject) => {
         const transaction = this.db.transaction("ufs", "readwrite");
         const store = transaction.objectStore("ufs");
-        store.put({ id: node, name: node.split("/").pop(), parentId: node.split("/").slice(0, -1).join("/") || "/", type: "directory" });
+        store.put({ filepath: node, type: "directory" });
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);
       });
@@ -16933,7 +16988,8 @@ return Store;
       return new Promise((resolve) => {
         const transaction = this.db.transaction("ufs", "readonly");
         const store = transaction.objectStore("ufs");
-        const request = store.get(node);
+        const indexStore = store.index("filepath");
+        const request = indexStore.get(node);
         request.onsuccess = () => resolve(!!request.result);
         request.onerror = () => resolve(false);
       });
@@ -16945,7 +17001,8 @@ return Store;
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction("ufs", "readonly");
         const store = transaction.objectStore("ufs");
-        const request = store.get(node);
+        const indexStore = store.index("filepath");
+        const request = indexStore.get(node);
         request.onsuccess = () => resolve(request.result ? request.result.type === "file" : false);
         request.onerror = () => reject(request.error);
       });
@@ -16957,7 +17014,8 @@ return Store;
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction("ufs", "readonly");
         const store = transaction.objectStore("ufs");
-        const request = store.get(node);
+        const indexStore = store.index("filepath");
+        const request = indexStore.get(node);
         request.onsuccess = () => resolve(request.result ? request.result.type === "directory" : false);
         request.onerror = () => reject(request.error);
       });
@@ -16966,36 +17024,69 @@ return Store;
     delete_file(nodeInput) {
       this.trace("delete_file", arguments);
       const node = this.resolve_path(nodeInput);
-      return new Promise((resolve, reject) => {
-        const transaction = this.db.transaction("ufs", "readwrite");
-        const store = transaction.objectStore("ufs");
-        const request = store.delete(node);
-        transaction.oncomplete = () => resolve();
-        transaction.onerror = () => reject(transaction.error);
+      return this.$deleteMany(file => {
+        return (file.type === "file") && (file.filepath === node);
       });
     }
 
-    delete_directory(nodeInput) {
+    async delete_directory(nodeInput) {
       this.trace("delete_directory", arguments);
       const node = this.resolve_path(nodeInput);
-      const memos = [node];
+      await this.$deleteMany(file => file.filepath.startsWith(node));
+      await this.$deleteMany(file => file.filepath === node);
+    }
+
+    $updateMany(filterCallback, expanderCallback) {
+      this.trace("$updateMany", arguments);
       return new Promise((resolve, reject) => {
-        this.read_directory(node).then(async (contents) => {
-          const transaction = this.db.transaction("ufs", "readwrite");
-          const store = transaction.objectStore("ufs");
-          Iterating_files:
-          for (let item in contents) {
-            const otherPath = this.resolve_path(`${node}/${item}`);
-            if(memos.indexOf(otherPath) !== -1) {
-              continue Iterating_files;
+        const transaction = this.db.transaction("ufs", 'readwrite');
+        const objectStore = transaction.objectStore("ufs");
+        const request = objectStore.openCursor();
+        let updatedCount = 0;
+        request.onsuccess = () => {
+          const cursor = request.result;
+          if (cursor) {
+            const isAccepted = filterCallback(cursor.value, cursor);
+            if (isAccepted) {
+              const expanderItem = expanderCallback({ ...cursor.value }, cursor);
+              const updatedItem = { ...cursor.value, ...expanderItem };
+              const updateRequest = cursor.update(updatedItem);
+              updateRequest.onsuccess = () => {
+                updatedCount++;
+              };
             }
-            memos.push(otherPath);
-            await this.delete_directory(otherPath);
+            cursor.continue();
+          } else {
+            return resolve(updatedCount);
           }
-          store.delete(node);
-          transaction.oncomplete = () => resolve();
-          transaction.onerror = () => reject(transaction.error);
-        });
+        };
+        request.onerror = () => reject(transaction.error);
+      });
+    }
+
+    $deleteMany(filterCallback) {
+      this.trace("$deleteMany", arguments);
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction("ufs", 'readwrite');
+        const objectStore = transaction.objectStore("ufs");
+        const request = objectStore.openCursor();
+        let deletedCount = 0;
+        request.onsuccess = () => {
+          const cursor = request.result;
+          if (cursor) {
+            const isAccepted = filterCallback(cursor.value, cursor);
+            if (isAccepted) {
+              const deleteRequest = cursor.delete();
+              deleteRequest.onsuccess = () => {
+                deletedCount++;
+              };
+            }
+            cursor.continue();
+          } else {
+            return resolve(deletedCount);
+          }
+        };
+        request.onerror = () => reject(transaction.error);
       });
     }
 
@@ -17003,28 +17094,100 @@ return Store;
       this.trace("rename", arguments);
       const node = this.resolve_path(nodeInput);
       const newNode = node.split("/").slice(0, -1).concat(newName).join("/") || "/";
-      return new Promise((resolve, reject) => {
+      const pathBegin = node.replace(/\/$/g, "") + "/";
+      const newNodeBegin = newNode.replace(/\/$/g, "") + "/";
+      console.log("Buscando nodos que empiecen por: «" + pathBegin + "»");
+      const renameSubnodes = async () => {
+        const allSubnodes = await this.$selectMany(file => file.filepath.startsWith(pathBegin));
+        const allPromises = [];
+        for (let index = 0; index < allSubnodes.length; index++) {
+          const subnode = allSubnodes[index];
+          const newSubpath = subnode.filepath.replace(pathBegin, newNodeBegin);;
+          console.log("Reemplazando a:", subnode.filepath, "Por:", newSubpath);
+          const subpromise = this.$update(subnode.id, { filepath: newSubpath });
+          allPromises.push(subpromise);
+        }
+        return await Promise.all(allPromises);
+      };
+      const renameNode = () => new Promise((resolve, reject) => {
         const transaction = this.db.transaction("ufs", "readwrite");
         const store = transaction.objectStore("ufs");
-        const request = store.get(node);
+        const indexStore = store.index("filepath");
+        const request = indexStore.get(node);
         request.onsuccess = () => {
           if (!request.result) {
             reject(new Error("Node not found"));
             return;
           }
           const data = request.result;
-          data.id = newNode;
-          data.name = newName;
-          store.delete(node);
+          data.filepath = newNode;
           store.put(data);
           transaction.oncomplete = () => resolve();
           transaction.onerror = () => reject(transaction.error);
         };
         request.onerror = () => reject(request.error);
       });
-    }    
+      return Promise.all([
+        renameNode().then(() => renameSubnodes()),
+      ]);
+    }
 
-  };
+    async $filepath(filepath) {
+      const selection = await this.$selectMany(file => file.filepath === filepath);
+      if (selection.length === 1) {
+        return selection[0];
+      } else if (selection.length > 1) {
+        return selection;
+      }
+      return null;
+    }
+
+    $selectMany(filterCallback) {
+      this.trace("$selectMany", arguments);
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction("ufs", 'readonly');
+        const objectStore = transaction.objectStore("ufs");
+        const request = objectStore.openCursor(); // Usa cursor para recorrer la BD sin cargar todo en memoria
+        const results = [];
+        request.onsuccess = (event) => {
+          const cursor = event.target.result;
+          if (cursor) {
+            let isAccepted = undefined;
+            try {
+              isAccepted = filterCallback(cursor.value);
+            } catch (error) {
+              console.error("Error arised from filter callback on «selectMany»", error);
+            }
+            if (isAccepted) { // Aplica la función de filtro
+              results.push(cursor.value);
+            }
+            cursor.continue(); // Avanza al siguiente registro
+          } else {
+            resolve(results); // Se terminó el recorrido
+          }
+        };
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    $update(id, item) {
+      this.trace("$update", arguments);
+      return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction("ufs", 'readwrite');
+        const objectStore = transaction.objectStore("ufs");
+        const request0 = objectStore.get(id);
+        request0.onsuccess = () => {
+          const originalState = request0.result;
+          if (!originalState) return reject(`No item found by id «${id}» on «$update»`);
+          const request = objectStore.put({ ...originalState, ...item, id });
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        };
+        request0.onerror = () => reject(request0.error);
+      });
+    }
+
+  }
 
   const api = {
     node_driver: UFS_manager_for_node,
@@ -17036,7 +17199,7 @@ return Store;
     },
     driver(id) {
       const driverId = id.toLowerCase() + "_driver";
-      if(!(driverId in api)) {
+      if (!(driverId in api)) {
         throw new Error(`Cannot find driver «${driverId}» on «UFS_manager.driver»`);
       }
       return {
@@ -21021,9 +21184,9 @@ Vue.component('LswDataImplorer', {
                                     v-if="enabledWindowsSystem"
                                     v-on:click="goHome">☰</button>
                                 <button class="mini"
-                                    v-on:click="minimize(dialog.id)">-</button>
+                                    v-on:click="minimize(dialog.id)">💡</button>
                                 <button class="mini"
-                                    v-on:click="close(dialog.id)">X</button>
+                                    v-on:click="close(dialog.id)">❌</button>
                             </div>
                         </div>
                         <div class="dialog_body">
@@ -21340,15 +21503,16 @@ Vue.component("LswWindowsMainTab", {
                     <div>Process manager</div>
                 </div>
                 <div class="dialog_topbar_buttons">
-                    <button v-if="\$consoleHooker?.is_shown === false" class="mini" style="white-space: nowrap;flex: 1; margin-right: 4px;" v-on:click="() => \$consoleHooker?.show()">💻</button><button class="mini" v-on:click="viewer.toggleState">-</button>
+                    <button v-if="\$consoleHooker?.is_shown === false" class="mini" style="white-space: nowrap;flex: 1; margin-right: 4px;" v-on:click="() => \$consoleHooker?.show()">💻</button
+                    ><button class="mini" v-on:click="viewer.toggleState">💡</button>
                 </div>
             </div>
             <div class="dialog_body">
                 <div class="main_tab_topbar">
-                    <button class="main_tab_topbar_button" v-on:click="openAgenda">Agenda</button>
-                    <button class="main_tab_topbar_button" v-on:click="openWiki">Wiki</button>
-                    <button class="main_tab_topbar_button" v-on:click="openRest">Data</button>
-                    <button class="main_tab_topbar_button" v-on:click="openFilesystem">Files</button>
+                    <button class="main_tab_topbar_button" v-on:click="openAgenda">📓 Agenda</button>
+                    <button class="main_tab_topbar_button" v-on:click="openWiki">🔬 Wiki</button>
+                    <button class="main_tab_topbar_button" v-on:click="openRest">📦 Data</button>
+                    <button class="main_tab_topbar_button" v-on:click="openFilesystem">📂 Files</button>
                 </div>
                 <div class="pad_normal" v-if="!Object.keys(\$lsw.dialogs.opened).length">
                     <span>No processes found right now.</span>
@@ -22100,30 +22264,31 @@ Vue.component("LswFilesystemExplorer", {
   name: "LswFilesystemExplorer",
   template: `<div class="lsw_filesystem_explorer">
     <div class="current_node_box">
-        <span class="previous_node_path" v-if="current_node !== '/'">
-            <button class="mini previous_node_button" v-on:click="go_up">◀</button>
+        <span class="previous_node_path" :class="current_node !== '/' ? '' : 'visibility_hidden'">
+            <button class="mini previous_node_button" v-on:click="goUp"
+            style="transform: rotate(180deg); margin: 1px;">➜</button>
         </span>
         <span class="current_node_path">{{ current_node_basedir }}</span>
         <span class="current_node_filename">{{ current_node_basename }}</span>
     </div>
     <div class="filesystem_ui">
         <div class="leftside">
-            <lsw-filesystem-buttons-panel :explorer="this" />
+            <lsw-filesystem-buttons-panel :explorer="this" ref="panelLeft" />
         </div>
         <div class="middleside">
             <div class="headerside">
-                <lsw-filesystem-buttons-panel :explorer="this" />
+                <lsw-filesystem-buttons-panel :explorer="this" ref="panelTop" />
             </div>
-            <div class="bodyside">
+            <div class="bodyside" v-if="is_ready">
                 <lsw-filesystem-treeviewer v-if="current_node_is_directory" :explorer="this" ref="treeviewer" />
                 <lsw-filesystem-editor v-else-if="current_node_is_file" :explorer="this" ref="editor" :filecontents="current_node_contents" />
             </div>
             <div class="footerside">
-                <lsw-filesystem-buttons-panel :explorer="this" />
+                <lsw-filesystem-buttons-panel :explorer="this" ref="panelBottom" />
             </div>
         </div>
         <div class="rightside">
-            <lsw-filesystem-buttons-panel :explorer="this" />
+            <lsw-filesystem-buttons-panel :explorer="this" ref="panelRight" />
         </div>
     </div>
 </div>`,
@@ -22131,6 +22296,7 @@ Vue.component("LswFilesystemExplorer", {
   data() {
     this.$trace("lsw-filesystem-explorer.data");
     return {
+      is_ready: false,
       current_node: undefined,
       current_node_parts: undefined,
       current_node_basename: undefined,
@@ -22139,6 +22305,7 @@ Vue.component("LswFilesystemExplorer", {
       current_node_subnodes: [],
       current_node_is_file: false,
       current_node_is_directory: false,
+      STANDARIZED_REFRESH_DELAY: 100
     };
   },
   methods: {
@@ -22146,102 +22313,402 @@ Vue.component("LswFilesystemExplorer", {
       this.$trace("lsw-filesystem-explorer.methods.open");
       return this.open_node(...args);
     },
-    go_up() {
+    goUp() {
+      this.$trace("lsw-filesystem-explorer.methods.goUp");
       const parts = this.current_node.split("/");
       parts.pop();
       const dest = this.normalize_path("/" + parts.join("/"));
       return this.open(dest);
     },
+    async refresh() {
+      this.$trace("lsw-filesystem-explorer.methods.refresh");
+      this.is_ready = false;
+      try {
+        await this.open(this.current_node);
+      } catch (error) {
+        throw error;
+      } finally {
+        this.$nextTick(() => {
+          this.is_ready = true;
+          this.$forceUpdate(true);
+        });
+      }
+    },
     normalize_path(subpath) {
       this.$trace("lsw-filesystem-explorer.methods.normalize_path");
       return this.$lsw.fs.resolve_path(this.current_node, subpath);
     },
-    async open_node(subpath) {
+    async open_node(subpath = this.current_node) {
       this.$trace("lsw-filesystem-explorer.methods.open_node");
       try {
         if (["", "/"].indexOf(subpath) !== -1) {
-          return await this._open_directory("/");
+          return await this._openDirectory("/");
         }
         const temporaryPath = this.normalize_path(subpath);
         const is_directory = await this.$lsw.fs.is_directory(temporaryPath);
         if (is_directory) {
-          return await this._open_directory(temporaryPath);
+          return await this._openDirectory(temporaryPath);
         }
         const is_file = await this.$lsw.fs.is_file(temporaryPath);
         if (is_file) {
-          return await this._open_file(temporaryPath);
+          return await this._openFile(temporaryPath);
         }
         throw new Error(`Cannot open path because it does not exist: ${temporaryPath} on «LswFilesystemExplorer.methods.open_node»`);
       } catch (error) {
         console.log(error);
+        throw error;
       }
     },
-    _set_as_file() {
+    async processToCreateFile() {
+      this.$trace("lsw-filesystem-explorer.methods.processToCreateFile");
+      const filename = await this.$lsw.dialogs.open({
+        title: "Crear fichero",
+        template: `<div>
+          <div class="pad_1">
+            <div>Estás en la carpeta:</div>
+            <div class="pad_2">{{ current_directory }}</div>
+            <div>Di el nombre del nuevo fichero:</div>
+            <div class="pad_top_1">
+              <input class="width_100" type="text" placeholder="myfile.txt" v-model="filename" v-focus v-on:keyup.enter="() => accept(filename)" />
+            </div>
+          </div>
+          <hr />
+          <div class="flex_row centered pad_1">
+            <div class="flex_100"></div>
+            <div class="flex_1 pad_right_1">
+              <button class="nowrap danger_button" v-on:click="() => accept(filename)">Crear fichero</button>
+            </div>
+            <div class="flex_1">
+              <button class="nowrap " v-on:click="() => accept(false)">Cancelar</button>
+            </div>
+          </div>
+        </div>`,
+        factory: {
+          data() {
+            return {
+              current_directory: this.$lsw.fs.get_current_directory(),
+              filename: "",
+            };
+          },
+        },
+      });
+      if(!filename) return;
+      const filepath = this.$lsw.fs.resolve_path(this.$lsw.fs.get_current_directory(), filename);
+      await this.$lsw.fs.write_file(filepath, "");
+      this.refresh();
+    },
+    async processToCreateDirectory() {
+      this.$trace("lsw-filesystem-explorer.methods.processToCreateDirectory");
+      const filename = await this.$lsw.dialogs.open({
+        title: "Crear directorio",
+        template: `<div>
+          <div class="pad_1">
+            <div>Estás en la carpeta:</div>
+            <div class="pad_2">{{ current_directory }}</div>
+            <div>Di el nombre del nuevo directorio:</div>
+            <div class="pad_top_1">
+              <input class="width_100" type="text" placeholder="myfolder" v-model="filename" v-focus v-on:keyup.enter="() => accept(filename)" />
+            </div>
+          </div>
+          <hr />
+          <div class="flex_row centered pad_1">
+            <div class="flex_100"></div>
+            <div class="flex_1 pad_right_1">
+              <button class="nowrap danger_button" v-on:click="() => accept(filename)">Sí, seguro</button>
+            </div>
+            <div class="flex_1">
+              <button class="nowrap " v-on:click="() => accept(false)">Cancelar</button>
+            </div>
+          </div>
+        </div>`,
+        factory: {
+          data() {
+            return {
+              current_directory: this.$lsw.fs.get_current_directory(),
+              filename: "",
+            };
+          },
+        },
+      });
+      if(!filename) return;
+      const filepath = this.$lsw.fs.resolve_path(this.$lsw.fs.get_current_directory(), filename);
+      await this.$lsw.fs.make_directory(filepath);
+      this.refresh();
+    },
+    async processToDeleteDirectory() {
+      this.$trace("lsw-filesystem-explorer.methods.processToDeleteDirectory");
+      const confirmation = await this.$lsw.dialogs.open({
+        title: "Eliminar directorio",
+        template: `<div>
+          <div class="pad_1">
+            <div>¿Seguro que quieres eliminar el directorio?</div>
+            <div class="pad_2">{{ current_directory }}</div>
+          </div>
+          <hr />
+          <div class="flex_row centered pad_1">
+            <div class="flex_100"></div>
+            <div class="flex_1 pad_right_1">
+              <button class="nowrap danger_button" v-on:click="() => accept(true)">Sí, seguro</button>
+            </div>
+            <div class="flex_1">
+              <button class="nowrap " v-on:click="() => accept(false)">Cancelar</button>
+            </div>
+          </div>
+        </div>`,
+        factory: {
+          data: {
+            current_directory: this.$lsw.fs.get_current_directory(),
+          }
+        }
+      });
+      if(!confirmation) return;
+      await this.$lsw.fs.delete_directory(this.$lsw.fs.get_current_directory());
+      this.refresh();
+    },
+    async processToDeleteFile() {
+      this.$trace("lsw-filesystem-explorer.methods.processToDeleteFile");
+      const confirmation = await this.$lsw.dialogs.open({
+        title: "Eliminar fichero",
+        template: `<div>
+          <div class="pad_1">
+            <div>¿Seguro que quieres eliminar el fichero?</div>
+            <div class="pad_2">{{ current_file }}</div>
+          </div>
+          <hr />
+          <div class="flex_row centered pad_1">
+            <div class="flex_100"></div>
+            <div class="flex_1 pad_right_1">
+              <button class="nowrap danger_button" v-on:click="() => accept(true)">Sí, seguro</button>
+            </div>
+            <div class="flex_1">
+              <button class="nowrap " v-on:click="() => accept(false)">Cancelar</button>
+            </div>
+          </div>
+        </div>`,
+        factory: {
+          data: {
+            current_file: this.current_node,
+          }
+        }
+      });
+      if(!confirmation) return;
+      await this.$lsw.fs.delete_file(this.current_node);
+      const upperDir = (() => {
+        const parts = this.current_node.split("/");
+        parts.pop();
+        return parts.join("/");
+      })();
+      this.refresh();
+    },
+    async processToRenameFile() {
+      this.$trace("lsw-filesystem-explorer.methods.processToRenameFile");
+      const elementType = this.current_node_is_file ? "fichero" : "directorio";
+      const newName = await this.$lsw.dialogs.open({
+        title: "Renombrar " + elementType,
+        template: `<div>
+          <div class="pad_1">
+            <div>Refiriéndose al {{ elementType }}:</div>
+            <div class="pad_2">{{ filename }}</div>
+          </div>
+          <div class="pad_1">
+            <div>Di el nuevo nombre del {{ elementType }}:</div>
+            <div class="pad_top_1">
+              <input v-focus class="width_100" type="text" placeholder="Nuevo nombre aquí" v-model="new_filename" v-on:keyup.enter="() => accept(new_filename)" />
+            </div>
+          </div>
+          <hr />
+          <div class="flex_row centered">
+            <div class="flex_100"></div>
+            <div class="flex_1 pad_right_1">
+              <button class="nowrap danger_button" v-on:click="() => accept(new_filename)">Sí, seguro</button>
+            </div>
+            <div class="flex_1">
+              <button class="nowrap " v-on:click="() => accept(false)">Cancelar</button>
+            </div>
+          </div>
+        </div>`,
+        factory: {
+          data: {
+            elementType,
+            filename: this.current_node,
+            new_filename: this.current_node.split("/").pop(),
+          }
+        }
+      });
+      if(newName === false) return;
+      if(newName.trim() === "") return;
+      const allParts = this.current_node.split("/");
+      allParts.pop();
+      const dirPath = "/" + allParts.join("/");
+      const newFullpath = this.$lsw.fs.resolve_path(dirPath, newName);
+      await this.$lsw.fs.rename(this.current_node, newName.replace(/^\/+/g, ""));
+      await this.open(newFullpath);
+    },
+    async processToExecuteFile() {
+      this.$trace("lsw-filesystem-explorer.methods.processToExecuteFile");
+      const editorContents = this.$refs.editor.getContents();
+      const AsyncFunction = (async function() {}).constructor;
+      const asyncFunction = new AsyncFunction(editorContents);
+      try {
+        await asyncFunction.call(this);
+      } catch (error) {
+        this.$lsw.toasts.send({
+          title: "Error arised when executing file",
+          text: `File ${this.current_node} produced following error: ${error.name}: ${error.message}`
+        });
+      }
+    },
+    async processToLoadFile() {
+      this.$trace("lsw-filesystem-explorer.methods.processToLoadFile");
+      this.is_ready = false;
+      const contents = await this.$lsw.fs.read_file(this.current_node);
+      this.current_node_contents = contents;
+      this.$nextTick(() => {
+        this.is_ready = true;
+      });
+    },
+    async processToSaveFile() {
+      this.$trace("lsw-filesystem-explorer.methods.processToSaveFile");
+      if(this.$refs.editor) {
+        const editorContents = this.$refs.editor.getContents();
+        console.log(this.current_node, editorContents);
+        await this.$lsw.fs.write_file(this.current_node, editorContents);
+      }
+    },
+    _setButtonsForFile() {
+      this.$trace("lsw-filesystem-explorer.methods._setButtonsForFile");
+      this.is_ready = false;
       this.current_node_is_file = true;
       this.current_node_is_directory = false;
+      const allButtonsOnFile = [
+        {
+          text: "➜",
+          classes: "reversed",
+          click: () => this.goUp(),
+        }, {
+          text: "💾",
+          click: () => this.processToSaveFile(),
+        }, {
+          text: "↔️",
+          click: () => this.processToRenameFile(),
+        }, {
+          text: "🔄",
+          click: () => this.processToLoadFile(),
+        }, {
+          text: "📄 ❌",
+          classes: "danger_button",
+          click: () => this.processToDeleteFile(),
+        }
+      ];
+      if(this.current_node.endsWith(".js")) {
+        allButtonsOnFile.push({
+          text: "⚡️",
+          classes: "danger_button",
+          click: () => this.processToExecuteFile(),
+        });
+      }
+      this.$refs.panelTop.setButtons(...allButtonsOnFile);
+      this.$nextTick(() => {
+        this.is_ready = true;
+      });
     },
-    _set_as_directory() {
+    _setButtonsForDirectory() {
+      this.$trace("lsw-filesystem-explorer.methods._setButtonsForDirectory");
+      this.is_ready = false;
       this.current_node_is_directory = true;
       this.current_node_is_file = false;
+      this.$refs.panelTop.setButtons({
+        text: "📄+",
+        click: () => this.processToCreateFile(),
+      }, {
+        text: "📁+",
+        click: () => this.processToCreateDirectory(),
+      }, {
+        text: "📁 ❌",
+        classes: "danger_button",
+        click: () => this.processToDeleteDirectory()
+      });
+      this.$nextTick(() => {
+        this.is_ready = true;
+      });
     },
-    async _open_file(subpath) {
-      this.$trace("lsw-filesystem-explorer.methods._open_file");
+    async _openFile(subpath) {
+      this.$trace("lsw-filesystem-explorer.methods._openFile");
       this.current_node = subpath;
       const contents = await this.$lsw.fs.read_file(this.current_node);
       this.current_node_contents = contents;
-      this._set_as_file();
+      this._setButtonsForFile();
     },
-    async _open_directory(subpath) {
-      this.$trace("lsw-filesystem-explorer.methods._open_directory");
+    async _openDirectory(subpath) {
+      this.$trace("lsw-filesystem-explorer.methods._openDirectory");
       this.current_node = subpath;
       const subnodes = await this.$lsw.fs.read_directory(this.current_node);
-      this.current_node_subnodes = subnodes;
-      this._set_as_directory();
+      const sortedSubnodes = {
+        files: [],
+        folders: []
+      };
+      Object.keys(subnodes).forEach(id => {
+        const subnode = subnodes[id];
+        const subnodeType = typeof subnode === "string" ? "files" : "folders";
+        sortedSubnodes[subnodeType].push(id);
+      });
+      const formattedSubnodes = {};
+      sortedSubnodes.folders.sort().forEach(folder => {
+        formattedSubnodes[folder] = {};
+      });
+      sortedSubnodes.files.sort().forEach(file => {
+        formattedSubnodes[file] = "...";
+      });
+      console.log(subnodes, formattedSubnodes);
+      this.$lsw.fs.change_directory(subpath);
+      this.current_node_subnodes = formattedSubnodes;
+      this._setButtonsForDirectory();
     },
-    _update_node_parts(newValue = this.current_node) {
-      this.$trace("lsw-filesystem-explorer.methods._update_node_parts");
+    __update_node_parts(newValue = this.current_node) {
+      this.$trace("lsw-filesystem-explorer.methods.__update_node_parts");
       this.current_node_parts = newValue.split("/").filter(p => p !== "");
     },
-    _update_current_node_basename(current_node_parts = this.current_node_parts) {
-      this.$trace("lsw-filesystem-explorer.methods._update_current_node_basename");
+    __update_current_node_basename(current_node_parts = this.current_node_parts) {
+      this.$trace("lsw-filesystem-explorer.methods.__update_current_node_basename");
       if (current_node_parts.length) {
         this.current_node_basename = current_node_parts[current_node_parts.length - 1];
       } else {
         this.current_node_basename = "/";
       }
     },
-    _update_current_node_basedir(current_node_parts = this.current_node_parts) {
-      this.$trace("lsw-filesystem-explorer.methods._update_current_node_basedir");
+    __update_current_node_basedir(current_node_parts = this.current_node_parts) {
+      this.$trace("lsw-filesystem-explorer.methods.__update_current_node_basedir");
       if (current_node_parts.length > 1) {
         this.current_node_basedir = "/" + [].concat(current_node_parts).splice(0, current_node_parts.length - 1).join("/") + "/";
       } else {
         this.current_node_basedir = "/";
       }
     },
-    _update_node_subdata(newValue = this.current_node) {
-      this.$trace("lsw-filesystem-explorer.methods._update_node_subdata");
-      this._update_node_parts(newValue);
-      this._update_current_node_basename();
-      this._update_current_node_basedir();
+    _updateNodeSubdata(newValue = this.current_node) {
+      this.$trace("lsw-filesystem-explorer.methods._updateNodeSubdata");
+      this.__update_node_parts(newValue);
+      this.__update_current_node_basename();
+      this.__update_current_node_basedir();
     },
-    set_panel_buttons(panelOptions = {}) {
+    setPanelButtons(panelOptions = {}) {
+      this.$trace("lsw-filesystem-explorer.methods.setPanelButtons");
       Validation: {
         if (typeof panelOptions !== "object") {
-          throw new Error("Required argument «panelOptions» to be an object on «LswFilesystemExplorer.methods.set_panel_buttons»");
+          throw new Error("Required argument «panelOptions» to be an object on «LswFilesystemExplorer.methods.setPanelButtons»");
         }
         const keys = Object.keys(panelOptions);
         if (keys.length === 0) {
-          throw new Error("Required argument «panelOptions» to be have 1 or more keys on «LswFilesystemExplorer.methods.set_panel_buttons»");
+          throw new Error("Required argument «panelOptions» to be have 1 or more keys on «LswFilesystemExplorer.methods.setPanelButtons»");
         }
         const valid_keys = ["top", "bottom", "left", "right"];
         for (let index = 0; index < keys.length; index++) {
           const key = keys[index];
           if(valid_keys.indexOf(key) === -1) {
-            throw new Error(`Required argument «panelOptions[${key}]» to be a valid key out of «${valid_keys.join(",")}», not «${key}» on «LswFilesystemExplorer.methods.set_panel_buttons»`);
+            throw new Error(`Required argument «panelOptions[${key}]» to be a valid key out of «${valid_keys.join(",")}», not «${key}» on «LswFilesystemExplorer.methods.setPanelButtons»`);
           }
           const value = panelOptions[key];
           if(typeof value !== "object") {
-            throw new Error(`Required argument «panelOptions[${key}]» to be an object or array, not ${typeof value}» on «LswFilesystemExplorer.methods.set_panel_buttons»`);
+            throw new Error(`Required argument «panelOptions[${key}]» to be an object or array, not ${typeof value}» on «LswFilesystemExplorer.methods.setPanelButtons»`);
           }
         }
       }
@@ -22250,7 +22717,7 @@ Vue.component("LswFilesystemExplorer", {
   watch: {
     current_node(newValue) {
       this.$trace("lsw-filesystem-explorer.watch.current_node");
-      this._update_node_subdata(newValue);
+      this._updateNodeSubdata(newValue);
     }
   },
   async mounted() {
@@ -22268,24 +22735,44 @@ Vue.component("LswFilesystemExplorer", {
 Vue.component("LswFilesystemButtonsPanel", {
   name: "LswFilesystemButtonsPanel",
   template: `<div class="lsw_filesystem_buttons_panel">
-    
+    <div class="buttons_panel centered" :class="'flex_' + orientation">
+        <div class="flex_1 pad_right_1" v-for="button, buttonIndex in buttons" v-bind:key="'button_index_' + buttonIndex">
+            <button class="nowrap" :class="button.classes || ''" v-on:click="button.click">{{ button.text }}</button>
+        </div>
+        <div class="flex_100"></div>
+    </div>
 </div>`,
   props: {
     explorer: {
       type: Object,
       required: true
+    },
+    orientation: {
+      type: String,
+      default: () => "row" // could be "column" too
     }
   },
   data() {
     return {
-
+      buttons: []
     };
   },
   watch: {
 
   },
   methods: {
-
+    setButtons(...buttons) {
+      this.$trace("lsw-filesystem-buttons-panel.methods.prependButtons");
+      this.buttons = buttons;
+    },
+    prependButtons(...buttons) {
+      this.$trace("lsw-filesystem-buttons-panel.methods.prependButtons");
+      this.buttons = buttons.concat(this.buttons);
+    },
+    appendButtons(...buttons) {
+      this.$trace("lsw-filesystem-buttons-panel.methods.appendButtons");
+      this.buttons = this.buttons.concat(buttons);
+    },
   },
   mounted() {
 
@@ -22293,8 +22780,9 @@ Vue.component("LswFilesystemButtonsPanel", {
 });
 Vue.component("LswFilesystemEditor", {
   name: "LswFilesystemEditor",
-  template: `<div class="lsw_filesystem_editor">
-    <textarea class="editor" v-model="filecontents" />
+  template: `<div class="lsw_filesystem_editor" style="padding-bottom:1px;">
+    <div style="min-height:1px;"></div>
+    <textarea class="editor" v-model="contents" spellcheck="false" />
 </div>`,
   props: {
     explorer: {
@@ -22308,14 +22796,19 @@ Vue.component("LswFilesystemEditor", {
   },
   data() {
     return {
-      
+      contents: this.filecontents
     };
   },
   watch: {
 
   },
   methods: {
-
+    getContents() {
+      return this.contents;
+    },
+    setContents(contents) {
+      this.contents = contents;
+    }
   },
   mounted() {
 
@@ -22328,32 +22821,42 @@ Vue.component("LswFilesystemTreeviewer", {
         <thead style="display: none;"></thead>
         <tbody>
             <tr v-if="explorer.current_node !== '/'"
-                class="treeviewer_row">
-                <td>📁</td>
-                <td v-on:click="() => go_up()">
-                    <a href="javascript:void(0)">..</a>
+                class="treeviewer_row"
+                v-on:click="() => goUp()">
+                <td class="icon_cell">📁</td>
+                <td>
+                    <a class="filename_link" href="javascript:void(0)">..</a>
                 </td>
                 <td></td>
+                <td>
+                    <button style="visibility: hidden;" class="mini" v-on:click="() => deleteNode(subnodeIndex)">❌</button>
+                </td>
             </tr>
             <template v-for="subnode, subnodeIndex, subnodeCounter in explorer.current_node_subnodes">
                 <tr class="treeviewer_row"
                     v-bind:key="'subnode_obj_' + subnodeIndex">
                     <template v-if="typeof subnode === 'object'">
-                        <td v-on:click="() => open_subnode(subnodeIndex)">📁</td>
-                        <td v-on:click="() => open_subnode(subnodeIndex)">
-                            <a href="javascript:void(0)"><b>{{ subnodeIndex }}</b></a>
+                        <td v-on:click="() => openSubnode(subnodeIndex)" class="icon_cell">📁</td>
+                        <td v-on:click="() => openSubnode(subnodeIndex)">
+                            <a class="filename_link" href="javascript:void(0)"><b>{{ subnodeIndex }}</b></a>
                         </td>
-                        <td>
-                            <button class="mini">X</button>
+                        <td style="padding: 2px;">
+                            <button class="mini nowrap" v-on:click="() => renameNode(subnodeIndex)">↔️</button>
+                        </td>
+                        <td style="padding: 2px;">
+                            <button class="mini danger_button nowrap" v-on:click="() => deleteNode(subnodeIndex)">📁 ❌</button>
                         </td>
                     </template>
                     <template v-else-if="typeof subnode === 'string'">
-                        <td v-on:click="() => open_subnode(subnodeIndex)"> </td>
-                        <td v-on:click="() => open_subnode(subnodeIndex)">
-                            <a href="javascript:void(0)">{{ subnodeIndex }}</a>
+                        <td v-on:click="() => openSubnode(subnodeIndex)" class="icon_cell">📄</td>
+                        <td v-on:click="() => openSubnode(subnodeIndex)">
+                            <a class="filename_link" href="javascript:void(0)">{{ subnodeIndex }}</a>
                         </td>
-                        <td>
-                            <button class="mini">X</button>
+                        <td style="padding: 2px;">
+                            <button class="mini nowrap" v-on:click="() => renameNode(subnodeIndex)">↔️</button>
+                        </td>
+                        <td style="padding: 2px;">
+                            <button class="mini danger_button nowrap" v-on:click="() => deleteNode(subnodeIndex)">📄 ❌</button>
                         </td>
                     </template>
                 </tr>
@@ -22369,23 +22872,118 @@ Vue.component("LswFilesystemTreeviewer", {
     }
   },
   data() {
-    return {
-
-    };
+    this.$trace("lsw-filesystem-treeviewer.data");
+    return {};
   },
-  watch: {
-
-  },
+  watch: {},
   methods: {
-    go_up() {
-      return this.explorer.go_up();
+    goUp() {
+      this.$trace("lsw-filesystem-treeviewer.methods.goUp");
+      return this.explorer.goUp();
     },
-    open_subnode(subnodeIndex) {
+    openSubnode(subnodeIndex) {
+      this.$trace("lsw-filesystem-treeviewer.methods.openSubnode");
       return this.explorer.open(subnodeIndex);
+    },
+    async deleteNode(subnodeIndex) {
+      this.$trace("lsw-filesystem-treeviewer.methods.deleteNode");
+      const fullpath = this.$lsw.fs.resolve_path(subnodeIndex);
+      const isDirectory = await this.$lsw.fs.is_directory(fullpath);
+      const elementType = isDirectory ? 'directorio' : 'fichero';
+      const confirmation = await this.$lsw.dialogs.open({
+        title: `Proceder a eliminar ${elementType}`,
+        template: `
+          <div class="pad_1">
+            <div>Seguro que quieres eliminar el {{ elementType }} «{{ fullpath }}»?</div>
+            <hr />
+            <div class="flex_row centered">
+              <div class="flex_100"></div>
+              <div class="flex_1 pad_right_1">
+                <button class="danger_button nowrap" v-on:click="() => accept(true)">Sí, eliminar</button>
+              </div>
+              <div class="flex_1">
+                <button class="" v-on:click="() => accept(false)">Salir</button>
+              </div>
+            </div>
+          </div>
+        `,
+        factory: {
+          data: {
+            elementType,
+            fullpath,
+          }
+        }
+      });
+      if(!confirmation) return;
+      try {
+        if(isDirectory) {
+          await this.$lsw.fs.delete_directory(fullpath);
+        } else {
+          await this.$lsw.fs.delete_file(fullpath);
+        }
+        await this.explorer.refresh();
+      } catch (error) {
+        await this.$lsw.dialogs.open({
+          title: `El fichero no se pudo eliminar`,
+          template: `
+            <div class="pad_1">
+              <div>El fichero «{{ fullpath }}» no se pudo eliminar debido al siguiente error:</div>
+              <hr />
+              <div v-if="error">{{ error.name }}: {{ error.message }}</div>
+            </div>
+          `,
+          factory: {
+            data: {
+              error,
+              fullpath,
+            }
+          }
+        });
+      }
+    },
+    async renameNode(subnodeIndex) {
+      this.$trace("lsw-filesystem-treeviewer.methods.renameNode");
+      const fullpath = this.$lsw.fs.resolve_path(subnodeIndex);
+      const isDirectory = await this.$lsw.fs.is_directory(fullpath);
+      const elementType = isDirectory ? 'directorio' : 'fichero';
+      const newName = await this.$lsw.dialogs.open({
+        title: "Renombrar " + elementType,
+        template: `<div>
+          <div class="pad_1">
+            <div>Refiriéndose al {{ elementType }}:</div>
+            <div class="pad_2">{{ filename }}</div>
+            <div>Di el nuevo nombre del {{ elementType }}:</div>
+            <input v-focus class="width_100" type="text" v-model="newFilename" v-on:keyup.enter="() => accept(newFilename)" />
+          </div>
+          <hr />
+          <div class="flex_row centered pad_1">
+            <div class="flex_100"></div>
+            <div class="flex_1 pad_right_1">
+              <button class="" v-on:click="() => accept(newFilename)">Renombrar</button>
+            </div>
+            <div class="flex_1">
+              <button class="" v-on:click="() => accept(false)">Cancelar</button>
+            </div>
+          </div>
+        </div>`,
+        factory: {
+          data: {
+            elementType,
+            fullpath,
+            filename: subnodeIndex,
+            newFilename: subnodeIndex,
+          }
+        }
+      });
+      if(typeof newName !== "string") return;
+      if(newName.trim() === "") return;
+      await this.$lsw.fs.rename(subnodeIndex, newName.replace(/^\/+/g, ""));
+      this.explorer.refresh();
     }
   },
   mounted() {
-    this.explorer.set_panel_buttons({
+    this.$trace("lsw-filesystem-treeviewer.mounted");
+    this.explorer.setPanelButtons({
       top: [],
       left: [],
       right: [],
@@ -22393,7 +22991,7 @@ Vue.component("LswFilesystemTreeviewer", {
     })
   },
   unmounted() {
-
+    this.$trace("lsw-filesystem-treeviewer.unmounted");
   }
 });
 Vue.component("LswWiki", {
@@ -23195,6 +23793,9 @@ Vue.component("LswAgenda", {
                 modo="date"
                 :al-cambiar-valor="(v, cal) => loadDateTasks(v, cal)" />
         </div>
+        <div class="limitador_viewer">
+            <lsw-agenda-limitador-viewer :agenda="this" />
+        </div>
         <div class="tasks_viewer">
             <div class="selected_day_title"
                 v-if="selectedDate">
@@ -23291,7 +23892,7 @@ Vue.component("LswAgenda", {
                                     <div class="flex_1 hour_task_details_duration pill_middle">
                                         <div class="lighted_cell">{{ tarea.tiene_duracion || '🤔' }}</div>
                                     </div>
-                                    <div class="flex_100 hour_task_name pill_middle" style="overflow: hidden;">
+                                    <div class="flex_100 hour_task_name pill_middle" style="overflow: hidden;" v-on:click="() => advanceTaskState(tarea)">
                                         <div class="lighted_cell" style="text-overflow: ellipsis; overflow: clip; max-width: 100%;">{{ tarea.en_concepto || '🤔' }}</div>
                                     </div>
                                     <div class="flex_1 hour_task_editer pill_middle button_pill_cell">
@@ -23326,8 +23927,6 @@ Vue.component("LswAgenda", {
                 No hay tareas asignadas para este día.
             </div>
         </div>
-    </div>
-    <div>
     </div>
 </div>`,
   props: {},
@@ -23513,6 +24112,21 @@ Vue.component("LswAgenda", {
       this.$trace("lsw-agenda.methods.onInsertTask");
       const id = await this.$lsw.database.insert('Accion', v);
       this.selectedForm = id;
+      this.refreshTasks();
+    },
+    async advanceTaskState(tarea) {
+      this.$trace("lsw-agenda.methods.onInsertTask");
+      const siguienteEstado = (() => {
+        switch(tarea.tiene_estado) {
+          case "pendiente": return "completada";
+          case "completada": return "fallida";
+          case "fallida": return "pendiente";
+          default: return "pendiente";
+        }
+      })();
+      await this.$lsw.database.overwrite('Accion', tarea.id, {
+        tiene_estado: siguienteEstado
+      });
       this.refreshTasks();
     }
   },
@@ -23896,18 +24510,90 @@ Vue.component("LswAgendaLimitadorAdd", {
 });
 Vue.component("LswAgendaLimitadorSearch", {
   template: `<div class="LswAgendaLimitadorSearch">
-  LswAgendaLimitadorSearch
+  <lsw-table v-if="isLoaded"
+    :initial-input="rows"></lsw-table>
 </div>`,
   props: {},
   data() {
     this.$trace("lsw-agenda-limitador-search.data");
-    return {};
+    return {
+      isLoaded: false,
+    };
   },
-  methods: {},
+  methods: {
+    async loadRows() {
+      this.$trace("lsw-agenda-limitador-search.methods.loadRows");
+      this.rows = await this.$lsw.database.selectMany("Limitador", it => true);
+      this.isLoaded = true;
+    }
+  },
   watch: {},
   mounted() {
     try {
       this.$trace("lsw-agenda-limitador-search.mounted");
+      this.loadRows();
+    } catch(error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswAgendaLimitadorViewer", {
+  template: `<div class="LswAgendaLimitadorViewer">
+    <div v-if="isLoaded">
+      <div class="infracciones_list" v-if="infracciones.length">
+        <template v-for="infraccion, infraccionIndex in infracciones">
+          <div class="infraccion_item" v-bind:key="'infraccion_' + infraccionIndex">
+            <div class="infraccion_text">⚠️ <b style="text-decoration: underline;">Infracción {{ infraccionIndex + 1 }}.</b> {{ infraccion.message }}</div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>`,
+  props: {},
+  data() {
+    this.$trace("lsw-agenda-limitador-viewer.data");
+    return {
+      isLoaded: false,
+      limitadores: undefined,
+      infracciones: [],
+    };
+  },
+  methods: {
+    fixAsyncCode(asyncCode) {
+      if(asyncCode.trim().startsWith("async ")) {
+        return `return await (${asyncCode}).call(this)`
+      }
+      return asyncCode;
+    },
+    async executeLimitadores() {
+      const lims = this.limitadores;
+      for(let index=0; index<lims.length; index++) {
+        const limitador = lims[index];
+        const asyncCode = limitador.tiene_funcion;
+        const AsyncFunc = (async function() {}).constructor;
+        const fixedAsyncCode = this.fixAsyncCode(asyncCode);
+        const asyncFunc = new AsyncFunc(fixedAsyncCode);
+        console.log(asyncFunc);
+        try {
+          await asyncFunc.call(this);
+        } catch (error) {
+          this.infracciones.push(error);
+        }
+      }
+    },
+    async loadLimitadores() {
+      this.$trace("lsw-agenda-limitador-viewer.methods.loadLimitadores");
+      const limitadores = await this.$lsw.database.selectMany("Limitador");
+      this.limitadores = limitadores;
+      await this.executeLimitadores();
+    }
+  },
+  watch: {},
+  async mounted() {
+    try {
+      this.$trace("lsw-agenda-limitador-viewer.mounted");
+      await this.loadLimitadores();
+      this.isLoaded = true;
     } catch(error) {
       console.log(error);
     }
@@ -24465,12 +25151,13 @@ Vue.component("LswLongTextControl", {
             }
         }">
             <div class="flex_row">
-                <textarea class="flex_100"
+                <textarea class="flex_100 nowrap"
                     type="text"
                     v-model="value"
                     v-on="settings?.input?.events || {}"
                     v-bind="settings?.input?.props || {}"
                     v-xform.input="{name: '*'}"
+                    spellcheck="false"
                     ref="textInput" />
             </div>
             <lsw-control-error />
