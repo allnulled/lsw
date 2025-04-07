@@ -42,7 +42,28 @@ rel correr
       };
     },
     methods: {
-
+      async resetDatabase() {
+        this.$trace("App.methods.resetDatabase");
+        const confirmacion = this.$window.confirm("Estás seguro que quieres resetear la base de datos?");
+        if(!confirmacion) return;
+        const reconfirmacion = this.$window.confirm("Seguro, eh?");
+        if(!reconfirmacion) return;
+        try {
+          this.$lsw.database.close();
+        } catch (error) {
+          console.log(error);
+        }
+        try {
+          await LswDatabase.deleteDatabase();
+        } catch (error) {
+          console.log(error);
+        }
+        try {
+          this.$lsw.database = await LswDatabase.open("lsw_default_database");
+        } catch (error) {
+          console.log(error);
+        }
+      }
     },
     mounted() {
       console.log("[*] Application mounted.");
