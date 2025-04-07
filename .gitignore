@@ -29,6 +29,7 @@ src/lsw-framework/src/apis/lsw-dom
 src/lsw-framework/src/apis/lsw-lifecycle
 src/lsw-framework/src/apis/lsw-randomizer
 src/lsw-framework/src/apis/lsw-schema
+src/lsw-framework/src/apis/lsw-typer
 src/lsw-framework/src/components/lsw-calendario
 src/lsw-framework/src/components/lsw-dialogs
 src/lsw-framework/src/components/lsw-windows
