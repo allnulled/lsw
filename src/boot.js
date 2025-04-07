@@ -3,7 +3,13 @@ Start_environment: {
   window.process.env = Object.assign(window.process || {});
   window.process.env.NODE_ENV = window.location.href.startsWith("https") ? "production" : "test";
   window.process.env.NODE_ENV = "test";
-  window.process.env.NODE_ENV = "production";      
+  window.process.env.NODE_ENV = "production";
+}
+
+Set_global_configurations: {
+  // Cambiar cuando se quiera resetear el esquema:
+  process.env.LSW_RESET_DATABASE = 1;
+  process.env.LSW_RESET_DATABASE = 0;
 }
 
 const boot = async function () {
@@ -109,6 +115,22 @@ const boot = async function () {
               importer.scriptSrc("lsw-framework/src/apis/lsw-utils/lsw-utils.js"),
               // UFS:
               importer.scriptSrc("lsw-framework/src/apis/lsw-filesystem/ufs-v1.0.2.js"),
+              // JSON typer:
+              importer.scriptSrc("lsw-framework/src/apis/lsw-typer/lsw-typer.js").then(() => {
+                // JSON typer API:
+                return importer.scriptSrc("lsw-framework/src/apis/lsw-typer/lsw-typer.api.js");
+              }).then(() => {
+                // JSON typer default types:
+                return Promise.all([
+                  importer.scriptSrc("lsw-framework/src/apis/lsw-typer/default/org.allnulled.lsw/type/duration.js"),
+                  importer.scriptSrc("lsw-framework/src/apis/lsw-typer/default/org.allnulled.lsw/type/day.js"),
+                  importer.scriptSrc("lsw-framework/src/apis/lsw-typer/default/org.allnulled.lsw/type/moment.js"),
+                ]).then(() => Promise.all([
+                  importer.scriptSrc("lsw-framework/src/apis/lsw-typer/default/duration.js"),
+                  importer.scriptSrc("lsw-framework/src/apis/lsw-typer/default/day.js"),
+                  importer.scriptSrc("lsw-framework/src/apis/lsw-typer/default/moment.js"),
+                ]));
+              }),
               // LSW ConsoleHooker API (not component):
               importer.scriptSrc("lsw-framework/src/components/lsw-console-hooker/console-hooker-api.js"),
               // LSW Formtypes:
@@ -223,6 +245,8 @@ const boot = async function () {
               importer.importVueComponent("lsw-framework/src/components/lsw-filesystem-explorer/lsw-filesystem-treeviewer/lsw-filesystem-treeviewer"),
               // LSW Wiki components:
               importer.importVueComponent("lsw-framework/src/components/lsw-wiki/lsw-wiki/lsw-wiki"),
+              // LSW Notes component:
+              importer.importVueComponent("lsw-framework/src/components/lsw-notes/lsw-notes"),
               // LSW Agenda components:
               importer.importVueComponent("lsw-framework/src/components/lsw-calendario/lsw-calendario"),
               importer.importVueComponent("lsw-framework/src/components/lsw-agenda/lsw-agenda/lsw-agenda"),

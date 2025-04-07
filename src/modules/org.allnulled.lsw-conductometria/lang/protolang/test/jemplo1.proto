@@ -1,0 +1,26 @@
+fun yo.pasear.perrillo {
+    const triggerId = it.en_concepto;
+    const result = await this.$lsw.database.select("");
+}
+
+rel consumir leche
+  > calcio * 0.3
+  > pesadez * 2h
+  >> yo.consumir.alimento
+
+rel correr
+  > ansiedad * 0.1
+  > calma * 0.3
+  > musculación * 0.2
+  >> yo.correr
+
+rel caminar
+  > calma * 0.2
+  > musculación * 0.1
+  >> yo.caminar 
+
+rel pasear perrillo
+  > caminar * 1
+  > socialización * 0.7
+  >> yo.pasear.perrillo
+

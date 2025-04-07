@@ -37,6 +37,7 @@ module.exports = [
   `${basepath}/src/apis/lsw-depender/lsw-depender.js`,
   `${basepath}/src/apis/lsw-depender/lsw-depender.js`,
   `${basepath}/src/apis/lsw-filesystem/lsw-filesystem.unbundled.js`,
+  `${basepath}/src/apis/lsw-typer/lsw-typer.js`,
   `${basepath}/src/components/lsw-database-ui/database-adapter/LswDatabaseAdapter.js`,
   `${basepath}/src/directives/v-descriptor/v-descriptor.js`,
   `${basepath}/src/directives/v-focus/v-focus.js`,

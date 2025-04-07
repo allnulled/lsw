@@ -262,4 +262,10 @@ module.exports = [{
   sourceType: "git",
   source: "https://github.com/allnulled/v-xform.git",
   version: "last"
+}, {
+  name: "@allnulled/lsw-typer",
+  path: "src/lsw-framework/src/apis/lsw-typer",
+  sourceType: "git",
+  source: "https://github.com/allnulled/lsw-typer.git",
+  version: "last"
 }]

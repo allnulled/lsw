@@ -613,13 +613,16 @@ table.lsw_table_itself>thead>tr>th.button_header {
 
 .database_breadcrumb {
     padding: 4px;
-    padding-top: 0px;
 }
 .database_breadcrumb_box {
     padding: 4px;
     border: 1px solid #999;
     background-color: #DDD;
     text-shadow: 0 0 1px black;
+}
+
+.hideBreadcrumb > div > .database_breadcrumb {
+    display: none;
 }
 
 
@@ -1633,6 +1636,7 @@ select.form_control {
 .lsw_ref_object_control {}
 .lsw_ref_list_control {}
 .lsw_ref_relation_control {}
+.lsw_notes {}
 .lsw-schema-based-form {}
 
 .schema_form_top_panel {

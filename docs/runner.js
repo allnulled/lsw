@@ -3,6 +3,7 @@ LswLifecycle.hooks.register("app:load_modules", "load_all_modules", async () => 
     Step_1_inject_modules: {
       // await LswLifecycle.loadModule("app");
       await importer.scriptSrc("assets/lib/jquery/jquery-v3.7.1.js");
+      await importer.scriptSrc("assets/lib/marked/marked.js");
       await LswLifecycle.loadModule("org.allnulled.lsw-agenda-ui");
       await LswLifecycle.loadModule("org.allnulled.lsw-conductometria");
       await LswLifecycle.loadModule("org.allnulled.lsw.db");

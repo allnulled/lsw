@@ -310,8 +310,7 @@ Vue.component("LswCalendario", {
       this.$trace("lsw-calendario.methods.ir_a_mes_anterior");
       try {
         const nueva_fecha = new Date(this.fecha_seleccionada);
-        nueva_fecha.setMonth(nueva_fecha.getMonth() - 1);
-        this.fecha_seleccionada = nueva_fecha;
+        this.fecha_seleccionada = new Date(nueva_fecha.getFullYear(), nueva_fecha.getMonth()-1, 1);
       } catch (error) {
         console.log(error);
         throw error;
@@ -322,8 +321,7 @@ Vue.component("LswCalendario", {
       this.$trace("lsw-calendario.methods.ir_a_mes_siguiente");
       try {
         const nueva_fecha = new Date(this.fecha_seleccionada);
-        nueva_fecha.setMonth(nueva_fecha.getMonth() + 1);
-        this.fecha_seleccionada = nueva_fecha;
+        this.fecha_seleccionada = new Date(nueva_fecha.getFullYear(), nueva_fecha.getMonth()+1, 1);
       } catch (error) {
         console.log(error);
         throw error;
@@ -488,13 +486,19 @@ Vue.component("LswCalendario", {
           }
         })();
         const celdas_vacias_anteriores = new Array(dias_antes_de_entrar_en_el_mes);
-        const dia_final_del_mes = new Date(nuevo_valor);
-        dia_final_del_mes.setMonth(dia_final_del_mes.getMonth() + 1);
-        dia_final_del_mes.setDate(1);
-        dia_final_del_mes.setDate(dia_final_del_mes.getDate() - 1);
+        let dia_final_del_mes = undefined;
+        Logica_anterior: {
+          dia_final_del_mes = new Date(nuevo_valor);
+          dia_final_del_mes.setMonth(dia_final_del_mes.getMonth() + 1);
+          dia_final_del_mes.setDate(1);
+          dia_final_del_mes.setDate(dia_final_del_mes.getDate() - 1);
+        }
+        Logica_chatgpt: {
+          dia_final_del_mes = new Date(nuevo_valor.getFullYear(), nuevo_valor.getMonth() + 1, 0);
+        }
         const numero_final_de_mes = dia_final_del_mes.getDate();
         let fila_actual = celdas_vacias_anteriores;
-        for (let index = 1; index < numero_final_de_mes + 1; index++) {
+        for (let index = 1; index <= numero_final_de_mes; index++) {
           const nueva_fecha = new Date(dia_1_del_mes);
           nueva_fecha.setDate(index);
           fila_actual.push(nueva_fecha);
@@ -563,7 +567,7 @@ Vue.component("LswTable", {
         <div class="lsw_table_top_panel">
             <div class="flex_row centered">
                 <div class="flex_1">
-                    <button class="bordered_1 cursor_pointer"
+                    <button class="cursor_pointer"
                         v-on:click="digestOutput">🛜</button>
                 </div>
                 <div class="flex_100 title_box">{{ title }}</div>
@@ -2051,18 +2055,31 @@ Vue.component("LswConsoleHooker", {
   }
 });
 Vue.component("LswDatabaseExplorer", {
-  template: `<div class="lsw_database_ui database_explorer">
+  template: `<div class="lsw_database_ui database_explorer" :class="{hideBreadcrumb: !showBreadcrumb}">
     <template v-if="!isLoading">
         <component :is="selectedPage" :args="selectedArgs" :database-explorer="this" />
     </template>
 </div>`,
-  props: {},
+  props: {
+    showBreadcrumb: {
+      type: Boolean,
+      default: () => true
+    },
+    initialPage: {
+      type: String,
+      default: () => "lsw-page-tables"
+    },
+    initialArgs: {
+      type: Object,
+      default: () => ({ database: "lsw_default_database" })
+    }
+  },
   data() {
     this.$trace("lsw-database-explorer.data", arguments);
     return {
       isLoading: false,
-      selectedPage: "lsw-page-tables",
-      selectedArgs: { database: "lsw_default_database" },
+      selectedPage: this.initialPage,
+      selectedArgs: this.initialArgs,
     }
   },
   methods: {
@@ -2195,7 +2212,13 @@ Vue.component("LswPageDatabases", {
 });
 Vue.component("LswPageRows", {
   template: `<div>
-    <h3>Registros de {{ args.table }} [{{ args.database }}]</h3>
+    <h3>
+        <span>
+            <button v-on:click="goBack">⬅️</button>
+        </span>
+        <span>{{ args.table }} [all]</span>
+        <span>[{{ args.database }}]</span>
+    </h3>
     <lsw-database-breadcrumb :breadcrumb="breadcrumb" :database-explorer="databaseExplorer" />
     <lsw-table
         :initial-input="rows" v-if="rows"
@@ -2268,6 +2291,12 @@ Vue.component("LswPageRows", {
     }
   },
   methods: {
+    goBack() {
+      this.$trace("lsw-page-rows.methods.goBack", arguments);
+      return this.databaseExplorer.selectPage("LswPageTables", {
+        database: this.database,
+      });
+    },
     async loadRows() {
       this.$trace("lsw-page-rows.methods.loadRows", arguments);
       this.connection = this.connection ?? new LswDatabaseAdapter(this.database);
@@ -2298,7 +2327,10 @@ Vue.component("LswPageRow", {
   template: `<div>
     <h3>
         <span>
-            Registro de {{ args.table }}
+            <span>
+                <button v-on:click="goBack">⬅️</button>
+            </span>
+            <span>{{ args.table }}</span>
         </span>
         <span v-if="(args.rowId && args.rowId !== -1)">
             [#{{ args.rowId }}]
@@ -2376,6 +2408,13 @@ Vue.component("LswPageRow", {
     }
   },
   methods: {
+    goBack() {
+      this.$trace("lsw-page-row.methods.goBack", arguments);
+      return this.databaseExplorer.selectPage("LswPageRows", {
+        database: this.database,
+        table: this.table
+      });
+    },
     async loadRow() {
       this.$trace("lsw-page-row.methods.loadRow", arguments);
       try {
@@ -3606,8 +3645,7 @@ Vue.component("LswCalendario", {
       this.$trace("lsw-calendario.methods.ir_a_mes_anterior");
       try {
         const nueva_fecha = new Date(this.fecha_seleccionada);
-        nueva_fecha.setMonth(nueva_fecha.getMonth() - 1);
-        this.fecha_seleccionada = nueva_fecha;
+        this.fecha_seleccionada = new Date(nueva_fecha.getFullYear(), nueva_fecha.getMonth()-1, 1);
       } catch (error) {
         console.log(error);
         throw error;
@@ -3618,8 +3656,7 @@ Vue.component("LswCalendario", {
       this.$trace("lsw-calendario.methods.ir_a_mes_siguiente");
       try {
         const nueva_fecha = new Date(this.fecha_seleccionada);
-        nueva_fecha.setMonth(nueva_fecha.getMonth() + 1);
-        this.fecha_seleccionada = nueva_fecha;
+        this.fecha_seleccionada = new Date(nueva_fecha.getFullYear(), nueva_fecha.getMonth()+1, 1);
       } catch (error) {
         console.log(error);
         throw error;
@@ -3784,13 +3821,19 @@ Vue.component("LswCalendario", {
           }
         })();
         const celdas_vacias_anteriores = new Array(dias_antes_de_entrar_en_el_mes);
-        const dia_final_del_mes = new Date(nuevo_valor);
-        dia_final_del_mes.setMonth(dia_final_del_mes.getMonth() + 1);
-        dia_final_del_mes.setDate(1);
-        dia_final_del_mes.setDate(dia_final_del_mes.getDate() - 1);
+        let dia_final_del_mes = undefined;
+        Logica_anterior: {
+          dia_final_del_mes = new Date(nuevo_valor);
+          dia_final_del_mes.setMonth(dia_final_del_mes.getMonth() + 1);
+          dia_final_del_mes.setDate(1);
+          dia_final_del_mes.setDate(dia_final_del_mes.getDate() - 1);
+        }
+        Logica_chatgpt: {
+          dia_final_del_mes = new Date(nuevo_valor.getFullYear(), nuevo_valor.getMonth() + 1, 0);
+        }
         const numero_final_de_mes = dia_final_del_mes.getDate();
         let fila_actual = celdas_vacias_anteriores;
-        for (let index = 1; index < numero_final_de_mes + 1; index++) {
+        for (let index = 1; index <= numero_final_de_mes; index++) {
           const nueva_fecha = new Date(dia_1_del_mes);
           nueva_fecha.setDate(index);
           fila_actual.push(nueva_fecha);
@@ -4076,7 +4119,7 @@ Vue.component("LswAgenda", {
                 v-if="selectedDate">
                 <div class="flex_row centered">
                     <div class="flex_1 margin_right_1"><button class="bright_border" v-on:click="() => selectHour('new')" :class="{activated: selectedForm === 'new'}">#️⃣</button></div>
-                    <div class="flex_100">{{ \$lsw.timer.utils.formatDateToSpanish(selectedDate, true) }}</div>
+                    <div class="flex_100">{{ \$lsw.timer.utils.formatDateToSpanish(selectedDate, true) }} {{ selectedDate.getMonth() }}</div>
                     <div class="flex_1 nowrap" :style="(!isLoading) && Array.isArray(selectedDateTasksFormattedPerHour) && selectedDateTasksFormattedPerHour.length ? '' : 'visibility: hidden'">
                         <button class="bright_border" v-on:click="togglePsicodelia" :class="{activated: hasPsicodelia}">❤️</button>
                         <button class="bright_border" v-on:click="showAllHours">🔓*</button>
@@ -5310,7 +5353,7 @@ Vue.component("LswControlError", {
 });
 Vue.component("LswErrorViewer", {
   template: `<div class="lsw_error_viewer">
-    <div class="" v-if="currentError">
+    <div class="box_error_container error_is_affecting_field position_relative" v-if="currentError">
         <div class="position_absolute top_0" style="right: 20px;">
             <div class="pad_1">
                 <button v-on:click="() => setError()">❎</button>
@@ -5318,7 +5361,19 @@ Vue.component("LswErrorViewer", {
         </div>
         <div class="box_error_content">
             <div class="errorMessage">
-                {{ currentError.name }}: {{ currentError.message }}
+                <template v-if="currentError.location">
+                    <span>{{ currentError.name }}</span>
+                    <span>{{ currentError.location.start.offset }}-{{ currentError.location.end.offset }}</span>
+                    <span> | </span>
+                    <span></span>
+                    <span>{{ currentError.location.start.line }}:{{ currentError.location.start.column }}-{{ currentError.location.end.line }}:{{ currentError.location.end.column }}</span>
+                    <span>{{ currentError.found }}</span>
+                    <span>{{ currentError.message }}</span>
+                    <pre style="font-size:10px;">  - {{ currentError.expected.map(it => JSON.stringify(it.text)).join("\n  - ") }}</pre>
+                </template>
+                <template v-else>
+                    {{ currentError.name }}: {{ currentError.message }}
+                </template>
             </div>
         </div>
     </div>
@@ -5327,18 +5382,25 @@ Vue.component("LswErrorViewer", {
     error: {
       type: [Object, Boolean],
       default: () => false
+    },
+    onClearError: {
+      type: Function,
+      default: () => {}
     }
   },
   data() {
     this.$trace("lsw-error-viewer.data");
     return {
-      currentError: undefined,
+      currentError: this.error,
     };
   },
   methods: {
     setError(error = undefined) {
       this.$trace("lsw-error-viewer.methods.setError");
       this.currentError = error;
+      if(typeof error === "undefined") {
+        this.onClearError();
+      }
     },
   },
   watch: {},
@@ -6045,6 +6107,110 @@ Vue.component("LswRefRelationControl", {
   mounted() {
     try {
       this.$trace("lsw-ref-relation-control.mounted");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+Vue.component("LswNotes", {
+  template: `<div class="lsw_notes">
+    <div class="pad_1 float_right">
+        <div class="flex_row">
+            <div class="flex_100"></div>
+            <div class="flex_1">
+                <button class="danger_button"
+                    v-on:click="openAddNoteDialog">+</button>
+            </div>
+        </div>
+    </div>
+    <div class="pad_1" v-if="isLoaded">
+        <lsw-database-explorer :show-breadcrumb="false" initial-page="lsw-page-rows" :initial-args="{database:'lsw_default_database',table:'Nota'}" />
+    </div>
+</div>`,
+  props: {
+    
+  },
+  data() {
+    this.$trace("lsw-notes.data");
+    return {
+      isLoaded: false,
+      allNotes: false,
+      currentError: this.error,
+    };
+  },
+  methods: {
+    setError(error = undefined) {
+      this.$trace("lsw-notes.methods.setError");
+      this.currentError = error;
+    },
+    async loadNotes() {
+      this.$trace("lsw-notes.methods.loadNotes");
+      // @TODO: seleccionar e importar notes.
+      this.isLoaded = false;
+      const notes = await this.$lsw.database.selectMany("Nota");
+      this.allNotes = notes;
+      this.isLoaded = true;
+    },
+    async openAddNoteDialog() {
+      this.$trace("lsw-notes.methods.openAddNoteDialog");
+      const response = await this.$lsw.dialogs.open({
+        title: "Nueva nota",
+        template: `<div class="pad_1 position_absolute top_0 right_0 left_0 bottom_0 flex_column">
+          <div class="flex_1">
+            <input class="width_100" type="text" v-model="value.tiene_fecha" placeholder="Fecha de la nota" />
+          </div>
+          <div class="flex_1" style="padding-top: 1px;">
+            <input class="width_100" type="text" v-model="value.tiene_titulo" placeholder="Título de la nota" />
+          </div>
+          <div class="flex_1 flex_row centered" style="padding-top: 1px;">
+            <div class="flex_1">Estado: </div>
+            <select class="flex_100" v-model="value.tiene_estado">
+              <option value="creada">Creada</option>
+              <option value="procesada">Procesada</option>
+              <option value="dudosa">Dudosa</option>
+              <option value="desestimada">Desestimada</option>
+            </select>
+          </div>
+          <div class="flex_1" style="padding-top: 2px;">
+            <input class="width_100" type="text" v-model="value.tiene_categorias" placeholder="categoría 1; categoria 2; categoria 3" />
+          </div>
+          <div class="flex_100" style="padding-top: 1px;">
+            <textarea v-focus v-model="value.tiene_contenido" spellcheck="false" style="height: 100%;" placeholder="Contenido de la nota. Acepta **markdown**, recuerda." />
+          </div>
+          <div class="flex_row pad_top_1">
+            <div class="flex_100"></div>
+            <div class="flex_1 flex_row">
+              <div class="pad_right_1">
+                <button v-on:click="accept">Añadir</button>
+              </div>
+              <div>
+                <button v-on:click="cancel">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </div>`,
+        factory: {
+          data: {
+            value: {
+              tiene_fecha: LswTimer.utils.formatDatestringFromDate(new Date()),
+              tiene_titulo: "",
+              tiene_categorias: "",
+              tiene_contenido: "",
+              tiene_estado: "creada", // "procesada"
+            }
+          }
+        }
+      });
+      if(typeof response !== "object") return;
+      await this.$lsw.database.insert("Nota", response);
+      await this.loadNotes();
+    }
+  },
+  watch: {},
+  async mounted() {
+    try {
+      this.$trace("lsw-notes.mounted");
+      await this.loadNotes();
     } catch (error) {
       console.log(error);
     }

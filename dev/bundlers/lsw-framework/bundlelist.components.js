@@ -59,5 +59,6 @@ module.exports = [
   `${basepath}/src/components/lsw-formtypes/components/lsw-formtype/type/lsw-ref-object-control/lsw-ref-object-control`,
   `${basepath}/src/components/lsw-formtypes/components/lsw-formtype/type/lsw-ref-list-control/lsw-ref-list-control`,
   `${basepath}/src/components/lsw-formtypes/components/lsw-formtype/type/lsw-ref-relation-control/lsw-ref-relation-control`,
+  `${basepath}/src/components/lsw-notes/lsw-notes`,
   `${basepath}/src/components/lsw-schema-based-form/lsw-schema-based-form`,
 ];

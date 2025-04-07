@@ -1,0 +1,1 @@
+npx nodemon -w protolang.pegjs -w examples -x 'bash builder.sh' -e "prot,pegjs,js"

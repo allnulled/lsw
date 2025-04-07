@@ -1,0 +1,14 @@
+<div class="lsw_notes">
+    <div class="pad_1 float_right">
+        <div class="flex_row">
+            <div class="flex_100"></div>
+            <div class="flex_1">
+                <button class="danger_button"
+                    v-on:click="openAddNoteDialog">+</button>
+            </div>
+        </div>
+    </div>
+    <div class="pad_1" v-if="isLoaded">
+        <lsw-database-explorer :show-breadcrumb="false" initial-page="lsw-page-rows" :initial-args="{database:'lsw_default_database',table:'Nota'}" />
+    </div>
+</div>
