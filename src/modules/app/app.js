@@ -49,7 +49,7 @@ rel correr
         const reconfirmacion = this.$window.confirm("Seguro, eh?");
         if(!reconfirmacion) return;
         try {
-          this.$lsw.database.close();
+          await this.$lsw.database.close();
         } catch (error) {
           console.log(error);
         }
