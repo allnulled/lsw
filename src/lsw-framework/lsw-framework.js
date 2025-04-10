@@ -27547,6 +27547,10 @@ Vue.component("LswNotes", {
     <div class="pad_1 float_right">
         <div class="flex_row">
             <div class="flex_100"></div>
+            <div class="flex_1 pad_right_1">
+                <button class="danger_button"
+                    v-on:click="loadNotes">♻️</button>
+            </div>
             <div class="flex_1">
                 <button class="danger_button"
                     v-on:click="openAddNoteDialog">+</button>
